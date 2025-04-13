@@ -1,6 +1,9 @@
 package org.tinylog.core.backend;
 
-import org.tinylog.core.internal.LoggingContext;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ServiceLoader;
 
 /**
  * Builder for creating an instance of a {@link LoggingBackend}.
@@ -28,9 +31,29 @@ public interface LoggingBackendBuilder {
     /**
      * Creates a new instance of the logging backend.
      *
-     * @param context The current logging context
+     * @param context The tinylog context to use for creating a new logging backend
      * @return New instance of the logging backend
      */
-    LoggingBackend create(LoggingContext context);
+    LoggingBackend create(TinylogContext context);
+
+    /**
+     * Loads and creates all available logging backend builders.
+     *
+     * <p>
+     *     All logging backend builders are mapped to their lower case names.
+     * </p>
+     *
+     * @param loader The class loader to use for loading the service implementations
+     * @return A map with the names and logging backend builder instances
+     */
+    static Map<String, LoggingBackendBuilder> load(ClassLoader loader) {
+        Map<String, LoggingBackendBuilder> builders = new LinkedHashMap<>();
+
+        ServiceLoader
+            .load(LoggingBackendBuilder.class, loader)
+            .forEach(builder -> builders.put(builder.getName().toLowerCase(Locale.ENGLISH), builder));
+
+        return builders;
+    }
 
 }

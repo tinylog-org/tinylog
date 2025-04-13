@@ -4,11 +4,14 @@ import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
+import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
+import org.tinylog.core.Level;
 import org.tinylog.core.internal.InternalLogger;
 
 /**
  * Resolver for JNDI values.
  */
+@IgnoreJRERequirement
 public class JndiValueResolver implements VariableResolver {
 
     private static final String DEFAULT_PREFIX = "java:comp/env/";
@@ -28,7 +31,7 @@ public class JndiValueResolver implements VariableResolver {
     }
 
     @Override
-    public String resolve(String name) {
+    public String resolve(String name, InternalLogger logger) {
         String fullName = name.contains(":") ? name : DEFAULT_PREFIX + name;
 
         try {
@@ -37,7 +40,7 @@ public class JndiValueResolver implements VariableResolver {
         } catch (NameNotFoundException ex) {
             return null;
         } catch (NamingException ex) {
-            InternalLogger.error(ex, "Failed to look up \"{}\"", fullName);
+            logger.log(Level.ERROR, ex, "Failed to look up \"{}\"", fullName);
             return null;
         }
     }

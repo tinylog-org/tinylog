@@ -5,14 +5,14 @@ package org.tinylog.core;
  */
 public final class Tinylog {
 
-    private static final Framework framework = new Framework(true, true);
+    private static final Framework framework = new Framework();
 
     /** */
     private Tinylog() {
     }
 
     /**
-     * Creates a {@link ConfigurationBuilder} for changing the current tinylog configuration.
+     * Creates a {@link ConfigurationBuilder} for changing the current configuration.
      *
      * @param inherit {@code true} for initializing the {@link ConfigurationBuilder} with the current configuration,
      *                {@code false} for creating an empty {@link ConfigurationBuilder}
@@ -23,58 +23,12 @@ public final class Tinylog {
     }
 
     /**
-     * Gets the actual framework instance.
+     * Gets the global tinylog framework instance.
      *
-     * <p>
-     *     This framework instance is only for tinylog itself and tinylog extensions.
-     * </p>
-     *
-     * @return The actual framework instance
+     * @return The global tinylog framework instance
      */
     public static Framework getFramework() {
         return framework;
-    }
-
-    /**
-     * Registers a new {@link Hook}.
-     *
-     * @param hook Hook to register
-     */
-    public static void registerHook(Hook hook) {
-        framework.registerHook(hook);
-    }
-
-    /**
-     * Removes a registered {@link Hook}.
-     *
-     * @param hook Hook to unregister
-     */
-    public static void removeHook(Hook hook) {
-        framework.removeHook(hook);
-    }
-
-    /**
-     * Starts tinylog if it is not running yet.
-     *
-     * <p>
-     *     When the first log entry is issued, tinylog starts automatically by itself. This method only needs to be
-     *     called in a few corner cases.
-     * </p>
-     */
-    public static void startUp() {
-        framework.startUp();
-    }
-
-    /**
-     * Shuts down tinylog manually.
-     *
-     * <p>
-     *     If auto shutdown has not been disabled, tinylog will shut down by itself. This method only needs to be called
-     *     if auto shutdown has been explicitly disabled.
-     * </p>
-     */
-    public static void shutDown() {
-        framework.shutDown();
     }
 
 }

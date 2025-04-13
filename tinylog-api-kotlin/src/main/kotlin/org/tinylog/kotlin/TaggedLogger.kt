@@ -2,8 +2,9 @@ package org.tinylog.kotlin
 
 import org.tinylog.core.Framework
 import org.tinylog.core.Level
+import org.tinylog.core.LogEntry
 import org.tinylog.core.backend.OutputDetails
-import org.tinylog.core.format.message.EnhancedMessageFormatter
+import org.tinylog.core.format.message.MessageFormatter
 
 /**
  * Logger for issuing tagged log entries.
@@ -11,10 +12,12 @@ import org.tinylog.core.format.message.EnhancedMessageFormatter
  * @param tag The case-sensitive category tag of this logger
  * @param framework The underlying framework instance
  */
-class TaggedLogger(val tag: String?, framework: Framework) {
+class TaggedLogger(
+    val tag: String?,
+    private val framework: Framework,
+    private val formatter: MessageFormatter,
+) {
     private val runtime = framework.runtime
-    private val backend = framework.loggingBackend
-    private val formatter = EnhancedMessageFormatter(framework.classLoader)
 
     private val visibilityTrace: OutputDetails
     private val visibilityDebug: OutputDetails
@@ -23,7 +26,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     private val visibilityError: OutputDetails
 
     init {
-        val visibility = backend.getLevelVisibilityByTag(tag)
+        val visibility = framework.getLevelVisibilityByTag(tag)
         visibilityTrace = visibility.trace
         visibilityDebug = visibility.debug
         visibilityInfo = visibility.info
@@ -39,10 +42,9 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      *
      * @return `true` if enabled, otherwise `false`
      */
-    fun isTraceEnabled(): Boolean {
-        return visibilityTrace != OutputDetails.DISABLED &&
-            backend.isEnabled(runtime.getDirectCaller(visibilityTrace), tag, Level.TRACE)
-    }
+    fun isTraceEnabled(): Boolean =
+        visibilityTrace != OutputDetails.DISABLED &&
+            framework.isEnabled(runtime.getDirectCaller(visibilityTrace), tag, Level.TRACE)
 
     /**
      * Issues a trace log entry for any object with a suitable [toString()] method.
@@ -59,7 +61,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun trace(message: Any?) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityTrace)
-            backend.log(location.get(), tag, Level.TRACE, null, message, null, null)
+            submit(location.get(), Level.TRACE, null, message, null)
         }
     }
 
@@ -75,7 +77,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun trace(message: String) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityTrace)
-            backend.log(location.get(), tag, Level.TRACE, null, message, null, null)
+            submit(location.get(), Level.TRACE, null, message, null)
         }
     }
 
@@ -95,7 +97,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun trace(message: () -> Any?) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityTrace)
-            backend.log(location.get(), tag, Level.TRACE, null, message.asSupplier(), null, null)
+            submit(location.get(), Level.TRACE, null, message, null)
         }
     }
 
@@ -123,7 +125,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityTrace)
-            backend.log(location.get(), tag, Level.TRACE, null, message, arguments.withSuppliers(), formatter)
+            submit(location.get(), Level.TRACE, null, message, arguments.withSuppliers())
         }
     }
 
@@ -139,7 +141,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun trace(exception: Throwable) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityTrace)
-            backend.log(location.get(), tag, Level.TRACE, exception, null, null, null)
+            submit(location.get(), Level.TRACE, exception, null, null)
         }
     }
 
@@ -160,7 +162,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityTrace)
-            backend.log(location.get(), tag, Level.TRACE, exception, message, null, null)
+            submit(location.get(), Level.TRACE, exception, message, null)
         }
     }
 
@@ -184,7 +186,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityTrace)
-            backend.log(location.get(), tag, Level.TRACE, exception, message.asSupplier(), null, null)
+            submit(location.get(), Level.TRACE, exception, message, null)
         }
     }
 
@@ -215,7 +217,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityTrace)
-            backend.log(location.get(), tag, Level.TRACE, exception, message, arguments.withSuppliers(), formatter)
+            submit(location.get(), Level.TRACE, exception, message, arguments.withSuppliers())
         }
     }
 
@@ -227,10 +229,9 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      *
      * @return `true` if enabled, otherwise `false`
      */
-    fun isDebugEnabled(): Boolean {
-        return visibilityDebug != OutputDetails.DISABLED &&
-            backend.isEnabled(runtime.getDirectCaller(visibilityDebug), tag, Level.DEBUG)
-    }
+    fun isDebugEnabled(): Boolean =
+        visibilityDebug != OutputDetails.DISABLED &&
+            framework.isEnabled(runtime.getDirectCaller(visibilityDebug), tag, Level.DEBUG)
 
     /**
      * Issues a debug log entry for any object with a suitable [toString()] method.
@@ -247,7 +248,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun debug(message: Any?) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityDebug)
-            backend.log(location.get(), tag, Level.DEBUG, null, message, null, null)
+            submit(location.get(), Level.DEBUG, null, message, null)
         }
     }
 
@@ -263,7 +264,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun debug(message: String) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityDebug)
-            backend.log(location.get(), tag, Level.DEBUG, null, message, null, null)
+            submit(location.get(), Level.DEBUG, null, message, null)
         }
     }
 
@@ -283,7 +284,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun debug(message: () -> Any?) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityDebug)
-            backend.log(location.get(), tag, Level.DEBUG, null, message.asSupplier(), null, null)
+            submit(location.get(), Level.DEBUG, null, message, null)
         }
     }
 
@@ -311,7 +312,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityDebug)
-            backend.log(location.get(), tag, Level.DEBUG, null, message, arguments.withSuppliers(), formatter)
+            submit(location.get(), Level.DEBUG, null, message, arguments.withSuppliers())
         }
     }
 
@@ -327,7 +328,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun debug(exception: Throwable) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityDebug)
-            backend.log(location.get(), tag, Level.DEBUG, exception, null, null, null)
+            submit(location.get(), Level.DEBUG, exception, null, null)
         }
     }
 
@@ -348,7 +349,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityDebug)
-            backend.log(location.get(), tag, Level.DEBUG, exception, message, null, null)
+            submit(location.get(), Level.DEBUG, exception, message, null)
         }
     }
 
@@ -372,7 +373,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityDebug)
-            backend.log(location.get(), tag, Level.DEBUG, exception, message.asSupplier(), null, null)
+            submit(location.get(), Level.DEBUG, exception, message, null)
         }
     }
 
@@ -403,7 +404,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityDebug)
-            backend.log(location.get(), tag, Level.DEBUG, exception, message, arguments.withSuppliers(), formatter)
+            submit(location.get(), Level.DEBUG, exception, message, arguments.withSuppliers())
         }
     }
 
@@ -415,10 +416,9 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      *
      * @return `true` if enabled, otherwise `false`
      */
-    fun isInfoEnabled(): Boolean {
-        return visibilityInfo != OutputDetails.DISABLED &&
-            backend.isEnabled(runtime.getDirectCaller(visibilityInfo), tag, Level.INFO)
-    }
+    fun isInfoEnabled(): Boolean =
+        visibilityInfo != OutputDetails.DISABLED &&
+            framework.isEnabled(runtime.getDirectCaller(visibilityInfo), tag, Level.INFO)
 
     /**
      * Issues an info log entry for any object with a suitable [toString()] method.
@@ -435,7 +435,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun info(message: Any?) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityInfo)
-            backend.log(location.get(), tag, Level.INFO, null, message, null, null)
+            submit(location.get(), Level.INFO, null, message, null)
         }
     }
 
@@ -451,7 +451,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun info(message: String) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityInfo)
-            backend.log(location.get(), tag, Level.INFO, null, message, null, null)
+            submit(location.get(), Level.INFO, null, message, null)
         }
     }
 
@@ -471,7 +471,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun info(message: () -> Any?) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityInfo)
-            backend.log(location.get(), tag, Level.INFO, null, message.asSupplier(), null, null)
+            submit(location.get(), Level.INFO, null, message, null)
         }
     }
 
@@ -499,7 +499,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityInfo)
-            backend.log(location.get(), tag, Level.INFO, null, message, arguments.withSuppliers(), formatter)
+            submit(location.get(), Level.INFO, null, message, arguments.withSuppliers())
         }
     }
 
@@ -515,7 +515,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun info(exception: Throwable) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityInfo)
-            backend.log(location.get(), tag, Level.INFO, exception, null, null, null)
+            submit(location.get(), Level.INFO, exception, null, null)
         }
     }
 
@@ -536,7 +536,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityInfo)
-            backend.log(location.get(), tag, Level.INFO, exception, message, null, null)
+            submit(location.get(), Level.INFO, exception, message, null)
         }
     }
 
@@ -560,7 +560,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityInfo)
-            backend.log(location.get(), tag, Level.INFO, exception, message.asSupplier(), null, null)
+            submit(location.get(), Level.INFO, exception, message, null)
         }
     }
 
@@ -591,7 +591,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityInfo)
-            backend.log(location.get(), tag, Level.INFO, exception, message, arguments.withSuppliers(), formatter)
+            submit(location.get(), Level.INFO, exception, message, arguments.withSuppliers())
         }
     }
 
@@ -603,10 +603,9 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      *
      * @return `true` if enabled, otherwise `false`
      */
-    fun isWarnEnabled(): Boolean {
-        return visibilityWarn != OutputDetails.DISABLED &&
-            backend.isEnabled(runtime.getDirectCaller(visibilityWarn), tag, Level.WARN)
-    }
+    fun isWarnEnabled(): Boolean =
+        visibilityWarn != OutputDetails.DISABLED &&
+            framework.isEnabled(runtime.getDirectCaller(visibilityWarn), tag, Level.WARN)
 
     /**
      * Issues a warning log entry for any object with a suitable [toString()] method.
@@ -623,7 +622,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun warn(message: Any?) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityWarn)
-            backend.log(location.get(), tag, Level.WARN, null, message, null, null)
+            submit(location.get(), Level.WARN, null, message, null)
         }
     }
 
@@ -639,7 +638,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun warn(message: String) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityWarn)
-            backend.log(location.get(), tag, Level.WARN, null, message, null, null)
+            submit(location.get(), Level.WARN, null, message, null)
         }
     }
 
@@ -659,7 +658,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun warn(message: () -> Any?) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityWarn)
-            backend.log(location.get(), tag, Level.WARN, null, message.asSupplier(), null, null)
+            submit(location.get(), Level.WARN, null, message, null)
         }
     }
 
@@ -687,7 +686,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityWarn)
-            backend.log(location.get(), tag, Level.WARN, null, message, arguments.withSuppliers(), formatter)
+            submit(location.get(), Level.WARN, null, message, arguments.withSuppliers())
         }
     }
 
@@ -703,7 +702,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun warn(exception: Throwable) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityWarn)
-            backend.log(location.get(), tag, Level.WARN, exception, null, null, null)
+            submit(location.get(), Level.WARN, exception, null, null)
         }
     }
 
@@ -724,7 +723,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityWarn)
-            backend.log(location.get(), tag, Level.WARN, exception, message, null, null)
+            submit(location.get(), Level.WARN, exception, message, null)
         }
     }
 
@@ -748,7 +747,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityWarn)
-            backend.log(location.get(), tag, Level.WARN, exception, message.asSupplier(), null, null)
+            submit(location.get(), Level.WARN, exception, message, null)
         }
     }
 
@@ -779,7 +778,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityWarn)
-            backend.log(location.get(), tag, Level.WARN, exception, message, arguments.withSuppliers(), formatter)
+            submit(location.get(), Level.WARN, exception, message, arguments.withSuppliers())
         }
     }
 
@@ -791,10 +790,9 @@ class TaggedLogger(val tag: String?, framework: Framework) {
      *
      * @return `true` if enabled, otherwise `false`
      */
-    fun isErrorEnabled(): Boolean {
-        return visibilityError != OutputDetails.DISABLED &&
-            backend.isEnabled(runtime.getDirectCaller(visibilityError), tag, Level.ERROR)
-    }
+    fun isErrorEnabled(): Boolean =
+        visibilityError != OutputDetails.DISABLED &&
+            framework.isEnabled(runtime.getDirectCaller(visibilityError), tag, Level.ERROR)
 
     /**
      * Issues an error log entry for any object with a suitable [toString()] method.
@@ -811,7 +809,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun error(message: Any?) {
         if (visibilityError != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityError)
-            backend.log(location.get(), tag, Level.ERROR, null, message, null, null)
+            submit(location.get(), Level.ERROR, null, message, null)
         }
     }
 
@@ -827,7 +825,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun error(message: String) {
         if (visibilityError != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityError)
-            backend.log(location.get(), tag, Level.ERROR, null, message, null, null)
+            submit(location.get(), Level.ERROR, null, message, null)
         }
     }
 
@@ -847,7 +845,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun error(message: () -> Any?) {
         if (visibilityError != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityError)
-            backend.log(location.get(), tag, Level.ERROR, null, message.asSupplier(), null, null)
+            submit(location.get(), Level.ERROR, null, message, null)
         }
     }
 
@@ -875,7 +873,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityError != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityError)
-            backend.log(location.get(), tag, Level.ERROR, null, message, arguments.withSuppliers(), formatter)
+            submit(location.get(), Level.ERROR, null, message, arguments.withSuppliers())
         }
     }
 
@@ -891,7 +889,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     fun error(exception: Throwable) {
         if (visibilityError != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityError)
-            backend.log(location.get(), tag, Level.ERROR, exception, null, null, null)
+            submit(location.get(), Level.ERROR, exception, null, null)
         }
     }
 
@@ -912,7 +910,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityError != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityError)
-            backend.log(location.get(), tag, Level.ERROR, exception, message, null, null)
+            submit(location.get(), Level.ERROR, exception, message, null)
         }
     }
 
@@ -936,7 +934,7 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityError != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityError)
-            backend.log(location.get(), tag, Level.ERROR, exception, message.asSupplier(), null, null)
+            submit(location.get(), Level.ERROR, exception, message, null)
         }
     }
 
@@ -967,7 +965,38 @@ class TaggedLogger(val tag: String?, framework: Framework) {
     ) {
         if (visibilityError != OutputDetails.DISABLED) {
             val location = runtime.getDirectCaller(visibilityError)
-            backend.log(location.get(), tag, Level.ERROR, exception, message, arguments.withSuppliers(), formatter)
+            submit(location.get(), Level.ERROR, exception, message, arguments.withSuppliers())
         }
+    }
+
+    /**
+     * Submits a new log entry to the framework.
+     *
+     * @param location The location information of the caller
+     * @param level The severity level of the log entry
+     * @param throwable The throwable to log
+     * @param message The message to log
+     * @param arguments The replacements for potential placeholders in the message
+     */
+    private fun submit(
+        location: Any,
+        level: Level,
+        throwable: Throwable?,
+        message: Any?,
+        arguments: Array<out Any?>?,
+    ) {
+        framework.submit(
+            LogEntry(
+                Thread.currentThread(),
+                framework.contextStorage.mapping,
+                location,
+                tag,
+                level,
+                throwable,
+                formatter,
+                if (message is Function0<*>) message()?.toString() else message?.toString(),
+                arguments,
+            ),
+        )
     }
 }

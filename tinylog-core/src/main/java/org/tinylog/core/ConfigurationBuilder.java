@@ -3,11 +3,13 @@ package org.tinylog.core;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.tinylog.core.internal.InternalLogger;
+
 /**
  * Builder with a fluent API for tinylog configurations.
  *
  * <p>
- *     A created configuration is applied only if the method {@link ConfigurationBuilder#activate()} is called.
+ *     A created configuration is only applied when the method {@link ConfigurationBuilder#activate()} is called.
  * </p>
  *
  * @see Tinylog#getConfigurationBuilder(boolean)
@@ -16,14 +18,17 @@ public class ConfigurationBuilder {
 
     private final Framework framework;
     private final Map<String, String> properties;
+    private final InternalLogger logger;
 
     /**
      * @param framework The underlying framework instance
-     * @param properties The initial configuration
+     * @param properties The initial configuration properties
+     * @param logger The internal logger instance for issuing internal tinylog log entries
      */
-    ConfigurationBuilder(Framework framework, Map<String, String> properties) {
+    ConfigurationBuilder(Framework framework, Map<String, String> properties, InternalLogger logger) {
         this.framework = framework;
         this.properties = new LinkedHashMap<>(properties);
+        this.logger = logger;
     }
 
     /**
@@ -65,17 +70,19 @@ public class ConfigurationBuilder {
     }
 
     /**
-     * Applies the configuration. The current configuration will be replaced.
+     * Applies the configuration by replacing the current configuration.
      *
      * <p>
-     *     New configurations can be activated as needed before issuing any log entries. As soon as the first log entry
-     *     is issued, the current configuration becomes frozen and can no longer be replaced by others.
+     *     New configurations can be activated before any log entries are issued. As soon as the first log entry is
+     *     issued or the tinylog framework is started for any other reason, the current configuration becomes frozen and
+     *     can no longer be replaced by another configuration.
      * </p>
      *
-     * @throws UnsupportedOperationException The current configuration has already been applied and cannot be replaced
+     * @throws UnsupportedOperationException If the current configuration has already been applied and cannot be
+     *                                       replaced
      */
     public void activate() {
-        Configuration configuration = new Configuration(properties);
+        Configuration configuration = new Configuration(properties, logger);
         framework.setConfiguration(configuration);
     }
 

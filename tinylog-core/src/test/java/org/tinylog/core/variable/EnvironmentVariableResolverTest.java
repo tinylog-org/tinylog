@@ -3,10 +3,27 @@ package org.tinylog.core.variable;
 import java.util.ServiceLoader;
 
 import org.junit.jupiter.api.Test;
+import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.test.junit.log.Tinylog;
+
+import jakarta.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Tinylog
 class EnvironmentVariableResolverTest {
+
+    @Inject
+    private InternalLogger logger;
+
+    /**
+     * Verifies that the resolver is registered as service.
+     */
+    @Test
+    void service() {
+        assertThat(ServiceLoader.load(VariableResolver.class))
+            .anyMatch(loader -> loader instanceof EnvironmentVariableResolver);
+    }
 
     /**
      * Verifies that the name is "environment variable".
@@ -32,7 +49,7 @@ class EnvironmentVariableResolverTest {
     @Test
     void resolveExistingVariable() {
         EnvironmentVariableResolver resolver = new EnvironmentVariableResolver();
-        assertThat(resolver.resolve("PATH")).isNotNull().isEqualTo(System.getenv("PATH"));
+        assertThat(resolver.resolve("PATH", logger)).isNotNull().isEqualTo(System.getenv("PATH"));
     }
 
     /**
@@ -41,16 +58,7 @@ class EnvironmentVariableResolverTest {
     @Test
     void resolveMissingVariable() {
         EnvironmentVariableResolver resolver = new EnvironmentVariableResolver();
-        assertThat(resolver.resolve("INVALID_NON_EXISTING_VARIABLE")).isNull();
-    }
-
-    /**
-     * Verifies that the resolver is registered as service.
-     */
-    @Test
-    void service() {
-        assertThat(ServiceLoader.load(VariableResolver.class))
-            .anyMatch(loader -> loader instanceof EnvironmentVariableResolver);
+        assertThat(resolver.resolve("INVALID_NON_EXISTING_VARIABLE", logger)).isNull();
     }
 
 }

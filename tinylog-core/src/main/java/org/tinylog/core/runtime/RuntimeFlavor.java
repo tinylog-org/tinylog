@@ -12,6 +12,20 @@ import org.tinylog.core.backend.OutputDetails;
 public interface RuntimeFlavor {
 
     /**
+     * Gets the name and version of the operating system.
+     *
+     * @return The name and version of the operating system
+     */
+    String getOperatingSystem();
+
+    /**
+     * Gets the name and version of the virtual machine.
+     *
+     * @return The name and version of the virtual machine
+     */
+    String getVirtualMachine();
+
+    /**
      * Gets the process ID of the current process.
      *
      * @return The process ID of the current process
@@ -19,9 +33,9 @@ public interface RuntimeFlavor {
     long getProcessId();
 
     /**
-     * Gets the uptime of the application.
+     * Gets the uptime of the runtime.
      *
-     * @return The uptime of the application
+     * @return The uptime of the runtime
      */
     Duration getUptime();
 
@@ -48,7 +62,7 @@ public interface RuntimeFlavor {
      *         <td>{@code null}</td>
      *     </tr>
      *     <tr>
-     *         <td>{@link OutputDetails#ENABLED_WITHOUT_LOCATION_INFORMATION}</td>
+     *         <td>{@link OutputDetails#ENABLED_WITHOUT_LOCATION_INFO}</td>
      *         <td>{@code null}</td>
      *     </tr>
      *     <tr>
@@ -56,7 +70,7 @@ public interface RuntimeFlavor {
      *         <td>{@link Class} or class name as {@link String}</td>
      *     </tr>
      *     <tr>
-     *         <td>{@link OutputDetails#ENABLED_WITH_FULL_LOCATION_INFORMATION}</td>
+     *         <td>{@link OutputDetails#ENABLED_WITH_FULL_LOCATION_INFO}</td>
      *         <td>{@link StackTraceElement}</td>
      *     </tr>
      * </table>
@@ -82,7 +96,7 @@ public interface RuntimeFlavor {
      *         <td>{@code null}</td>
      *     </tr>
      *     <tr>
-     *         <td>{@link OutputDetails#ENABLED_WITHOUT_LOCATION_INFORMATION}</td>
+     *         <td>{@link OutputDetails#ENABLED_WITHOUT_LOCATION_INFO}</td>
      *         <td>{@code null}</td>
      *     </tr>
      *     <tr>
@@ -90,7 +104,7 @@ public interface RuntimeFlavor {
      *         <td>{@link Class} or class name as {@link String}</td>
      *     </tr>
      *     <tr>
-     *         <td>{@link OutputDetails#ENABLED_WITH_FULL_LOCATION_INFORMATION}</td>
+     *         <td>{@link OutputDetails#ENABLED_WITH_FULL_LOCATION_INFO}</td>
      *         <td>{@link StackTraceElement}</td>
      *     </tr>
      * </table>

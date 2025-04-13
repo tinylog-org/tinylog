@@ -1,36 +1,49 @@
 package org.tinylog.core.format.message;
 
-import javax.inject.Inject;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.internal.LoggingContext;
-import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.Configuration;
+import org.tinylog.test.junit.log.Tinylog;
+
+import jakarta.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CaptureLogEntries
+@Tinylog
 class SimpleMessageFormatterTest {
 
     @Inject
-    private LoggingContext context;
+    private Configuration configuration;
 
     /**
-     * Verifies that a single argument can be resolved.
+     * Verifies that a single static argument can be formatted.
      */
     @Test
-    void resolveSingleArgument() {
+    void resolveStaticSingleArgument() {
         SimpleMessageFormatter formatter = new SimpleMessageFormatter();
-        String output = formatter.format(context, "Hello {}!", "Alice");
+        String output = formatter.format(configuration, "Hello {}!", "Alice");
         assertThat(output).isEqualTo("Hello Alice!");
     }
 
     /**
-     * Verifies that multiple arguments can be resolved.
+     * Verifies that a single lazy argument can be formatted.
+     */
+    @Test
+    void formatLazyArgument() {
+        SimpleMessageFormatter formatter = new SimpleMessageFormatter();
+        Supplier<?> supplier = () -> "Alice";
+        String output = formatter.format(configuration, "Hello {}!", supplier);
+        assertThat(output).isEqualTo("Hello Alice!");
+    }
+
+    /**
+     * Verifies that multiple arguments can be formatted.
      */
     @Test
     void resolveMultipleArguments() {
         SimpleMessageFormatter formatter = new SimpleMessageFormatter();
-        String output = formatter.format(context, "{} + {} = {}", 1, 2, 3);
+        String output = formatter.format(configuration, "{} + {} = {}", 1, 2, 3);
         assertThat(output).isEqualTo("1 + 2 = 3");
     }
 
@@ -40,7 +53,7 @@ class SimpleMessageFormatterTest {
     @Test
     void ignoreSuperfluousPlaceholders() {
         SimpleMessageFormatter formatter = new SimpleMessageFormatter();
-        String output = formatter.format(context, "{}, {}, and {}", 1, 2);
+        String output = formatter.format(configuration, "{}, {}, and {}", 1, 2);
         assertThat(output).isEqualTo("1, 2, and {}");
     }
 
@@ -50,7 +63,7 @@ class SimpleMessageFormatterTest {
     @Test
     void ignoreSuperfluousArguments() {
         SimpleMessageFormatter formatter = new SimpleMessageFormatter();
-        String output = formatter.format(context, "{}, {}, and {}", 1, 2, 3, 4);
+        String output = formatter.format(configuration, "{}, {}, and {}", 1, 2, 3, 4);
         assertThat(output).isEqualTo("1, 2, and 3");
     }
 

@@ -3,11 +3,11 @@ package org.tinylog.impl.backend;
 import java.util.Locale;
 
 import org.tinylog.core.Configuration;
+import org.tinylog.core.Level;
+import org.tinylog.core.backend.TinylogContext;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.internal.LoggingContext;
-import org.tinylog.core.internal.SafeServiceLoader;
-import org.tinylog.impl.writers.Writer;
-import org.tinylog.impl.writers.WriterBuilder;
+import org.tinylog.impl.writer.Writer;
+import org.tinylog.impl.writer.WriterBuilder;
 
 /**
  * Parser and creator for configured writers.
@@ -19,27 +19,25 @@ class WriterConfiguration {
      */
     static final String TYPE_KEY = "type";
 
-    private final LoggingContext context;
-    private final Configuration entireConfiguration;
+    private final TinylogContext context;
     private final LevelConfiguration levelConfiguration;
 
-    private Writer writer;
     private boolean created;
+    private Writer writer;
 
     /**
-     * @param context The current logging context
-     * @param configuration The writer configuration to parse
+     * @param context The tinylog context to use for the writer
      */
-    WriterConfiguration(LoggingContext context, Configuration configuration) {
+    WriterConfiguration(TinylogContext context) {
         this.context = context;
-        this.entireConfiguration = configuration;
         this.levelConfiguration = new LevelConfiguration(
-            configuration.getList(LevelConfiguration.KEY),
-            false
+            context.getConfiguration().getList(LevelConfiguration.KEY),
+            false,
+            context.getLogger()
         );
 
-        this.writer = null;
         this.created = false;
+        this.writer = null;
     }
 
     /**
@@ -47,7 +45,7 @@ class WriterConfiguration {
      *
      * @return The level configuration with activated severity levels and tags
      */
-    public LevelConfiguration getLevelConfiguration() {
+    LevelConfiguration getLevelConfiguration() {
         return levelConfiguration;
     }
 
@@ -60,43 +58,54 @@ class WriterConfiguration {
      *
      * @return The created writer or {@code null} if the creation failed
      */
-    public Writer getOrCreateWriter() {
+    Writer getOrCreateWriter() {
         if (!created) {
             created = true;
-
-            String type = entireConfiguration.getValue(TYPE_KEY);
-            if (type == null) {
-                InternalLogger.error(
-                    null,
-                    "Missing writer name in property \"{}\"",
-                    entireConfiguration.resolveFullKey(TYPE_KEY)
-                );
-            } else {
-                String name = type.toLowerCase(Locale.ENGLISH);
-                WriterBuilder builder = SafeServiceLoader
-                    .asList(context.getFramework().getClassLoader(), WriterBuilder.class, "writer builders")
-                    .stream()
-                    .filter(writerBuilder -> name.equals(writerBuilder.getName()))
-                    .findAny()
-                    .orElse(null);
-
-                if (builder == null) {
-                    InternalLogger.error(
-                        null,
-                        "Could not find any writer builder with the name \"{}\" in the classpath",
-                        name
-                    );
-                } else {
-                    try {
-                        writer = builder.create(context, entireConfiguration);
-                    } catch (Exception ex) {
-                        InternalLogger.error(ex, "Failed to create writer for \"{}\"", name);
-                    }
-                }
-            }
+            writer = createWriter();
         }
 
         return writer;
+    }
+
+    /**
+     * Creates a new writer instance.
+     *
+     * @return The created writer or {@code null} if the creation failed
+     */
+    private Writer createWriter() {
+        Configuration configuration = context.getConfiguration();
+        InternalLogger logger = context.getLogger();
+
+        String type = configuration.getValue(TYPE_KEY);
+
+        if (type == null) {
+            logger.log(
+                Level.ERROR,
+                "Missing writer name in property \"{}\"",
+                configuration.resolveFullKey(TYPE_KEY)
+            );
+            return null;
+        }
+
+        ClassLoader loader = context.getLoader();
+        String name = type.toLowerCase(Locale.ENGLISH);
+        WriterBuilder builder = WriterBuilder.load(loader).get(name);
+
+        if (builder == null) {
+            logger.log(
+                Level.ERROR,
+                "Could not find any writer builder with the name \"{}\" in the classpath",
+                name
+            );
+            return null;
+        }
+
+        try {
+            return builder.create(context);
+        } catch (Exception ex) {
+            logger.log(Level.ERROR, ex, "Failed to create the writer for \"{}\"", name);
+            return null;
+        }
     }
 
 }

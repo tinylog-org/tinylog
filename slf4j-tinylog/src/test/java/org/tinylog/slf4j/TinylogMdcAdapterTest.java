@@ -5,14 +5,15 @@ import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.context.ContextStorage;
-import org.tinylog.impl.context.ThreadLocalContextStorage;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class TinylogMdcAdapterTest {
 
-    private ContextStorage contextStorage;
+    private ContextStorage storage;
     private TinylogMdcAdapter mdcAdapter;
 
     /**
@@ -20,8 +21,8 @@ class TinylogMdcAdapterTest {
      */
     @BeforeEach
     void init() {
-        contextStorage = new ThreadLocalContextStorage();
-        mdcAdapter = new TinylogMdcAdapter(contextStorage);
+        storage = mock(ContextStorage.class);
+        mdcAdapter = new TinylogMdcAdapter(storage);
     }
 
     /**
@@ -30,7 +31,7 @@ class TinylogMdcAdapterTest {
     @Test
     void put() {
         mdcAdapter.put("foo", "bar");
-        assertThat(contextStorage.get("foo")).isEqualTo("bar");
+        verify(storage).put("foo", "bar");
     }
 
     /**
@@ -38,7 +39,7 @@ class TinylogMdcAdapterTest {
      */
     @Test
     void get() {
-        contextStorage.put("foo", "bar");
+        when(storage.get("foo")).thenReturn("bar");
         assertThat(mdcAdapter.get("foo")).isEqualTo("bar");
     }
 
@@ -47,9 +48,8 @@ class TinylogMdcAdapterTest {
      */
     @Test
     void remove() {
-        contextStorage.put("foo", "bar");
         mdcAdapter.remove("foo");
-        assertThat(mdcAdapter.get("foo")).isNull();
+        verify(storage).remove("foo");
     }
 
     /**
@@ -57,9 +57,8 @@ class TinylogMdcAdapterTest {
      */
     @Test
     void clear() {
-        contextStorage.put("foo", "bar");
         mdcAdapter.clear();
-        assertThat(mdcAdapter.get("foo")).isNull();
+        verify(storage).clear();
     }
 
     /**
@@ -67,8 +66,8 @@ class TinylogMdcAdapterTest {
      */
     @Test
     void getCopyOfContextMap() {
-        contextStorage.put("foo", "bar");
-        assertThat(mdcAdapter.getCopyOfContextMap()).containsExactly(entry("foo", "bar"));
+        when(storage.getMapping()).thenReturn(Collections.singletonMap("foo", "42"));
+        assertThat(mdcAdapter.getCopyOfContextMap()).isEqualTo(Collections.singletonMap("foo", "42"));
     }
 
     /**
@@ -77,7 +76,7 @@ class TinylogMdcAdapterTest {
     @Test
     void setContextMap() {
         mdcAdapter.setContextMap(Collections.singletonMap("foo", "bar"));
-        assertThat(mdcAdapter.getCopyOfContextMap()).containsExactly(entry("foo", "bar"));
+        verify(storage).replace(Collections.singletonMap("foo", "bar"));
     }
 
     /**

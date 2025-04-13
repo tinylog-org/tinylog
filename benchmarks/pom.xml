@@ -31,6 +31,7 @@
         <module>benchmark-charset-encoding</module>
         <module>benchmark-file-output</module>
         <module>benchmark-logging</module>
+        <module>benchmark-queue</module>
     </modules>
 
     <profiles>

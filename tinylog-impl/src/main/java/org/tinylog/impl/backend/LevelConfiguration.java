@@ -7,7 +7,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.tinylog.core.Level;
 import org.tinylog.core.internal.InternalLogger;
@@ -49,16 +48,17 @@ class LevelConfiguration {
     private final Map<String, Level> levels;
 
     /**
-     * @param elements Configured severity levels (can be tagged or untagged)
+     * @param elements The configured severity levels (can be tagged or untagged)
      * @param addInternalTagImplicitly Flag for activating the severity level {@link Level#WARN WARN} implicitly for the
      *                                 {@link InternalLogger#TAG tinylog} tag if not defined in the passed elements
+     * @param logger The internal logger instance for issuing internal tinylog log entries
      */
-    LevelConfiguration(List<String> elements, boolean addInternalTagImplicitly) {
-        this(parseLevels(elements, addInternalTagImplicitly));
+    LevelConfiguration(List<String> elements, boolean addInternalTagImplicitly, InternalLogger logger) {
+        this(parseLevels(elements, addInternalTagImplicitly, logger));
     }
 
     /**
-     * @param levels The mapping of tags or placeholders and the assigned severity levels
+     * @param levels The mapping of tags and placeholders to their assigned severity levels
      */
     LevelConfiguration(Map<String, Level> levels) {
         this.levels = new HashMap<>(levels);
@@ -69,7 +69,7 @@ class LevelConfiguration {
      *
      * @return The least severe configured severity leve
      */
-    public Level getLeastSevereLevel() {
+    Level getLeastSevereLevel() {
         return levels.values().stream().reduce(Level.OFF, Level::leastSevereLevel);
     }
 
@@ -78,18 +78,18 @@ class LevelConfiguration {
      *
      * @return All tags with custom severity levels
      */
-    public Collection<String> getTags() {
+    Collection<String> getTags() {
         return levels.keySet().stream().filter(placeholderFilter.negate()).collect(Collectors.toList());
     }
 
     /**
      * Gets the severity level for a specific tag.
      *
-     * @param tag The tag for which the configured severity level is requested (minus "{@code -}" can be used for
+     * @param tag The tag for which the configured severity level is requested (a minus "{@code -}" can be used for
      *            getting the configured severity level for untagged log entries)
      * @return The severity level for the passed tag
      */
-    public Level getLevel(String tag) {
+    Level getLevel(String tag) {
         if (UNTAGGED_PLACEHOLDER.equals(tag) || TAGGED_PLACEHOLDER.equals(tag)) {
             return levels.getOrDefault(tag, Level.OFF);
         } else {
@@ -98,24 +98,19 @@ class LevelConfiguration {
     }
 
     /**
-     * Gets a stream with all internally stored entries with the tag or placeholder as key and the assigned severity
-     * level as value.
-     *
-     * @return The stream with all internally stored entries
-     */
-    public Stream<Map.Entry<String, Level>> stream() {
-        return levels.entrySet().stream();
-    }
-
-    /**
      * Parses configured severity levels.
      *
-     * @param elements Configured severity levels (can be tagged or untagged)
+     * @param elements The configured severity levels to parse (can be tagged or untagged)
      * @param addInternalTagImplicitly Flag for activating the severity level {@link Level#WARN WARN} implicitly for the
      *                                 {@link InternalLogger#TAG tinylog} tag if not defined in the passed elements
-     * @return The mapping of tags or placeholders and the assigned severity levels
+     * @param logger The internal logger instance for issuing internal tinylog log entries
+     * @return The mapping of tags anf placeholders to their assigned severity levels
      */
-    private static Map<String, Level> parseLevels(List<String> elements, boolean addInternalTagImplicitly) {
+    private static Map<String, Level> parseLevels(
+        List<String> elements,
+        boolean addInternalTagImplicitly,
+        InternalLogger logger
+    ) {
         Map<String, Level> levels = new HashMap<>();
 
         for (String element : elements) {
@@ -127,7 +122,7 @@ class LevelConfiguration {
             try {
                 level = Level.valueOf(levelName.toUpperCase(Locale.ENGLISH));
             } catch (IllegalArgumentException ex) {
-                InternalLogger.error(ex, "Invalid severity level \"{}\"", levelName);
+                logger.log(Level.ERROR, ex, "Invalid severity level \"{}\"", levelName);
                 continue;
             }
 

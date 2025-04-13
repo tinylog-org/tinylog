@@ -37,7 +37,7 @@ class NoLocationInformationTest {
      * Shuts the benchmark including the logging framework gracefully down.
      */
     @AfterAll
-    static void dispose() {
+    static void dispose() throws InterruptedException {
         benchmark.shutdown();
     }
 
@@ -48,7 +48,7 @@ class NoLocationInformationTest {
     @Order(1)
     void discard() throws InterruptedException {
         benchmark.discard();
-        Thread.sleep(10);
+        Thread.sleep(100);
 
         String logFile = benchmark.getLogFile();
         assertThat(logFile).isNotNull();
@@ -64,7 +64,7 @@ class NoLocationInformationTest {
     @Order(2)
     void output() throws InterruptedException {
         benchmark.output();
-        Thread.sleep(10);
+        Thread.sleep(100);
 
         String logFile = benchmark.getLogFile();
         assertThat(logFile).isNotNull();

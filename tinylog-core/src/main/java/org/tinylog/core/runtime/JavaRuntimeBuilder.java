@@ -1,5 +1,7 @@
 package org.tinylog.core.runtime;
 
+import org.tinylog.core.internal.InternalLogger;
+
 /**
  * Builder for {@link JavaRuntime}.
  */
@@ -11,7 +13,7 @@ public class JavaRuntimeBuilder implements RuntimeBuilder {
 
     @Override
     public boolean isSupported() {
-        return !"Android Runtime".equals(System.getProperty("java.runtime.name"));
+        return !System.getProperty("java.runtime.name").equals("Android Runtime");
     }
 
     @Override
@@ -20,8 +22,8 @@ public class JavaRuntimeBuilder implements RuntimeBuilder {
     }
 
     @Override
-    public RuntimeFlavor create() {
-        return new JavaRuntime();
+    public RuntimeFlavor create(InternalLogger logger) {
+        return new JavaRuntime(logger);
     }
 
 }

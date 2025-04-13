@@ -1,38 +1,36 @@
 package org.tinylog.core.backend;
 
-import javax.inject.Inject;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junitpioneer.jupiter.StdErr;
+import org.junitpioneer.jupiter.StdIo;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.context.ContextStorage;
-import org.tinylog.core.format.message.EnhancedMessageFormatter;
-import org.tinylog.core.internal.LoggingContext;
-import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.core.test.system.CaptureSystemOutput;
-import org.tinylog.core.test.system.Output;
+import org.tinylog.core.format.message.SimpleMessageFormatter;
+import org.tinylog.test.junit.log.Tinylog;
 
+import jakarta.inject.Inject;
+
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CaptureLogEntries
-@CaptureSystemOutput
+@Tinylog
 class InternalLoggingBackendTest {
 
     @Inject
-    private LoggingContext context;
-
-    @Inject
-    private Output output;
+    private Configuration configuration;
 
     /**
      * Verifies that the provided context storage does not store any context values.
      */
     @Test
     void contextStorage() {
-        ContextStorage storage = new InternalLoggingBackend(context).getContextStorage();
+        ContextStorage storage = new InternalLoggingBackend(configuration).getContextStorage();
         storage.put("foo", "42");
         assertThat(storage.getMapping()).isEmpty();
     }
@@ -46,12 +44,12 @@ class InternalLoggingBackendTest {
     @ParameterizedTest
     @ValueSource(strings = {"Foo", "example.Foo", "org.tinylog.core.backend.InternalLoggingBackend"})
     void classesVisibility(String className) {
-        LevelVisibility visibility = new InternalLoggingBackend(context).getLevelVisibilityByClass(className);
+        LevelVisibility visibility = new InternalLoggingBackend(configuration).getLevelVisibilityByClass(className);
         assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
         assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
         assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
-        assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
-        assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+        assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFO);
+        assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFO);
     }
 
     /**
@@ -60,7 +58,7 @@ class InternalLoggingBackendTest {
      */
     @Test
     void untaggedVisibility() {
-        LevelVisibility visibility = new InternalLoggingBackend(context).getLevelVisibilityByTag(null);
+        LevelVisibility visibility = new InternalLoggingBackend(configuration).getLevelVisibilityByTag(null);
         assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
         assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
         assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
@@ -74,7 +72,7 @@ class InternalLoggingBackendTest {
      */
     @Test
     void unknownTaggedVisibility() {
-        LevelVisibility visibility = new InternalLoggingBackend(context).getLevelVisibilityByTag("foo");
+        LevelVisibility visibility = new InternalLoggingBackend(configuration).getLevelVisibilityByTag("foo");
         assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
         assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
         assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
@@ -88,107 +86,122 @@ class InternalLoggingBackendTest {
      */
     @Test
     void tinylogTaggedVisibility() {
-        LevelVisibility visibility = new InternalLoggingBackend(context).getLevelVisibilityByTag("tinylog");
+        LevelVisibility visibility = new InternalLoggingBackend(configuration).getLevelVisibilityByTag("tinylog");
         assertThat(visibility.getTrace()).isEqualTo(OutputDetails.DISABLED);
         assertThat(visibility.getDebug()).isEqualTo(OutputDetails.DISABLED);
         assertThat(visibility.getInfo()).isEqualTo(OutputDetails.DISABLED);
-        assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
-        assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION);
+        assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFO);
+        assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFO);
     }
 
     /**
-     * Verifies that logging is disabled for untagged log entries at all severity levels.
+     * Verifies that logging is disabled for untagged log entries of any severity level.
      *
      * @param level The severity level to test
      */
     @ParameterizedTest
-    @EnumSource(Level.class)
+    @EnumSource(mode = EnumSource.Mode.EXCLUDE, names = "OFF")
     void untaggedLogEntriesDisabled(Level level) {
-        InternalLoggingBackend backend = new InternalLoggingBackend(context);
+        InternalLoggingBackend backend = new InternalLoggingBackend(configuration);
         assertThat(backend.isEnabled(null, null, level)).isFalse();
     }
 
     /**
-     * Verifies that logging is disabled for tinylog log entries at trace, debug, and info severity levels.
+     * Verifies that logging is disabled for internal tinylog log entries with the severity levels TRACE, DEBUG, and
+     * INFO.
      *
      * @param level The severity level to test
      */
     @ParameterizedTest
-    @EnumSource(value = Level.class, names = {"TRACE", "DEBUG", "INFO"})
+    @EnumSource(mode = EnumSource.Mode.INCLUDE, names = {"TRACE", "DEBUG", "INFO"})
     void tinylogLogEntriesDisabled(Level level) {
-        InternalLoggingBackend backend = new InternalLoggingBackend(context);
+        InternalLoggingBackend backend = new InternalLoggingBackend(configuration);
         assertThat(backend.isEnabled(null, "tinylog", level)).isFalse();
     }
 
     /**
-     * Verifies that logging is enabled for tinylog log entries at warn and error severity levels.
+     * Verifies that logging is enabled for internal tinylog log entries with the severity levels WARN and ERROR.
      *
      * @param level The severity level to test
      */
     @ParameterizedTest
-    @EnumSource(value = Level.class, names = {"WARN", "ERROR"})
+    @EnumSource(mode = EnumSource.Mode.INCLUDE, names = {"WARN", "ERROR"})
     void tinylogLogEntriesEnabled(Level level) {
-        InternalLoggingBackend backend = new InternalLoggingBackend(context);
+        InternalLoggingBackend backend = new InternalLoggingBackend(configuration);
         assertThat(backend.isEnabled(null, "tinylog", level)).isTrue();
     }
 
     /**
-     * Verifies that a plain text message can be output at the severity levels warn and error.
+     * Verifies that log entries with a plain text message are output correctly.
      *
      * @param level The severity level for the log entry
+     * @param err The captured output of the standard error stream
      */
     @ParameterizedTest
-    @EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-    void plainTextMessage(Level level) {
-        new InternalLoggingBackend(context).log(
+    @EnumSource(mode = EnumSource.Mode.INCLUDE, names = {"WARN", "ERROR"})
+    @StdIo
+    void outputPlainTextMessage(Level level, StdErr err) {
+        LogEntry entry = new LogEntry(
+            Thread.currentThread(),
+            emptyMap(),
             null,
             "tinylog",
             level,
             null,
-            "Hello World!",
             null,
+            "Hello World!",
             null
         );
 
-        assertThat(output.consume()).containsExactly("TINYLOG " + level + ": Hello World!");
+        new InternalLoggingBackend(configuration).output(entry, true);
+        assertThat(err.capturedLines()).containsExactly("TINYLOG " + level + ": Hello World!");
     }
 
     /**
-     * Verifies that a formatted text message with placeholders can be output at the severity levels warn and error.
+     * Verifies that log entries with a formatted text message with placeholders are output correctly.
      *
      * @param level The severity level for the log entry
+     * @param err The captured output of the standard error stream
      */
     @ParameterizedTest
-    @EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-    void formattedTextMessage(Level level) {
-        new InternalLoggingBackend(context).log(
+    @EnumSource(mode = EnumSource.Mode.INCLUDE, names = {"WARN", "ERROR"})
+    @StdIo
+    void outputFormattedTextMessage(Level level, StdErr err) {
+        LogEntry entry = new LogEntry(
+            Thread.currentThread(),
+            emptyMap(),
             null,
             "tinylog",
             level,
             null,
+            new SimpleMessageFormatter(),
             "Hello {}!",
-            new Object[] {"world"},
-            new EnhancedMessageFormatter(context.getFramework().getClassLoader())
+            new Object[] {"Alice"}
         );
 
-        assertThat(output.consume()).containsExactly("TINYLOG " + level + ": Hello world!");
+        new InternalLoggingBackend(configuration).output(entry, true);
+        assertThat(err.capturedLines()).containsExactly("TINYLOG " + level + ": Hello Alice!");
     }
 
     /**
-     * Verifies that an exception can be output at the severity levels warn and error.
+     * Verifies that log entries with an exception but without any message are output correctly.
      *
      * @param level The severity level for the log entry
+     * @param err The captured output of the standard error stream
      */
     @ParameterizedTest
-    @EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-    void exceptionOnly(Level level) {
-        Exception exception = new NullPointerException();
+    @EnumSource(mode = EnumSource.Mode.INCLUDE, names = {"WARN", "ERROR"})
+    @StdIo
+    void outputExceptionOnly(Level level, StdErr err) {
+        Exception exception = new Exception();
         exception.setStackTrace(new StackTraceElement[] {
             new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
             new StackTraceElement("example.OtherClass", "bar", "OtherClass.java", 42),
         });
 
-        new InternalLoggingBackend(context).log(
+        LogEntry entry = new LogEntry(
+            Thread.currentThread(),
+            emptyMap(),
             null,
             "tinylog",
             level,
@@ -198,92 +211,109 @@ class InternalLoggingBackendTest {
             null
         );
 
-        assertThat(output.consume()).containsExactly(
-            "TINYLOG " + level + ": java.lang.NullPointerException",
+        new InternalLoggingBackend(configuration).output(entry, true);
+
+        assertThat(err.capturedLines()).containsExactly(
+            "TINYLOG " + level + ": java.lang.Exception",
             "\tat example.MyClass.foo(MyClass.java:42)",
             "\tat example.OtherClass.bar(OtherClass.java:42)"
         );
     }
 
     /**
-     * Verifies that an exception can be output together with a custom message at the severity levels warn and error.
+     * Verifies that log entries with an exception and a custom message are output correctly.
      *
      * @param level The severity level for the log entry
+     * @param err The captured output of the standard error stream
      */
     @ParameterizedTest
-    @EnumSource(value = Level.class, names = {"WARN", "ERROR"})
-    void exceptionWithCustomMessage(Level level) {
-        Exception exception = new UnsupportedOperationException();
+    @EnumSource(mode = EnumSource.Mode.INCLUDE, names = {"WARN", "ERROR"})
+    @StdIo
+    void outputExceptionWithCustomMessage(Level level, StdErr err) {
+        Exception exception = new Exception();
         exception.setStackTrace(new StackTraceElement[] {
             new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
         });
 
-        new InternalLoggingBackend(context).log(
+        LogEntry entry = new LogEntry(
+            Thread.currentThread(),
+            emptyMap(),
             null,
             "tinylog",
             level,
             exception,
-            "Oops!",
             null,
+            "Oops!",
             null
         );
 
-        assertThat(output.consume()).containsExactly(
-            "TINYLOG " + level + ": Oops!: java.lang.UnsupportedOperationException",
+        new InternalLoggingBackend(configuration).output(entry, true);
+
+        assertThat(err.capturedLines()).containsExactly(
+            "TINYLOG " + level + ": Oops!: java.lang.Exception",
             "\tat example.MyClass.foo(MyClass.java:42)"
         );
     }
 
     /**
-     * Verifies that log entries are discarded for the severity levels trace, debug, and info.
+     * Verifies that log entries with the severity levels TRACE, DEBUG, and INFO are discarded.
      *
      * @param level The severity level for the log entry
+     * @param err The captured output of the standard error stream
      */
     @ParameterizedTest
-    @EnumSource(value = Level.class, names = {"TRACE", "DEBUG", "INFO"})
-    void discardNonServeLogEntries(Level level) {
-        new InternalLoggingBackend(context).log(
+    @EnumSource(mode = EnumSource.Mode.INCLUDE, names = {"TRACE", "DEBUG", "INFO"})
+    @StdIo
+    void discardNonSevereSeverityLevels(Level level, StdErr err) {
+        LogEntry entry = new LogEntry(
+            Thread.currentThread(),
+            emptyMap(),
             null,
             "tinylog",
             level,
             null,
-            "Hello World!",
             null,
+            "Hello World!",
             null
         );
 
-        assertThat(output.consume()).isEmpty();
+        new InternalLoggingBackend(configuration).output(entry, true);
+        assertThat(err.capturedLines()).isEmpty();
     }
 
     /**
-     * Verifies that log entries will be discarded, if tag is not {@code tinylog}.
+     * Verifies that log entries with tags unequal "tinylog" are discarded.
      *
-     * @param tag The category tag for the log entry
-     * @param level The severity level for the log entry
+     * @param tag The category tag to test
+     * @param err The captured output of the standard error stream
      */
     @ParameterizedTest
-    @CsvSource({",ERROR", "foo,ERROR", ",WARN", "foo,WARN"})
-    void discardNonTinylogLogEntries(String tag, Level level) {
-        new InternalLoggingBackend(context).log(
+    @NullSource
+    @ValueSource(strings = {"foo", "bar"})
+    @StdIo
+    void discardNonInternalTags(String tag, StdErr err) {
+        LogEntry entry = new LogEntry(
+            Thread.currentThread(),
+            emptyMap(),
             null,
             tag,
-            level,
+            Level.ERROR,
+            null,
             null,
             "Hello World!",
-            null,
             null
         );
 
-        assertThat(output.consume()).isEmpty();
+        new InternalLoggingBackend(configuration).output(entry, true);
+        assertThat(err.capturedLines()).isEmpty();
     }
 
     /**
-     * Verifies that reconfiguration leads to the same logging backend.
+     * Verifies that the logging backend can be closed without throwing any exception.
      */
     @Test
-    void reconfigure() {
-        LoggingBackend backend = new InternalLoggingBackend(context);
-        assertThat(backend.reconfigure()).isSameAs(backend);
+    void closable() {
+        new InternalLoggingBackend(configuration).close();
     }
 
 }

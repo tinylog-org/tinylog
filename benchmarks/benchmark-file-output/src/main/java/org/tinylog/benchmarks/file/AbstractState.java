@@ -47,7 +47,7 @@ public abstract class AbstractState<T extends Closeable> implements Closeable {
     /**
      * Creates a new temporary file and an instance of the class to use for writing.
      *
-     * @throws IOException Failed to create or access the temporary file
+     * @throws IOException If failed to create or access the temporary file
      */
     @Setup(Level.Iteration)
     public void init() throws IOException {
@@ -60,7 +60,7 @@ public abstract class AbstractState<T extends Closeable> implements Closeable {
     /**
      * Closes the instance to use for writing and deletes the temporary file.
      *
-     * @throws IOException Failed to close the instance or to delete the temporary file
+     * @throws IOException If failed to close the instance or to delete the temporary file
      */
     @TearDown(Level.Iteration)
     public void dispose() throws IOException {
@@ -71,7 +71,7 @@ public abstract class AbstractState<T extends Closeable> implements Closeable {
     /**
      * Closes the temporary file.
      *
-     * @throws IOException Failed to close the file properly.
+     * @throws IOException If failed to close the file properly
      */
     @Override
     public void close() throws IOException {
@@ -82,7 +82,7 @@ public abstract class AbstractState<T extends Closeable> implements Closeable {
      * Writes a string into the current temporary file.
      *
      * @param content The string to write
-     * @throws IOException Failed to write into the temporary file
+     * @throws IOException If failed to write into the temporary file
      */
     public abstract void write(String content) throws IOException;
 
@@ -91,7 +91,7 @@ public abstract class AbstractState<T extends Closeable> implements Closeable {
      *
      * @param path The path of the file to use for writing
      * @return The created instance
-     * @throws IOException Failed to access the temporary file
+     * @throws IOException If failed to access the temporary file
      */
     protected abstract T create(Path path) throws IOException;
 

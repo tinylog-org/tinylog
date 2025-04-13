@@ -1,0 +1,86 @@
+apply plugin: "checkstyle"
+apply plugin: "com.android.library"
+apply plugin: "com.github.spotbugs"
+apply plugin: "jacoco"
+apply plugin: "de.mannodermaus.android-junit5"
+
+buildscript {
+    repositories {
+        google()
+        gradlePluginPortal()
+        mavenLocal()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.9.1"
+        classpath "com.github.spotbugs.snom:spotbugs-gradle-plugin:6.1.7"
+        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.12.0.0"
+        classpath "org.jacoco:org.jacoco.core:0.8.13"
+    }
+}
+
+repositories {
+    google()
+    gradlePluginPortal()
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.tinylog:tinylog-core:${version}"
+    implementation "org.tinylog:tinylog-impl:${version}"
+    androidTestImplementation "androidx.test:runner:1.6.2"
+    androidTestImplementation "de.mannodermaus.junit5:android-test-core:1.7.0"
+    androidTestImplementation "jakarta.inject:jakarta.inject-api:2.0.1"
+    androidTestImplementation "org.assertj:assertj-core:3.27.3"
+    androidTestImplementation "org.junit.jupiter:junit-jupiter-api:5.12.2"
+    androidTestImplementation "org.junit.jupiter:junit-jupiter-params:5.12.2"
+    androidTestImplementation "org.mockito:mockito-android:5.17.0"
+    androidTestImplementation "org.tinylog:tinylog-core:${version}:tests"
+    androidTestRuntimeOnly "de.mannodermaus.junit5:android-test-runner:1.7.0"
+}
+
+android {
+    namespace = "tinylog"
+
+    compileSdkVersion 35
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    buildTypes {
+        debug {
+            testCoverageEnabled = true
+        }
+    }
+
+    defaultConfig {
+        minSdkVersion 26
+        targetSdkVersion 35
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArgument("runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder")
+    }
+
+    packagingOptions {
+        exclude("META-INF/LICENSE*")
+        exclude("META-INF/licenses/*")
+    }
+}
+
+checkstyle {
+    toolVersion = "10.23.0"
+}
+
+spotbugs {
+    excludeFilter = file("../configuration/spotbugs-filters.xml")
+}
+
+tasks.register("checkstyle", Checkstyle) {
+    configFile file("../configuration/checkstyle-rules.xml")
+    configProperties["workspace_loc"] = file("..").path
+    source "src"
+    classpath = files()
+}

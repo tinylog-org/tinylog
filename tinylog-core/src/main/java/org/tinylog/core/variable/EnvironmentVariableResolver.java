@@ -1,5 +1,7 @@
 package org.tinylog.core.variable;
 
+import org.tinylog.core.internal.InternalLogger;
+
 /**
  * Resolver for environment variables.
  */
@@ -20,7 +22,7 @@ public class EnvironmentVariableResolver implements VariableResolver {
     }
 
     @Override
-    public String resolve(String name) {
+    public String resolve(String name, InternalLogger logger) {
         return System.getenv(name);
     }
 

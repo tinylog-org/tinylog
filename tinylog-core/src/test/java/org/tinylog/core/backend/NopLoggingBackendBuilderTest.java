@@ -3,14 +3,26 @@ package org.tinylog.core.backend;
 import java.util.ServiceLoader;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Configuration;
-import org.tinylog.core.Framework;
-import org.tinylog.core.internal.LoggingContext;
+import org.tinylog.test.junit.log.Tinylog;
 
-import static java.util.Collections.emptyMap;
+import jakarta.inject.Inject;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Tinylog
 class NopLoggingBackendBuilderTest {
+
+    @Inject
+    private TinylogContext context;
+
+    /**
+     * Verifies that the builder is registered as service.
+     */
+    @Test
+    void service() {
+        assertThat(ServiceLoader.load(LoggingBackendBuilder.class))
+            .anyMatch(builder -> builder instanceof NopLoggingBackendBuilder);
+    }
 
     /**
      * Verifies that the name is "nop".
@@ -26,19 +38,9 @@ class NopLoggingBackendBuilderTest {
      */
     @Test
     void creation() {
-        Framework framework = new Framework(false, false);
-        LoggingContext context = new LoggingContext(framework, new Configuration(emptyMap()));
         NopLoggingBackendBuilder builder = new NopLoggingBackendBuilder();
-        assertThat(builder.create(context)).isInstanceOf(NopLoggingBackend.class);
-    }
-
-    /**
-     * Verifies that the builder is registered as service.
-     */
-    @Test
-    void service() {
-        assertThat(ServiceLoader.load(LoggingBackendBuilder.class))
-            .anyMatch(builder -> builder instanceof NopLoggingBackendBuilder);
+        LoggingBackend backend = builder.create(context);
+        assertThat(backend).isInstanceOf(NopLoggingBackend.class);
     }
 
 }

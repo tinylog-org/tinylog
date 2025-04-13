@@ -11,8 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import com.google.common.collect.ImmutableMap;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,11 +41,11 @@ class BundleContextStorageTest {
      */
     @Test
     void receiveMapping() {
-        when(firstChildStorage.getMapping()).thenReturn(ImmutableMap.of("foo", "1", "bar", "1"));
-        when(secondChildStorage.getMapping()).thenReturn(ImmutableMap.of("bar", "2", "other", "2"));
+        when(firstChildStorage.getMapping()).thenReturn(Map.of("foo", "1", "bar", "1"));
+        when(secondChildStorage.getMapping()).thenReturn(Map.of("bar", "2", "other", "2"));
 
         assertThat(bundleStorage.getMapping())
-            .containsExactlyInAnyOrderEntriesOf(ImmutableMap.of("foo", "1", "bar", "1", "other", "2"));
+            .containsExactlyInAnyOrderEntriesOf(Map.of("foo", "1", "bar", "1", "other", "2"));
     }
 
     /**
@@ -104,62 +102,13 @@ class BundleContextStorageTest {
      * Verifies that a new replacement mapping is applied to all child storages.
      */
     @Test
-    void replaceWithNewMapping() {
-        Map<String, String> mapping = ImmutableMap.of("foo", "42");
+    void replaceMapping() {
+        Map<String, String> mapping = Map.of("foo", "42");
 
         bundleStorage.replace(mapping);
 
         verify(firstChildStorage).replace(mapping);
         verify(secondChildStorage).replace(mapping);
-    }
-
-    /**
-     * Verifies that the origin mapping of all child storages is restored, if an origin map is passed as replacement
-     * mapping.
-     */
-    @Test
-    void replaceWithOriginMapping() {
-        when(firstChildStorage.getMapping()).thenReturn(ImmutableMap.of("foo", "1"));
-        when(secondChildStorage.getMapping()).thenReturn(ImmutableMap.of("bar", "2"));
-
-        bundleStorage.replace(bundleStorage.getMapping());
-
-        verify(firstChildStorage).replace(ImmutableMap.of("foo", "1"));
-        verify(secondChildStorage).replace(ImmutableMap.of("bar", "2"));
-    }
-
-    /**
-     * Verifies that the entire origin mapping is applied as replacement mapping to all child storages, if the mapping
-     * was modified.
-     */
-    @Test
-    void replaceWithModifiedMapping() {
-        when(firstChildStorage.getMapping()).thenReturn(ImmutableMap.of("foo", "1"));
-        when(secondChildStorage.getMapping()).thenReturn(ImmutableMap.of("bar", "2"));
-
-        Map<String, String> mapping = bundleStorage.getMapping();
-        mapping.put("foo", "42");
-        bundleStorage.replace(mapping);
-
-        verify(firstChildStorage).replace(ImmutableMap.of("foo", "42", "bar", "2"));
-        verify(secondChildStorage).replace(ImmutableMap.of("foo", "42", "bar", "2"));
-    }
-
-    /**
-     * Verifies that the entire origin mapping is applied as replacement mapping to all child storages, if the mapping
-     * is from another bundle context storage instance.
-     */
-    @Test
-    void replaceWithForeignMapping() {
-        when(firstChildStorage.getMapping()).thenReturn(ImmutableMap.of("foo", "1"));
-        when(secondChildStorage.getMapping()).thenReturn(ImmutableMap.of("bar", "2"));
-
-        BundleContextStorage other = new BundleContextStorage(Arrays.asList(firstChildStorage, secondChildStorage));
-        Map<String, String> mapping = other.getMapping();
-        bundleStorage.replace(mapping);
-
-        verify(firstChildStorage).replace(ImmutableMap.of("foo", "1", "bar", "2"));
-        verify(secondChildStorage).replace(ImmutableMap.of("foo", "1", "bar", "2"));
     }
 
     /**

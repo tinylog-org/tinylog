@@ -1,13 +1,9 @@
 package org.tinylog.core.backend;
 
-import org.tinylog.core.internal.LoggingContext;
-
 /**
  * Builder for {@link NopLoggingBackend}.
  */
 public class NopLoggingBackendBuilder implements LoggingBackendBuilder {
-
-    private static final NopLoggingBackend PROVIDER = new NopLoggingBackend();
 
     /** */
     public NopLoggingBackendBuilder() {
@@ -19,8 +15,8 @@ public class NopLoggingBackendBuilder implements LoggingBackendBuilder {
     }
 
     @Override
-    public LoggingBackend create(LoggingContext context) {
-        return PROVIDER;
+    public LoggingBackend create(TinylogContext context) {
+        return new NopLoggingBackend();
     }
 
 }

@@ -1,6 +1,10 @@
 package org.tinylog.core.format.value;
 
-import org.tinylog.core.internal.LoggingContext;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
+
+import org.tinylog.core.Configuration;
 
 /**
  * Format interface for different value types.
@@ -18,11 +22,23 @@ public interface ValueFormat {
     /**
      * Formats the passed value.
      *
-     * @param context The current logging context
+     * @param configuration The current tinylog configuration
      * @param pattern The format pattern for the value
      * @param value The value to format
      * @return The formatted value
      */
-    String format(LoggingContext context, String pattern, Object value);
+    String format(Configuration configuration, String pattern, Object value);
+
+    /**
+     * Loads and creates all available value formats.
+     *
+     * @param loader The class loader to use for loading the service implementations
+     * @return A list with all value formats
+     */
+    static List<ValueFormat> load(ClassLoader loader) {
+        List<ValueFormat> formats = new ArrayList<>();
+        ServiceLoader.load(ValueFormat.class, loader).forEach(formats::add);
+        return formats;
+    }
 
 }

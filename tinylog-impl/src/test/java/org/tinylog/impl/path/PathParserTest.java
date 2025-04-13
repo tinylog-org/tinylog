@@ -5,26 +5,26 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
-import org.tinylog.core.internal.LoggingContext;
-import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.core.test.log.Log;
-import org.tinylog.impl.path.segments.PathSegment;
+import org.tinylog.core.backend.TinylogContext;
+import org.tinylog.impl.path.segment.PathSegment;
+import org.tinylog.test.junit.log.Log;
+import org.tinylog.test.junit.log.Tinylog;
+
+import jakarta.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CaptureLogEntries
+@Tinylog
 class PathParserTest {
 
     @Inject
-    private Framework framework;
+    private TinylogContext context;
 
     @Inject
-    private LoggingContext context;
+    private Configuration configuration;
 
     @Inject
     private Log log;
@@ -80,7 +80,7 @@ class PathParserTest {
     @Test
     void multiplePlaceholders() throws Exception {
         List<PathSegment> segments = new PathParser(context).parse("{process-id}/{date: YYYY.MM.DD}.txt");
-        assertThat(render(segments)).isEqualTo(framework.getRuntime().getProcessId() + "/1970.01.01.txt");
+        assertThat(render(segments)).isEqualTo(ProcessHandle.current().pid() + "/1970.01.01.txt");
     }
 
     /**
@@ -91,21 +91,21 @@ class PathParserTest {
         List<PathSegment> segments = new PathParser(context).parse("log.{foo}.txt");
         assertThat(render(segments)).isEqualTo("log.undefined.txt");
         assertThat(log.consume()).singleElement().satisfies(logEntry -> {
-            assertThat(logEntry.getLevel()).isEqualTo(Level.ERROR);
-            assertThat(logEntry.getMessage()).contains("foo");
+            assertThat(logEntry.getSeverityLevel()).isEqualTo(Level.ERROR);
+            assertThat(logEntry.getFormattedMessage(configuration)).contains("foo");
         });
     }
 
     /**
-     * Verifies that an error will be logged for a path with placeholder having an invalid configuration value.
+     * Verifies that an error will be logged for a path with a placeholder having an invalid configuration value.
      */
     @Test
     void invalidPlaceholder() throws Exception {
         List<PathSegment> segments = new PathParser(context).parse("log.{date: foo}.txt");
         assertThat(render(segments)).isEqualTo("log.undefined.txt");
         assertThat(log.consume()).singleElement().satisfies(logEntry -> {
-            assertThat(logEntry.getLevel()).isEqualTo(Level.ERROR);
-            assertThat(logEntry.getMessage()).contains("date: foo");
+            assertThat(logEntry.getSeverityLevel()).isEqualTo(Level.ERROR);
+            assertThat(logEntry.getFormattedMessage(configuration)).contains("date: foo");
         });
     }
 
@@ -119,7 +119,7 @@ class PathParserTest {
         ZonedDateTime date = ZonedDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
         StringBuilder builder = new StringBuilder();
         for (PathSegment segment : segments) {
-            segment.resolve(builder, date);
+            segment.resolve(builder, () -> date);
         }
         return builder.toString();
     }

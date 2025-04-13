@@ -4,14 +4,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.tinylog.core.Level;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.internal.SafeServiceLoader;
 import org.tinylog.core.variable.VariableResolver;
 
 /**
@@ -33,16 +32,16 @@ public abstract class AbstractConfigurationLoader implements ConfigurationLoader
     /**
      * Opens a URL, classpath resource, or local file as input stream.
      *
-     * @param classLoader Class loader to use to open classpath resources
+     * @param loader The class loader to use for loading resource files
      * @param file URL, classpath resource, or local file
      * @return The input stream of the passed file
-     * @throws IOException Failed to open the passed file
+     * @throws IOException If failed to open the passed file
      */
-    protected static InputStream getInputStream(ClassLoader classLoader, String file) throws IOException {
+    protected static InputStream getInputStream(ClassLoader loader, String file) throws IOException {
         if (URL_DETECTION_PATTERN.matcher(file).matches()) {
             return new URL(file).openStream();
         } else {
-            InputStream stream = classLoader.getResourceAsStream(file);
+            InputStream stream = loader.getResourceAsStream(file);
             return stream == null ? new FileInputStream(file) : stream;
         }
     }
@@ -50,17 +49,16 @@ public abstract class AbstractConfigurationLoader implements ConfigurationLoader
     /**
      * Resolves all variables in the passed configuration map.
      *
-     * @param loader The class loader to use for loading the service files and service implementation classes
-     * @param configuration The map with the loaded tinylog configuration
+     * @param loader The class loader to use for loading service implementations
+     * @param logger The internal logger instance for issuing internal tinylog log entries
+     * @param configuration The map with all loaded tinylog configuration properties
      */
-    protected static void resolveVariables(ClassLoader loader, Map<String, String> configuration) {
-        List<VariableResolver> resolvers = SafeServiceLoader.asList(
-            loader,
-            VariableResolver.class,
-            "variable resolvers"
-        );
-
-        for (VariableResolver resolver : resolvers) {
+    protected static void resolveVariables(
+        ClassLoader loader,
+        InternalLogger logger,
+        Map<String, String> configuration
+    ) {
+        for (VariableResolver resolver : VariableResolver.load(loader)) {
             String prefix = resolver.getPrefix();
             String regex = Pattern.quote(prefix) + "\\{([^|{}]+)(?:\\|([^{}]+))?\\}";
             Pattern pattern = Pattern.compile(regex);
@@ -69,12 +67,12 @@ public abstract class AbstractConfigurationLoader implements ConfigurationLoader
                 String value = entry.getValue();
                 if (value.contains(prefix)) {
                     Matcher matcher = pattern.matcher(value);
-                    StringBuffer buffer = new StringBuffer();
+                    StringBuffer builder = new StringBuffer();
                     while (matcher.find()) {
-                        matcher.appendReplacement(buffer, resolveVariable(matcher, resolver));
+                        matcher.appendReplacement(builder, resolveVariable(matcher, resolver, logger));
                     }
-                    matcher.appendTail(buffer);
-                    configuration.put(entry.getKey(), buffer.toString());
+                    matcher.appendTail(builder);
+                    configuration.put(entry.getKey(), builder.toString());
                 }
             }
         }
@@ -85,17 +83,18 @@ public abstract class AbstractConfigurationLoader implements ConfigurationLoader
      *
      * @param matcher The actual matcher at a found variable placeholder
      * @param resolver The resolver to resolve the found variable placeholder
+     * @param logger The internal logger instance for issuing internal tinylog log entries
      * @return The replacement text for the found variable placeholder
      */
-    private static String resolveVariable(Matcher matcher, VariableResolver resolver) {
+    private static String resolveVariable(Matcher matcher, VariableResolver resolver, InternalLogger logger) {
         String name = matcher.group(1).trim();
-        String value = resolver.resolve(name);
+        String value = resolver.resolve(name, logger);
 
         if (value == null) {
             value = matcher.group(2);
             if (value == null) {
-                InternalLogger.warn(
-                    null,
+                logger.log(
+                    Level.WARN,
                     "{}{} \"{}\" could not be found",
                     resolver.getName().substring(0, 1).toUpperCase(Locale.ENGLISH),
                     resolver.getName().substring(1),

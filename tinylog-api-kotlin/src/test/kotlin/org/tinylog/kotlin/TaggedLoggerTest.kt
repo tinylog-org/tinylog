@@ -4,43 +4,57 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import org.mockito.Mock
-import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.junit.jupiter.MockitoSettings
+import org.mockito.ArgumentCaptor
+import org.mockito.kotlin.any
+import org.mockito.kotlin.atMost
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.notNull
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.mockito.quality.Strictness
 import org.tinylog.core.Framework
 import org.tinylog.core.Level
+import org.tinylog.core.LogEntry
 import org.tinylog.core.backend.LevelVisibility
-import org.tinylog.core.backend.LoggingBackend
 import org.tinylog.core.backend.OutputDetails
-import org.tinylog.core.test.log.CaptureLogEntries
-import org.tinylog.core.test.log.Log
-import org.tinylog.core.test.log.LogEntry
-import java.util.function.Consumer
-import javax.inject.Inject
+import org.tinylog.core.context.NopContextStorage
+import org.tinylog.core.format.message.SimpleMessageFormatter
+import org.tinylog.core.runtime.JavaRuntime
 
-internal class TaggedLoggerTest {
+class TaggedLoggerTest {
+    private lateinit var framework: Framework
+
+    /**
+     * Creates the framework.
+     */
+    @BeforeEach
+    fun create() {
+        val javaRuntime = JavaRuntime(mock())
+        val nopContextStorage = NopContextStorage()
+
+        framework =
+            mock<Framework>().apply {
+                whenever(runtime).thenReturn(javaRuntime)
+                whenever(contextStorage).thenReturn(nopContextStorage)
+            }
+    }
+
     /**
      * Tests for category tags.
      */
-    @CaptureLogEntries
     @Nested
     inner class Tags {
-        @Inject
-        private lateinit var framework: Framework
-
         /**
          * Verifies that a string can be assigned as tag.
          */
         @Test
         fun stringTag() {
-            val logger = TaggedLogger("dummy", framework)
+            whenever(framework.getLevelVisibilityByTag("dummy")).thenReturn(LevelVisibility(OutputDetails.DISABLED))
+
+            val logger = TaggedLogger("dummy", framework, SimpleMessageFormatter())
             assertThat(logger.tag).isEqualTo("dummy")
         }
 
@@ -49,7 +63,9 @@ internal class TaggedLoggerTest {
          */
         @Test
         fun nullTag() {
-            val logger = TaggedLogger(null, framework)
+            whenever(framework.getLevelVisibilityByTag(null)).thenReturn(LevelVisibility(OutputDetails.DISABLED))
+
+            val logger = TaggedLogger(null, framework, SimpleMessageFormatter())
             assertThat(logger.tag).isNull()
         }
     }
@@ -57,42 +73,30 @@ internal class TaggedLoggerTest {
     /**
      * Tests for severity levels.
      */
-    @ExtendWith(MockitoExtension::class)
-    @MockitoSettings(strictness = Strictness.LENIENT)
     @Nested
     inner class Levels {
-        @Mock
-        private lateinit var backend: LoggingBackend
-
-        private val framework: Framework =
-            object : Framework(false, false) {
-                override fun getLoggingBackend(): LoggingBackend {
-                    return backend
-                }
-            }
-
         /**
          * Verifies the results of the [TaggedLogger.isTraceEnabled] method.
          *
-         * @param enabled The value for [LoggingBackend.isEnabled]
+         * @param enabled The value for [Framework.isEnabled]
          * @param outputDetails The value for [LevelVisibility.getTrace]
          */
         @ParameterizedTest
         @CsvSource(
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO",
         )
         fun isTraceEnabled(
             enabled: Boolean,
             outputDetails: OutputDetails,
         ) {
-            whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
+            whenever(framework.getLevelVisibilityByTag("test")).thenReturn(
                 LevelVisibility(
                     outputDetails,
                     OutputDetails.DISABLED,
@@ -102,34 +106,34 @@ internal class TaggedLoggerTest {
                 ),
             )
 
-            whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.TRACE))).thenReturn(enabled)
+            whenever(framework.isEnabled(notNull(), eq("test"), eq(Level.TRACE))).thenReturn(enabled)
 
-            val logger = TaggedLogger("test", framework)
+            val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
             assertThat(logger.isTraceEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
         }
 
         /**
          * Verifies the results of the [TaggedLogger.isDebugEnabled] method.
          *
-         * @param enabled The value for [LoggingBackend.isEnabled]
+         * @param enabled The value for [Framework.isEnabled]
          * @param outputDetails The value for [LevelVisibility.getDebug]
          */
         @ParameterizedTest
         @CsvSource(
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO",
         )
         fun isDebugEnabled(
             enabled: Boolean,
             outputDetails: OutputDetails,
         ) {
-            whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
+            whenever(framework.getLevelVisibilityByTag("test")).thenReturn(
                 LevelVisibility(
                     OutputDetails.DISABLED,
                     outputDetails,
@@ -139,34 +143,34 @@ internal class TaggedLoggerTest {
                 ),
             )
 
-            whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.DEBUG))).thenReturn(enabled)
+            whenever(framework.isEnabled(notNull(), eq("test"), eq(Level.DEBUG))).thenReturn(enabled)
 
-            val logger = TaggedLogger("test", framework)
+            val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
             assertThat(logger.isDebugEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
         }
 
         /**
          * Verifies the results of the [TaggedLogger.isInfoEnabled] method.
          *
-         * @param enabled The value for [LoggingBackend.isEnabled]
+         * @param enabled The value for [Framework.isEnabled]
          * @param outputDetails The value for [LevelVisibility.getInfo]
          */
         @ParameterizedTest
         @CsvSource(
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO",
         )
         fun isInfoEnabled(
             enabled: Boolean,
             outputDetails: OutputDetails,
         ) {
-            whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
+            whenever(framework.getLevelVisibilityByTag("test")).thenReturn(
                 LevelVisibility(
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
@@ -176,34 +180,34 @@ internal class TaggedLoggerTest {
                 ),
             )
 
-            whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.INFO))).thenReturn(enabled)
+            whenever(framework.isEnabled(notNull(), eq("test"), eq(Level.INFO))).thenReturn(enabled)
 
-            val logger = TaggedLogger("test", framework)
+            val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
             assertThat(logger.isInfoEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
         }
 
         /**
          * Verifies the results of the [TaggedLogger.isWarnEnabled] method.
          *
-         * @param enabled The value for [LoggingBackend.isEnabled]
+         * @param enabled The value for [Framework.isEnabled]
          * @param outputDetails The value for [LevelVisibility.getWarn]
          */
         @ParameterizedTest
         @CsvSource(
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO",
         )
         fun isWarnEnabled(
             enabled: Boolean,
             outputDetails: OutputDetails,
         ) {
-            whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
+            whenever(framework.getLevelVisibilityByTag("test")).thenReturn(
                 LevelVisibility(
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
@@ -213,34 +217,34 @@ internal class TaggedLoggerTest {
                 ),
             )
 
-            whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.WARN))).thenReturn(enabled)
+            whenever(framework.isEnabled(notNull(), eq("test"), eq(Level.WARN))).thenReturn(enabled)
 
-            val logger = TaggedLogger("test", framework)
+            val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
             assertThat(logger.isWarnEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
         }
 
         /**
          * Verifies the results of the [TaggedLogger.isErrorEnabled] method.
          *
-         * @param enabled The value for [LoggingBackend.isEnabled]
+         * @param enabled The value for [Framework.isEnabled]
          * @param outputDetails The value for [LevelVisibility.getError]
          */
         @ParameterizedTest
         @CsvSource(
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO",
         )
         fun isErrorEnabled(
             enabled: Boolean,
             outputDetails: OutputDetails,
         ) {
-            whenever(backend.getLevelVisibilityByTag("test")).thenReturn(
+            whenever(framework.getLevelVisibilityByTag("test")).thenReturn(
                 LevelVisibility(
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
@@ -250,9 +254,9 @@ internal class TaggedLoggerTest {
                 ),
             )
 
-            whenever(backend.isEnabled(notNull(), eq("test"), eq(Level.ERROR))).thenReturn(enabled)
+            whenever(framework.isEnabled(notNull(), eq("test"), eq(Level.ERROR))).thenReturn(enabled)
 
-            val logger = TaggedLogger("test", framework)
+            val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
             assertThat(logger.isErrorEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
         }
     }
@@ -262,23 +266,22 @@ internal class TaggedLoggerTest {
      */
     @Nested
     inner class LogEntries {
-        @Inject
-        private lateinit var framework: Framework
-
-        @Inject
-        private lateinit var log: Log
-
-        private lateinit var logger: TaggedLogger
+        private lateinit var visibility: LevelVisibility
 
         /**
-         * Creates the tagged logger instance and clears all trace and debug log entries, which have been issued while
-         * the creation.
+         * Initializes mock for level visibility.
          */
         @BeforeEach
         fun init() {
-            logger = TaggedLogger("test", framework)
-            assertThat(log.consume())
-                .allSatisfy(Consumer { assertThat(it.level).isGreaterThanOrEqualTo(Level.DEBUG) })
+            visibility = mock()
+
+            whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
+            whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
+            whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
+            whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
+            whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
+
+            whenever(framework.getLevelVisibilityByTag("test")).thenReturn(visibility)
         }
 
         /**
@@ -289,597 +292,711 @@ internal class TaggedLoggerTest {
             /**
              * Verifies that a trace log entry with an object can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             fun traceObjectMessage() {
+                whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace(42)
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, null, "42"))
+
+                verifyLogEntry(Level.TRACE, null, "42")
             }
 
             /**
              * Verifies that a trace log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             fun traceTextMessage() {
+                whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace("Hello World!")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, null, "Hello World!"))
+
+                verifyLogEntry(Level.TRACE, null, "Hello World!")
             }
 
             /**
              * Verifies that a trace log entry with a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             fun traceLazyMessage() {
+                whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace { "Hello World!" }
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, null, "Hello World!"))
+
+                verifyLogEntry(Level.TRACE, null, "Hello World!")
             }
 
             /**
              * Verifies that a trace log entry with a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             fun traceFormattedMessageWithArgument() {
+                whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace("Hello {}!", "Alice")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, null, "Hello Alice!"))
+
+                verifyLogEntry(Level.TRACE, null, "Hello Alice!")
             }
 
             /**
              * Verifies that a trace log entry with a message with placeholders and lazy arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             fun traceFormattedMessageWithLazyArgument() {
+                whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace("Hello {}!", { "Alice" })
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, null, "Hello Alice!"))
+
+                verifyLogEntry(Level.TRACE, null, "Hello Alice!")
             }
 
             /**
              * Verifies that a trace log entry with an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             fun traceException() {
+                whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace(exception)
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, exception, null))
+
+                verifyLogEntry(Level.TRACE, exception, null)
             }
 
             /**
              * Verifies that a trace log entry with an exception and a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             fun traceExceptionAndTextMessage() {
+                whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace(exception, "Oops!")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, exception, "Oops!"))
+
+                verifyLogEntry(Level.TRACE, exception, "Oops!")
             }
 
             /**
              * Verifies that a trace log entry with an exception and a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             fun traceExceptionAndLazyMessage() {
+                whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace(exception) { "Oops!" }
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, exception, "Oops!"))
+
+                verifyLogEntry(Level.TRACE, exception, "Oops!")
             }
 
             /**
              * Verifies that a trace log entry with an exception and a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             fun traceExceptionAndFormattedMessageWithArgument() {
+                whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace(exception, "Hello {}!", "Alice")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, exception, "Hello Alice!"))
+
+                verifyLogEntry(Level.TRACE, exception, "Hello Alice!")
             }
 
             /**
              * Verifies that a trace log entry with an exception and a message with placeholders and lazy arguments can
              * be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             fun traceExceptionAndFormattedMessageWithLazyArgument() {
+                whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace(exception, "Hello {}!", { "Alice" })
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, exception, "Hello Alice!"))
+
+                verifyLogEntry(Level.TRACE, exception, "Hello Alice!")
             }
 
             /**
              * Verifies that a debug log entry with an object can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun debugObjectMessage() {
+                whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug(42)
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, null, "42"))
+
+                verifyLogEntry(Level.DEBUG, null, "42")
             }
 
             /**
              * Verifies that a debug log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun debugTextMessage() {
+                whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug("Hello World!")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, null, "Hello World!"))
+
+                verifyLogEntry(Level.DEBUG, null, "Hello World!")
             }
 
             /**
              * Verifies that a debug log entry with a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun debugLazyMessage() {
+                whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug { "Hello World!" }
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, null, "Hello World!"))
+
+                verifyLogEntry(Level.DEBUG, null, "Hello World!")
             }
 
             /**
              * Verifies that a debug log entry with a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun debugFormattedMessageWithArgument() {
+                whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug("Hello {}!", "Alice")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, null, "Hello Alice!"))
+
+                verifyLogEntry(Level.DEBUG, null, "Hello Alice!")
             }
 
             /**
              * Verifies that a debug log entry with a message with placeholders and lazy arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun debugFormattedMessageWithLazyArgument() {
+                whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug("Hello {}!", { "Alice" })
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, null, "Hello Alice!"))
+
+                verifyLogEntry(Level.DEBUG, null, "Hello Alice!")
             }
 
             /**
              * Verifies that a debug log entry with an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun debugException() {
+                whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug(exception)
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, exception, null))
+
+                verifyLogEntry(Level.DEBUG, exception, null)
             }
 
             /**
              * Verifies that a debug log entry with an exception and a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun debugExceptionAndTextMessage() {
+                whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug(exception, "Oops!")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, exception, "Oops!"))
+
+                verifyLogEntry(Level.DEBUG, exception, "Oops!")
             }
 
             /**
              * Verifies that a debug log entry with an exception and a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun debugExceptionAndLazyMessage() {
+                whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug(exception) { "Oops!" }
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, exception, "Oops!"))
+
+                verifyLogEntry(Level.DEBUG, exception, "Oops!")
             }
 
             /**
              * Verifies that a debug log entry with an exception and a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun debugExceptionAndFormattedMessageWithArgument() {
+                whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug(exception, "Hello {}!", "Alice")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, exception, "Hello Alice!"))
+
+                verifyLogEntry(Level.DEBUG, exception, "Hello Alice!")
             }
 
             /**
              * Verifies that a debug log entry with an exception and a message with placeholders and lazy arguments can
              * be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun debugExceptionAndFormattedMessageWithLazyArgument() {
+                whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug(exception, "Hello {}!", { "Alice" })
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, exception, "Hello Alice!"))
+
+                verifyLogEntry(Level.DEBUG, exception, "Hello Alice!")
             }
 
             /**
              * Verifies that an info log entry with an object can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun infoObjectMessage() {
+                whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info(42)
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, null, "42"))
+
+                verifyLogEntry(Level.INFO, null, "42")
             }
 
             /**
              * Verifies that an info log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun infoTextMessage() {
+                whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info("Hello World!")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, null, "Hello World!"))
+
+                verifyLogEntry(Level.INFO, null, "Hello World!")
             }
 
             /**
              * Verifies that an info log entry with a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun infoLazyMessage() {
+                whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info { "Hello World!" }
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, null, "Hello World!"))
+
+                verifyLogEntry(Level.INFO, null, "Hello World!")
             }
 
             /**
              * Verifies that an info log entry with a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun infoFormattedMessageWithArgument() {
+                whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info("Hello {}!", "Alice")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, null, "Hello Alice!"))
+
+                verifyLogEntry(Level.INFO, null, "Hello Alice!")
             }
 
             /**
              * Verifies that an info log entry with a message with placeholders and lazy arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun infoFormattedMessageWithLazyArgument() {
+                whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info("Hello {}!", { "Alice" })
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, null, "Hello Alice!"))
+
+                verifyLogEntry(Level.INFO, null, "Hello Alice!")
             }
 
             /**
              * Verifies that an info log entry with an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun infoException() {
+                whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info(exception)
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, exception, null))
+
+                verifyLogEntry(Level.INFO, exception, null)
             }
 
             /**
              * Verifies that an info log entry with an exception and a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun infoExceptionAndTextMessage() {
+                whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info(exception, "Oops!")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, exception, "Oops!"))
+
+                verifyLogEntry(Level.INFO, exception, "Oops!")
             }
 
             /**
              * Verifies that an info log entry with an exception and a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun infoExceptionAndLazyMessage() {
+                whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info(exception) { "Oops!" }
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, exception, "Oops!"))
+
+                verifyLogEntry(Level.INFO, exception, "Oops!")
             }
 
             /**
              * Verifies that an info log entry with an exception and a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun infoExceptionAndFormattedMessageWithArgument() {
+                whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info(exception, "Hello {}!", "Alice")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, exception, "Hello Alice!"))
+
+                verifyLogEntry(Level.INFO, exception, "Hello Alice!")
             }
 
             /**
              * Verifies that an info log entry with an exception and a message with placeholders and lazy arguments can
              * be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun infoExceptionAndFormattedMessageWithLazyArgument() {
+                whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info(exception, "Hello {}!", { "Alice" })
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, exception, "Hello Alice!"))
+
+                verifyLogEntry(Level.INFO, exception, "Hello Alice!")
             }
 
             /**
              * Verifies that a warning log entry with an object can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun warnObjectMessage() {
+                whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn(42)
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, null, "42"))
+
+                verifyLogEntry(Level.WARN, null, "42")
             }
 
             /**
              * Verifies that a warning log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun warnTextMessage() {
+                whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn("Hello World!")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, null, "Hello World!"))
+
+                verifyLogEntry(Level.WARN, null, "Hello World!")
             }
 
             /**
              * Verifies that a warning log entry with a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun warnLazyMessage() {
+                whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn { "Hello World!" }
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, null, "Hello World!"))
+
+                verifyLogEntry(Level.WARN, null, "Hello World!")
             }
 
             /**
              * Verifies that a warning log entry with a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun warnFormattedMessageWithArgument() {
+                whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn("Hello {}!", "Alice")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, null, "Hello Alice!"))
+
+                verifyLogEntry(Level.WARN, null, "Hello Alice!")
             }
 
             /**
              * Verifies that a warning log entry with a message with placeholders and lazy arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun warnFormattedMessageWithLazyArgument() {
+                whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn("Hello {}!", { "Alice" })
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, null, "Hello Alice!"))
+
+                verifyLogEntry(Level.WARN, null, "Hello Alice!")
             }
 
             /**
              * Verifies that a warning log entry with an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun warnException() {
+                whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn(exception)
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, exception, null))
+
+                verifyLogEntry(Level.WARN, exception, null)
             }
 
             /**
              * Verifies that a warning log entry with an exception and a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun warnExceptionAndTextMessage() {
+                whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn(exception, "Oops!")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, exception, "Oops!"))
+
+                verifyLogEntry(Level.WARN, exception, "Oops!")
             }
 
             /**
              * Verifies that a warning log entry with an exception and a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun warnExceptionAndLazyMessage() {
+                whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn(exception) { "Oops!" }
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, exception, "Oops!"))
+
+                verifyLogEntry(Level.WARN, exception, "Oops!")
             }
 
             /**
              * Verifies that a warning log entry with an exception and a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun warnExceptionAndFormattedMessageWithArgument() {
+                whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn(exception, "Hello {}!", "Alice")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, exception, "Hello Alice!"))
+
+                verifyLogEntry(Level.WARN, exception, "Hello Alice!")
             }
 
             /**
              * Verifies that a warning log entry with an exception and a message with placeholders and lazy arguments can
              * be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun warnExceptionAndFormattedMessageWithLazyArgument() {
+                whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn(exception, "Hello {}!", { "Alice" })
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, exception, "Hello Alice!"))
+
+                verifyLogEntry(Level.WARN, exception, "Hello Alice!")
             }
 
             /**
              * Verifies that an error log entry with an object can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun errorObjectMessage() {
+                whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error(42)
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, null, "42"))
+
+                verifyLogEntry(Level.ERROR, null, "42")
             }
 
             /**
              * Verifies that an error log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun errorTextMessage() {
+                whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error("Hello World!")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, null, "Hello World!"))
+
+                verifyLogEntry(Level.ERROR, null, "Hello World!")
             }
 
             /**
              * Verifies that an error log entry with a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun errorLazyMessage() {
+                whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error { "Hello World!" }
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, null, "Hello World!"))
+
+                verifyLogEntry(Level.ERROR, null, "Hello World!")
             }
 
             /**
              * Verifies that an error log entry with a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun errorFormattedMessageWithArgument() {
+                whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error("Hello {}!", "Alice")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, null, "Hello Alice!"))
+
+                verifyLogEntry(Level.ERROR, null, "Hello Alice!")
             }
 
             /**
              * Verifies that an error log entry with a message with placeholders and lazy arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun errorFormattedMessageWithLazyArgument() {
+                whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error("Hello {}!", { "Alice" })
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, null, "Hello Alice!"))
+
+                verifyLogEntry(Level.ERROR, null, "Hello Alice!")
             }
 
             /**
              * Verifies that an error log entry with an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun errorException() {
+                whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error(exception)
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, exception, null))
+
+                verifyLogEntry(Level.ERROR, exception, null)
             }
 
             /**
              * Verifies that an error log entry with an exception and a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun errorExceptionAndTextMessage() {
+                whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error(exception, "Oops!")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, exception, "Oops!"))
+
+                verifyLogEntry(Level.ERROR, exception, "Oops!")
             }
 
             /**
              * Verifies that an error log entry with an exception and a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun errorExceptionAndLazyMessage() {
+                whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error(exception) { "Oops!" }
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, exception, "Oops!"))
+
+                verifyLogEntry(Level.ERROR, exception, "Oops!")
             }
 
             /**
              * Verifies that an error log entry with an exception and a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun errorExceptionAndFormattedMessageWithArgument() {
+                whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error(exception, "Hello {}!", "Alice")
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, exception, "Hello Alice!"))
+
+                verifyLogEntry(Level.ERROR, exception, "Hello Alice!")
             }
 
             /**
              * Verifies that an error log entry with an exception and a message with placeholders and lazy arguments can
              * be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun errorExceptionAndFormattedMessageWithLazyArgument() {
+                whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
+
                 val exception = Exception()
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error(exception, "Hello {}!", { "Alice" })
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, exception, "Hello Alice!"))
+
+                verifyLogEntry(Level.ERROR, exception, "Hello Alice!")
             }
 
             /**
-             * Creates a new log entry.
+             * Verifies backend mock invocation with expected log entry values.
              *
-             * @param level     Severity level
-             * @param exception Exception or any other kind of throwable
-             * @param message   Text message
-             * @return Created log entry
+             * @param level The expected severity level
+             * @param exception The expected exception
+             * @param message The expected rendered text message
              */
-            private fun createLogEntry(
+            private fun verifyLogEntry(
                 level: Level,
-                exception: Throwable?,
+                exception: Exception?,
                 message: String?,
-            ): LogEntry {
-                return LogEntry(Enabled::class.java.name, "test", level, exception, message)
+            ) {
+                val captor = ArgumentCaptor.forClass(LogEntry::class.java)
+                verify(framework, atMost(1)).getLevelVisibilityByTag(null)
+                verify(framework).submit(captor.capture())
+
+                assertThat(captor.allValues).singleElement().satisfies({ entry: LogEntry ->
+                    assertThat(entry.thread).isSameAs(Thread.currentThread())
+                    assertThat(entry.context).isEmpty()
+                    assertThat(entry.className).isEqualTo(Enabled::class.java.name)
+                    assertThat(entry.methodName).isNull()
+                    assertThat(entry.fileName).isNull()
+                    assertThat(entry.lineNumber).isEqualTo(-1)
+                    assertThat(entry.tag).isEqualTo("test")
+                    assertThat(entry.severityLevel).isEqualTo(level)
+                    assertThat(entry.throwable).isSameAs(exception)
+                    assertThat(entry.getFormattedMessage(mock())).isEqualTo(message)
+                })
             }
         }
 
@@ -891,541 +1008,598 @@ internal class TaggedLoggerTest {
             /**
              * Verifies that a trace log entry with an object is discarded if the trace severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun traceObjectMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace(42)
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a trace log entry with a plain text message is discarded if the trace severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun traceTextMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace("Hello World!")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a trace log entry with a lazy text message is discarded if the trace severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun traceLazyMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace { "Hello World!" }
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a trace log entry with a message with placeholders is discarded if the trace severity level
              * is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun traceFormattedMessageWithArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace("Hello {}!", "Alice")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a trace log entry with a message with placeholders and lazy arguments is discarded if the
              * trace severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun traceFormattedMessageWithLazyArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace("Hello {}!", { "Alice" })
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a trace log entry with an exception is discarded if the trace severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun traceException() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace(Exception())
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a trace log entry with an exception and a plain text message is discarded if the trace
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun traceExceptionAndTextMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace(Exception(), "Oops!")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a trace log entry with an exception and a lazy text message is discarded if the trace
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun traceExceptionAndLazyMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace(Exception()) { "Oops!" }
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a trace log entry with an exception and a message with placeholders is discarded if the
              * trace severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun traceExceptionAndFormattedMessageWithArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace(Exception(), "Hello {}!", "Alice")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a trace log entry with an exception and a message with placeholders and lazy arguments is
              * discarded if the trace severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             fun traceExceptionAndFormattedMessageWithLazyArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.trace(Exception(), "Hello {}!", { "Alice" })
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a debug log entry with an object is discarded if the debug severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun debugObjectMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug(42)
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a debug log entry with a plain text message is discarded if the debug severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun debugTextMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug("Hello World!")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a debug log entry with a lazy text message is discarded if the debug severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun debugLazyMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug { "Hello World!" }
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a debug log entry with a message with placeholders is discarded if the debug severity level
              * is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun debugFormattedMessageWithArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug("Hello {}!", "Alice")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a debug log entry with a message with placeholders and lazy arguments is discarded if the
              * debug severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun debugFormattedMessageWithLazyArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug("Hello {}!", { "Alice" })
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a debug log entry with an exception is discarded if the debug severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun debugException() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug(Exception())
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a debug log entry with an exception and a plain text message is discarded if the debug
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun debugExceptionAndTextMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug(Exception(), "Oops!")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a debug log entry with an exception and a lazy text message is discarded if the debug
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun debugExceptionAndLazyMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug(Exception()) { "Oops!" }
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a debug log entry with an exception and a message with placeholders is discarded if the
              * debug severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun debugExceptionAndFormattedMessageWithArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug(Exception(), "Hello {}!", "Alice")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a debug log entry with an exception and a message with placeholders and lazy arguments is
              * discarded if the debug severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             fun debugExceptionAndFormattedMessageWithLazyArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.debug(Exception(), "Hello {}!", { "Alice" })
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an info log entry with an object is discarded if the info severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun infoObjectMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info(42)
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an info log entry with a plain text message is discarded if the info severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun infoTextMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info("Hello World!")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an info log entry with a lazy text message is discarded if the info severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun infoLazyMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info { "Hello World!" }
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an info log entry with a message with placeholders is discarded if the info severity level
              * is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun infoFormattedMessageWithArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info("Hello {}!", "Alice")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an info log entry with a message with placeholders and lazy arguments is discarded if the
              * info severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun infoFormattedMessageWithLazyArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info("Hello {}!", { "Alice" })
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an info log entry with an exception is discarded if the info severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun infoException() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info(Exception())
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an info log entry with an exception and a plain text message is discarded if the info
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun infoExceptionAndTextMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info(Exception(), "Oops!")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an info log entry with an exception and a lazy text message is discarded if the info
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun infoExceptionAndLazyMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info(Exception()) { "Oops!" }
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an info log entry with an exception and a message with placeholders is discarded if the
              * info severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun infoExceptionAndFormattedMessageWithArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info(Exception(), "Hello {}!", "Alice")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an info log entry with an exception and a message with placeholders and lazy arguments is
              * discarded if the info severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             fun infoExceptionAndFormattedMessageWithLazyArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.info(Exception(), "Hello {}!", { "Alice" })
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a warning log entry with an object is discarded if the warn severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun warnObjectMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn(42)
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a warning log entry with a plain text message is discarded if the warn severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun warnTextMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn("Hello World!")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a warning log entry with a lazy text message is discarded if the warn severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun warnLazyMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn { "Hello World!" }
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a warning log entry with a message with placeholders is discarded if the warn severity level
              * is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun warnFormattedMessageWithArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn("Hello {}!", "Alice")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a warning log entry with a message with placeholders and lazy arguments is discarded if the
              * warn severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun warnFormattedMessageWithLazyArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn("Hello {}!", { "Alice" })
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a warning log entry with an exception is discarded if the warn severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun warnException() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn(Exception())
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a warning log entry with an exception and a plain text message is discarded if the warn
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun warnExceptionAndTextMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn(Exception(), "Oops!")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a warning log entry with an exception and a lazy text message is discarded if the warn
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun warnExceptionAndLazyMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn(Exception()) { "Oops!" }
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a warning log entry with an exception and a message with placeholders is discarded if the
              * warn severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun warnExceptionAndFormattedMessageWithArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn(Exception(), "Hello {}!", "Alice")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that a warning log entry with an exception and a message with placeholders and lazy arguments is
              * discarded if the warn severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             fun warnExceptionAndFormattedMessageWithLazyArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.warn(Exception(), "Hello {}!", { "Alice" })
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an error log entry with an object is discarded if the error severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             fun errorObjectMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error(42)
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an error log entry with a plain text message is discarded if the error severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             fun errorTextMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error("Hello World!")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an error log entry with a lazy text message is discarded if the error severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             fun errorLazyMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error { "Hello World!" }
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an error log entry with a message with placeholders is discarded if the error severity level
              * is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             fun errorFormattedMessageWithArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error("Hello {}!", "Alice")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an error log entry with a message with placeholders and lazy arguments is discarded if the
              * error severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             fun errorFormattedMessageWithLazyArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error("Hello {}!", { "Alice" })
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an error log entry with an exception is discarded if the error severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             fun errorException() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error(Exception())
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an error log entry with an exception and a plain text message is discarded if the error
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             fun errorExceptionAndTextMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error(Exception(), "Oops!")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an error log entry with an exception and a lazy text message is discarded if the error
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             fun errorExceptionAndLazyMessage() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error(Exception()) { "Oops!" }
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an error log entry with an exception and a message with placeholders is discarded if the
              * error severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             fun errorExceptionAndFormattedMessageWithArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error(Exception(), "Hello {}!", "Alice")
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
             }
 
             /**
              * Verifies that an error log entry with an exception and a message with placeholders and lazy arguments is
              * discarded if the error severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             fun errorExceptionAndFormattedMessageWithLazyArgument() {
+                val logger = TaggedLogger("test", framework, SimpleMessageFormatter())
                 logger.error(Exception(), "Hello {}!", { "Alice" })
-                assertThat(log.consume()).isEmpty()
+
+                verifyNoLogEntry()
+            }
+
+            /**
+             * Verifies that no log entry has been submitted.
+             */
+            private fun verifyNoLogEntry() {
+                verify(framework, never()).submit(any())
             }
         }
     }

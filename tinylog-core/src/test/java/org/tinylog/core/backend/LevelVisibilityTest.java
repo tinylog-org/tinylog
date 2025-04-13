@@ -115,13 +115,7 @@ class LevelVisibilityTest {
      */
     @Test
     void off() {
-        LevelVisibility visibility = new LevelVisibility(
-            OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
-            OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
-            OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
-            OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
-            OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION
-        );
+        LevelVisibility visibility = new LevelVisibility(OutputDetails.ENABLED_WITH_FULL_LOCATION_INFO);
 
         assertThatCode(() -> visibility.get(Level.OFF))
             .isInstanceOf(IllegalArgumentException.class)

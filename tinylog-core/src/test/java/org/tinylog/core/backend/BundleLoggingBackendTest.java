@@ -1,21 +1,19 @@
 package org.tinylog.core.backend;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.tinylog.core.Level;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.format.message.MessageFormatter;
 
-import com.google.common.collect.ImmutableMap;
-
-import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.any;
@@ -34,27 +32,16 @@ class BundleLoggingBackendTest {
         ContextStorage firstStorage = mock(ContextStorage.class);
         LoggingBackend firstBackend = mock(LoggingBackend.class);
         when(firstBackend.getContextStorage()).thenReturn(firstStorage);
-        when(firstStorage.getMapping()).thenReturn(Collections.singletonMap("foo", "1"));
+        when(firstStorage.getMapping()).thenReturn(Map.of("foo", "1"));
 
         ContextStorage secondStorage = mock(ContextStorage.class);
         LoggingBackend secondBackend = mock(LoggingBackend.class);
         when(secondBackend.getContextStorage()).thenReturn(secondStorage);
-        when(secondStorage.getMapping()).thenReturn(Collections.singletonMap("bar", "2"));
+        when(secondStorage.getMapping()).thenReturn(Map.of("bar", "2"));
 
         BundleLoggingBackend bundleBackend = new BundleLoggingBackend(Arrays.asList(firstBackend, secondBackend));
         assertThat(bundleBackend.getContextStorage().getMapping())
-            .containsExactlyInAnyOrderEntriesOf(ImmutableMap.of("foo", "1", "bar", "2"));
-    }
-
-    /**
-     * Verifies that all passed child logging backends are stored.
-     */
-    @Test
-    void childProviders() {
-        LoggingBackend first = mock(LoggingBackend.class);
-        LoggingBackend second = mock(LoggingBackend.class);
-        BundleLoggingBackend parent = new BundleLoggingBackend(Arrays.asList(first, second));
-        assertThat(parent.getChildren()).containsExactlyInAnyOrder(first, second);
+            .containsExactlyInAnyOrderEntriesOf(Map.of("foo", "1", "bar", "2"));
     }
 
     /**
@@ -64,16 +51,16 @@ class BundleLoggingBackendTest {
      * @param className The fully-qualified class name to test
      */
     @ParameterizedTest
-    @ValueSource(strings = {"Foo", "example.Foo", "org.tinylog.core.backend.BundleLoggingBackend"})
+    @ValueSource(strings = {"Foo", "example.Foo", "org.tinylog.core.backend.BundleLoggingBackendTest"})
     void classesVisibility(String className) {
         LoggingBackend first = mock(LoggingBackend.class);
         when(first.getLevelVisibilityByClass(className)).thenReturn(
             new LevelVisibility(
                 OutputDetails.DISABLED,
-                OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
-                OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
+                OutputDetails.ENABLED_WITHOUT_LOCATION_INFO,
+                OutputDetails.ENABLED_WITHOUT_LOCATION_INFO,
                 OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
-                OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION
+                OutputDetails.ENABLED_WITH_FULL_LOCATION_INFO
             )
         );
 
@@ -94,11 +81,11 @@ class BundleLoggingBackendTest {
         assertThat(visibility.getDebug()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
         assertThat(visibility.getInfo()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
         assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
-        assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION);
+        assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITH_FULL_LOCATION_INFO);
     }
 
     /**
-     * Verifies that the level visibilities of all child logging backends are correctly merged for tags.
+     * Verifies that the level visibilities of all child logging backends are correctly merged for category tags.
      *
      * @param tag The category tag to test
      */
@@ -110,10 +97,10 @@ class BundleLoggingBackendTest {
         when(first.getLevelVisibilityByTag(tag)).thenReturn(
             new LevelVisibility(
                 OutputDetails.DISABLED,
-                OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
-                OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
+                OutputDetails.ENABLED_WITHOUT_LOCATION_INFO,
+                OutputDetails.ENABLED_WITHOUT_LOCATION_INFO,
                 OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
-                OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION
+                OutputDetails.ENABLED_WITH_FULL_LOCATION_INFO
             )
         );
 
@@ -134,7 +121,7 @@ class BundleLoggingBackendTest {
         assertThat(visibility.getDebug()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
         assertThat(visibility.getInfo()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
         assertThat(visibility.getWarn()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
-        assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION);
+        assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITH_FULL_LOCATION_INFO);
     }
 
     /**
@@ -196,46 +183,51 @@ class BundleLoggingBackendTest {
 
     /**
      * Verifies that log entries are passed to all assigned child backends.
+     *
+     * @param last {@code true} if this is the last log entry to be currently processed, {@code false} if there
+     *             are still other log entries to be processed
      */
-    @Test
-    void provideLogsToChildren() {
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void provideLogsToChildren(boolean last) {
         LoggingBackend first = mock(LoggingBackend.class);
         LoggingBackend second = mock(LoggingBackend.class);
         BundleLoggingBackend backend = new BundleLoggingBackend(Arrays.asList(first, second));
 
-        Throwable throwable = new Throwable();
-        Object[] arguments = {"world"};
-        MessageFormatter formatter = mock(MessageFormatter.class);
-        backend.log("org.tinylog.Foo", "TEST", Level.INFO, throwable, "Hello {}!", arguments, formatter);
-
-        verify(first).log(
-            eq("org.tinylog.Foo"),
-            eq("TEST"),
-            eq(Level.INFO),
-            same(throwable),
-            eq("Hello {}!"),
-            same(arguments),
-            same(formatter)
+        LogEntry entry = new LogEntry(
+            Thread.currentThread(),
+            emptyMap(),
+            "Foo",
+            "bar",
+            Level.INFO,
+            new Throwable(),
+            mock(MessageFormatter.class),
+            "Hello {}!",
+            new Object[] {"Alice"}
         );
 
-        verify(second).log(
-            eq("org.tinylog.Foo"),
-            eq("TEST"),
-            eq(Level.INFO),
-            same(throwable),
-            eq("Hello {}!"),
-            same(arguments),
-            same(formatter)
-        );
+        backend.output(entry, last);
+
+        verify(first).output(same(entry), eq(last));
+        verify(second).output(same(entry), eq(last));
     }
 
     /**
-     * Verifies that reconfiguration is rejected.
+     * Verifies that all child backends are closed correctly.
      */
     @Test
-    void reconfigure() {
-        LoggingBackend backend = new BundleLoggingBackend(emptyList());
-        assertThatCode(backend::reconfigure).isInstanceOf(UnsupportedOperationException.class);
+    void closeChildren() {
+        LoggingBackend first = mock(LoggingBackend.class);
+        LoggingBackend second = mock(LoggingBackend.class);
+        BundleLoggingBackend backend = new BundleLoggingBackend(Arrays.asList(first, second));
+
+        verify(first, never()).close();
+        verify(second, never()).close();
+
+        backend.close();
+
+        verify(first).close();
+        verify(second).close();
     }
 
 }

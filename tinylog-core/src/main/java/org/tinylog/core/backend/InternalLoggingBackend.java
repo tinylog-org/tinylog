@@ -2,50 +2,43 @@ package org.tinylog.core.backend;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Objects;
 
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.context.NopContextStorage;
-import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.internal.LoggingContext;
 
 /**
  * Internal logging backend that prints internal tinylog errors and warnings to {@link System#err}.
  */
 public class InternalLoggingBackend implements LoggingBackend {
 
-    private static final ContextStorage STORAGE = new NopContextStorage();
+    private static final LevelVisibility INVISIBLE = new LevelVisibility(OutputDetails.DISABLED);
 
     private static final LevelVisibility VISIBLE = new LevelVisibility(
         OutputDetails.DISABLED,
         OutputDetails.DISABLED,
         OutputDetails.DISABLED,
-        OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION,
-        OutputDetails.ENABLED_WITHOUT_LOCATION_INFORMATION
+        OutputDetails.ENABLED_WITHOUT_LOCATION_INFO,
+        OutputDetails.ENABLED_WITHOUT_LOCATION_INFO
     );
 
-    private static final LevelVisibility INVISIBLE = new LevelVisibility(
-        OutputDetails.DISABLED,
-        OutputDetails.DISABLED,
-        OutputDetails.DISABLED,
-        OutputDetails.DISABLED,
-        OutputDetails.DISABLED
-    );
-
-    private final LoggingContext context;
+    private final ContextStorage contextStorage;
+    private final Configuration configuration;
 
     /**
-     * @param context The current logging context
+     * @param configuration The current tinylog configuration
      */
-    public InternalLoggingBackend(LoggingContext context) {
-        this.context = context;
+    public InternalLoggingBackend(Configuration configuration) {
+        this.contextStorage = new NopContextStorage();
+        this.configuration = configuration;
     }
 
     @Override
     public ContextStorage getContextStorage() {
-        return STORAGE;
+        return contextStorage;
     }
 
     @Override
@@ -64,27 +57,24 @@ public class InternalLoggingBackend implements LoggingBackend {
 
     @Override
     public boolean isEnabled(Object location, String tag, Level level) {
-        return Objects.equals(tag, InternalLogger.TAG) && level.isAtLeastAsSevereAs(Level.WARN);
+        return InternalLogger.TAG.equals(tag) && level.isAtLeastAsSevereAs(Level.WARN);
     }
 
     @Override
-    public void log(Object location, String tag, Level level, Throwable throwable, Object message, Object[] arguments,
-            MessageFormatter formatter) {
-        if (Objects.equals(tag, InternalLogger.TAG) && level.isAtLeastAsSevereAs(Level.WARN)) {
+    public void output(LogEntry entry, boolean last) {
+        if (InternalLogger.TAG.equals(entry.getTag()) && entry.getSeverityLevel().isAtLeastAsSevereAs(Level.WARN)) {
             StringBuilder builder = new StringBuilder();
 
             builder.append("TINYLOG ");
-            builder.append(level);
+            builder.append(entry.getSeverityLevel());
             builder.append(": ");
 
+            String message = entry.getFormattedMessage(configuration);
             if (message != null) {
-                if (formatter == null || arguments == null) {
-                    builder.append(message);
-                } else {
-                    builder.append(formatter.format(context, message.toString(), arguments));
-                }
+                builder.append(message);
             }
 
+            Throwable throwable = entry.getThrowable();
             if (throwable != null) {
                 if (message != null) {
                     builder.append(": ");
@@ -102,8 +92,8 @@ public class InternalLoggingBackend implements LoggingBackend {
     }
 
     @Override
-    public LoggingBackend reconfigure() {
-        return this;
+    public void close() {
+        // Ignore
     }
 
 }

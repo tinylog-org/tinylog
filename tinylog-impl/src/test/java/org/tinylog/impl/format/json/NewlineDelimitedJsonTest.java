@@ -4,45 +4,57 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
-import org.tinylog.impl.LogEntry;
-import org.tinylog.impl.LogEntryValue;
-import org.tinylog.impl.format.pattern.placeholders.DatePlaceholder;
-import org.tinylog.impl.format.pattern.placeholders.LevelPlaceholder;
-import org.tinylog.impl.format.pattern.placeholders.LinePlaceholder;
-import org.tinylog.impl.format.pattern.placeholders.MessageOnlyPlaceholder;
-import org.tinylog.impl.format.pattern.placeholders.MessagePlaceholder;
-import org.tinylog.impl.format.pattern.placeholders.StaticTextPlaceholder;
-import org.tinylog.impl.format.pattern.placeholders.TimestampPlaceholder;
-import org.tinylog.impl.format.pattern.placeholders.UptimePlaceholder;
-import org.tinylog.impl.test.FormatOutputRenderer;
-import org.tinylog.impl.test.LogEntryBuilder;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.backend.OutputDetails;
+import org.tinylog.core.runtime.RuntimeFlavor;
+import org.tinylog.impl.format.placeholder.DatePlaceholder;
+import org.tinylog.impl.format.placeholder.LevelPlaceholder;
+import org.tinylog.impl.format.placeholder.LinePlaceholder;
+import org.tinylog.impl.format.placeholder.MessageOnlyPlaceholder;
+import org.tinylog.impl.format.placeholder.MessagePlaceholder;
+import org.tinylog.impl.format.placeholder.Placeholder;
+import org.tinylog.impl.format.placeholder.StaticTextPlaceholder;
+import org.tinylog.impl.format.placeholder.TimestampPlaceholder;
+import org.tinylog.impl.format.placeholder.UptimePlaceholder;
+import org.tinylog.test.junit.log.Tinylog;
+import org.tinylog.test.util.FormatOutputRenderer;
+import org.tinylog.test.util.LogEntryBuilder;
 
-import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 
+@Tinylog
 class NewlineDelimitedJsonTest {
+
+    @Inject
+    private RuntimeFlavor runtime;
+
+    @Inject
+    private Configuration configuration;
 
     /**
      * Verifies that a JSON without any field is correctly rendered.
      */
     @Test
     void renderWithoutFields() {
-        NewlineDelimitedJson format = new NewlineDelimitedJson(emptyMap());
+        Map<String, Placeholder> fields = emptyMap();
+        NewlineDelimitedJson format = new NewlineDelimitedJson(fields);
 
-        assertThat(format.getRequiredLogEntryValues()).isEmpty();
+        assertThat(format.getOutputDetails()).isEqualTo(OutputDetails.DISABLED);
 
-        LogEntry logEntry = new LogEntryBuilder().create();
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
+        LogEntry logEntry = new LogEntryBuilder().create();
 
         assertThat(renderer.render(logEntry))
             .isEqualTo("{}" + System.lineSeparator());
@@ -53,12 +65,16 @@ class NewlineDelimitedJsonTest {
      */
     @Test
     void renderWithIntegerField() {
-        NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap("line", new LinePlaceholder()));
-        assertThat(format.getRequiredLogEntryValues()).containsExactly(LogEntryValue.LINE);
+        Map<String, Placeholder> fields = Map.of("line", new LinePlaceholder());
+        NewlineDelimitedJson format = new NewlineDelimitedJson(fields);
+
+        assertThat(format.getOutputDetails()).isEqualTo(OutputDetails.ENABLED_WITH_FULL_LOCATION_INFO);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
-        LogEntry filledLogEntry = new LogEntryBuilder().lineNumber(42).create();
+        LogEntry filledLogEntry = new LogEntryBuilder()
+            .stackTraceElement("MyClass", "foo", "MyClass.java", 42)
+            .create();
         assertThat(renderer.render(filledLogEntry))
             .isEqualTo("{\"line\": 42}" + System.lineSeparator());
 
@@ -72,20 +88,16 @@ class NewlineDelimitedJsonTest {
      */
     @Test
     void renderWithLongField() {
-        NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap("timestamp", new TimestampPlaceholder(
-            Instant::getEpochSecond
-        )));
-        assertThat(format.getRequiredLogEntryValues()).containsExactly(LogEntryValue.TIMESTAMP);
+        Map<String, Placeholder> fields = Map.of("timestamp", new TimestampPlaceholder(Instant::getEpochSecond));
+        NewlineDelimitedJson format = new NewlineDelimitedJson(fields);
+
+        assertThat(format.getOutputDetails()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFO);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
-        LogEntry filledLogEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
-        assertThat(renderer.render(filledLogEntry))
+        LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
+        assertThat(renderer.render(logEntry))
             .isEqualTo("{\"timestamp\": 0}" + System.lineSeparator());
-
-        LogEntry emptyLogEntry = new LogEntryBuilder().create();
-        assertThat(renderer.render(emptyLogEntry))
-            .isEqualTo("{\"timestamp\": null}" + System.lineSeparator());
     }
 
     /**
@@ -93,20 +105,16 @@ class NewlineDelimitedJsonTest {
      */
     @Test
     void renderWithDecimalField() {
-        NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap("uptime", new UptimePlaceholder(
-            "S", false
-        )));
-        assertThat(format.getRequiredLogEntryValues()).containsExactly(LogEntryValue.UPTIME);
+        Map<String, Placeholder> fields = Map.of("uptime", new UptimePlaceholder(runtime, "S", false));
+        NewlineDelimitedJson format = new NewlineDelimitedJson(fields);
+
+        assertThat(format.getOutputDetails()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFO);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
-        LogEntry filledLogEntry = new LogEntryBuilder().uptime(Duration.ofMillis(42)).create();
-        assertThat(renderer.render(filledLogEntry))
+        LogEntry logEntry = new LogEntryBuilder().uptime(Duration.ofMillis(42)).create();
+        assertThat(renderer.render(logEntry))
             .isEqualTo("{\"uptime\": 0.042000000}" + System.lineSeparator());
-
-        LogEntry emptyLogEntry = new LogEntryBuilder().create();
-        assertThat(renderer.render(emptyLogEntry))
-            .isEqualTo("{\"uptime\": null}" + System.lineSeparator());
     }
 
     /**
@@ -114,21 +122,17 @@ class NewlineDelimitedJsonTest {
      */
     @Test
     void renderWithTimestampField() {
-        NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap("date", new DatePlaceholder(
-            DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH).withZone(ZoneOffset.UTC),
-            false
-        )));
-        assertThat(format.getRequiredLogEntryValues()).containsExactly(LogEntryValue.TIMESTAMP);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ROOT).withZone(ZoneOffset.UTC);
+        Map<String, Placeholder> fields = Map.of("date", new DatePlaceholder(formatter, false));
+        NewlineDelimitedJson format = new NewlineDelimitedJson(fields);
+
+        assertThat(format.getOutputDetails()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFO);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
-        LogEntry filledLogEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
-        assertThat(renderer.render(filledLogEntry))
+        LogEntry logEntry = new LogEntryBuilder().timestamp(Instant.EPOCH).create();
+        assertThat(renderer.render(logEntry))
             .isEqualTo("{\"date\": \"1970-01-01\"}" + System.lineSeparator());
-
-        LogEntry emptyLogEntry = new LogEntryBuilder().create();
-        assertThat(renderer.render(emptyLogEntry))
-            .isEqualTo("{\"date\": null}" + System.lineSeparator());
     }
 
     /**
@@ -136,9 +140,10 @@ class NewlineDelimitedJsonTest {
      */
     @Test
     void renderWithStringField() {
-        NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap("message", new MessagePlaceholder()));
-        assertThat(format.getRequiredLogEntryValues())
-            .containsExactlyInAnyOrder(LogEntryValue.EXCEPTION, LogEntryValue.MESSAGE);
+        Map<String, Placeholder> fields = Map.of("message", new MessagePlaceholder(configuration));
+        NewlineDelimitedJson format = new NewlineDelimitedJson(fields);
+
+        assertThat(format.getOutputDetails()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFO);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
@@ -156,17 +161,16 @@ class NewlineDelimitedJsonTest {
      */
     @Test
     void renderWithTwoFields() {
-        NewlineDelimitedJson format = new NewlineDelimitedJson(ImmutableMap.ofEntries(
-            entry("level", new LevelPlaceholder()),
-            entry("message", new MessageOnlyPlaceholder())
-        ));
+        Map<String, Placeholder> fields = new LinkedHashMap<>();
+        fields.put("level", new LevelPlaceholder());
+        fields.put("message", new MessageOnlyPlaceholder(configuration));
+        NewlineDelimitedJson format = new NewlineDelimitedJson(fields);
 
-        assertThat(format.getRequiredLogEntryValues())
-            .containsExactlyInAnyOrder(LogEntryValue.LEVEL, LogEntryValue.MESSAGE);
+        assertThat(format.getOutputDetails()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFO);
 
-        LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).message("Hello World!").create();
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
+        LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).message("Hello World!").create();
         assertThat(renderer.render(logEntry))
             .isEqualTo("{\"level\": \"INFO\", \"message\": \"Hello World!\"}" + System.lineSeparator());
     }
@@ -193,13 +197,12 @@ class NewlineDelimitedJsonTest {
         " _\237_ , _\\u009F_"
     })
     void escapeFieldName(String originalName, String escapedName) {
-        NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap(
-            originalName, new MessageOnlyPlaceholder()
-        ));
+        Map<String, Placeholder> fields = Map.of(originalName, new MessageOnlyPlaceholder(configuration));
+        NewlineDelimitedJson format = new NewlineDelimitedJson(fields);
 
-        LogEntry logEntry = new LogEntryBuilder().message("foo").create();
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
+        LogEntry logEntry = new LogEntryBuilder().message("foo").create();
         assertThat(renderer.render(logEntry))
             .isEqualTo("{\"%s\": \"foo\"}" + System.lineSeparator(), escapedName);
     }
@@ -226,13 +229,12 @@ class NewlineDelimitedJsonTest {
         " _\237_ , _\\u009F_"
     })
     void escapeFieldValue(String originalValue, String escapedValue) {
-        NewlineDelimitedJson format = new NewlineDelimitedJson(singletonMap(
-            "foo", new StaticTextPlaceholder(originalValue)
-        ));
+        Map<String, Placeholder> fields = Map.of("foo", new StaticTextPlaceholder(originalValue));
+        NewlineDelimitedJson format = new NewlineDelimitedJson(fields);
 
-        LogEntry logEntry = new LogEntryBuilder().create();
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
+        LogEntry logEntry = new LogEntryBuilder().create();
         assertThat(renderer.render(logEntry))
             .isEqualTo("{\"foo\": \"%s\"}" + System.lineSeparator(), escapedValue);
     }

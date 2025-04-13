@@ -2,16 +2,14 @@ package org.tinylog;
 
 import java.util.Collections;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Tinylog;
-import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.context.ContextStorage;
+import org.tinylog.test.junit.isolate.IsolatedExecution;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -21,46 +19,33 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@IsolatedExecution(classes = ThreadContext.class)
 class ThreadContextTest {
 
-    private static MockedStatic<Tinylog> tinylogMock;
-    private static LoggingBackend backend;
-    private static ContextStorage storage;
+    private MockedStatic<Tinylog> tinylogMock;
+    private ContextStorage storage;
 
     /**
      * Initializes all mocks.
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    @BeforeAll
-    static void create() {
+    @BeforeEach
+    void create() {
         tinylogMock = mockStatic(Tinylog.class);
-        backend = mock(LoggingBackend.class);
         storage = mock(ContextStorage.class);
 
-        tinylogMock.when(Tinylog::getFramework).thenReturn(new Framework(false, false) {
-            @Override
-            public LoggingBackend getLoggingBackend() {
-                return backend;
-            }
-        });
+        Framework framework = mock(Framework.class);
+        when(framework.getContextStorage()).thenReturn(storage);
 
-        when(backend.getContextStorage()).thenReturn(storage);
+        tinylogMock.when(Tinylog::getFramework).thenReturn(framework);
     }
 
     /**
      * Restores the mocked tinylog class.
      */
-    @AfterAll
-    static void dispose() {
-        tinylogMock.close();
-    }
-
-    /**
-     * Resets the context storage.
-     */
     @AfterEach
-    void reset() {
-        Mockito.reset(storage);
+    void dispose() {
+        tinylogMock.close();
     }
 
     /**

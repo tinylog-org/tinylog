@@ -10,7 +10,7 @@ Example
 
 ```java
 import org.tinylog.Logger;
-    
+
 public class Application {
 
     public static void main(String[] args) {
@@ -44,7 +44,7 @@ For building tinylog or contributing to this project, please take a look at [con
 License
 -------
 
-Copyright 2020-2023 Martin Winandy
+Copyright 2020-2025 Martin Winandy
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

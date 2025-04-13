@@ -11,42 +11,67 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.ServiceLoader;
 
-import javax.inject.Inject;
-
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junitpioneer.jupiter.RestoreSystemProperties;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
-import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.core.test.log.Log;
+import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.test.junit.log.Log;
+import org.tinylog.test.junit.log.Tinylog;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
+import jakarta.inject.Inject;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@CaptureLogEntries
+@Tinylog
+@RestoreSystemProperties
 class PropertiesLoaderTest {
 
     @TempDir
     private Path folder;
 
     @Inject
+    private Configuration configuration;
+
+    @Inject
+    private InternalLogger logger;
+
+    @Inject
     private Log log;
 
-    private ClassLoader classLoader;
+    private URLClassLoader classLoader;
 
     /**
-     * Create a class loader that contains the current temporary folder.
-     *
-     * @throws MalformedURLException Failed to provide the current temporary folder as URL
+     * Creates a class loader that contains the current temporary folder.
      */
     @BeforeEach
     void init() throws MalformedURLException {
         URL[] urls = new URL[] {folder.toUri().toURL()};
         classLoader = new URLClassLoader(urls, Thread.currentThread().getContextClassLoader());
+    }
+
+    /**
+     * Closes the crated URL class loader.
+     */
+    @AfterEach
+    void destroy() throws IOException {
+        classLoader.close();
+    }
+
+    /**
+     * Verifies that the loader is registered as service.
+     */
+    @Test
+    void service() {
+        assertThat(ServiceLoader.load(ConfigurationLoader.class))
+            .anyMatch(loader -> loader instanceof PropertiesLoader);
     }
 
     /**
@@ -65,8 +90,8 @@ class PropertiesLoaderTest {
     void loadDefaultProductionPropertiesFile() throws IOException {
         createTextFile("tinylog.properties", "environment = production");
 
-        Map<String, String> configuration = new PropertiesLoader().load(classLoader);
-        assertThat(configuration).containsExactly(entry("environment", "production"));
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
+        assertThat(properties).containsExactly(entry("environment", "production"));
     }
 
     /**
@@ -76,8 +101,8 @@ class PropertiesLoaderTest {
     void loadDefaultTestPropertiesFile() throws IOException {
         createTextFile("tinylog-test.properties", "environment = test");
 
-        Map<String, String> configuration = new PropertiesLoader().load(classLoader);
-        assertThat(configuration).containsExactly(entry("environment", "test"));
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
+        assertThat(properties).containsExactly(entry("environment", "test"));
     }
 
     /**
@@ -87,8 +112,8 @@ class PropertiesLoaderTest {
     void loadDefaultDevelopmentPropertiesFile() throws IOException {
         createTextFile("tinylog-dev.properties", "environment = development");
 
-        Map<String, String> configuration = new PropertiesLoader().load(classLoader);
-        assertThat(configuration).containsExactly(entry("environment", "development"));
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
+        assertThat(properties).containsExactly(entry("environment", "development"));
     }
 
     /**
@@ -100,8 +125,8 @@ class PropertiesLoaderTest {
         createTextFile("tinylog.properties", "production = yes");
         createTextFile("tinylog-test.properties", "test = yes");
 
-        Map<String, String> configuration = new PropertiesLoader().load(classLoader);
-        assertThat(configuration).containsExactly(entry("test", "yes"));
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
+        assertThat(properties).containsExactly(entry("test", "yes"));
     }
 
     /**
@@ -113,68 +138,60 @@ class PropertiesLoaderTest {
         createTextFile("tinylog-test.properties", "test = yes");
         createTextFile("tinylog-dev.properties", "development = yes");
 
-        Map<String, String> configuration = new PropertiesLoader().load(classLoader);
-        assertThat(configuration).containsExactly(entry("development", "yes"));
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
+        assertThat(properties).containsExactly(entry("development", "yes"));
     }
 
     /**
      * Verifies that a custom resource from the classpath can be provided as tinylog configuration.
      */
     @Test
-    void loadCustomResource() throws Exception {
-        restoreSystemProperties(() -> {
-            createTextFile("my-configuration.properties", "foo = bar");
-            System.setProperty("tinylog.configuration", "my-configuration.properties");
+    void loadCustomResource() throws IOException {
+        createTextFile("my-configuration.properties", "foo = bar");
+        System.setProperty("tinylog.configuration", "my-configuration.properties");
 
-            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
-            assertThat(configuration).containsExactly(entry("foo", "bar"));
-        });
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
+        assertThat(properties).containsExactly(entry("foo", "bar"));
     }
 
     /**
      * Verifies that a custom local file can be provided as tinylog configuration.
      */
     @Test
-    void loadCustomLocalFile() throws Exception {
-        restoreSystemProperties(() -> {
-            Path file = createTextFile("my-configuration.properties", "foo = bar");
-            System.setProperty("tinylog.configuration", file.toString());
+    void loadCustomLocalFile() throws IOException {
+        Path file = createTextFile("my-configuration.properties", "foo = bar");
+        System.setProperty("tinylog.configuration", file.toString());
 
-            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
-            assertThat(configuration).containsExactly(entry("foo", "bar"));
-        });
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
+        assertThat(properties).containsExactly(entry("foo", "bar"));
     }
 
     /**
      * Verifies that a custom URL can be provided as tinylog configuration.
      */
     @Test
-    void loadCustomUrl() throws Exception {
-        restoreSystemProperties(() -> {
-            Path file = createTextFile("my-configuration.properties", "foo = bar");
-            System.setProperty("tinylog.configuration", file.toUri().toURL().toString());
+    void loadCustomUrl() throws IOException {
+        Path file = createTextFile("my-configuration.properties", "foo = bar");
+        System.setProperty("tinylog.configuration", file.toUri().toURL().toString());
 
-            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
-            assertThat(configuration).containsExactly(entry("foo", "bar"));
-        });
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
+        assertThat(properties).containsExactly(entry("foo", "bar"));
     }
 
     /**
      * Verifies that no default properties files will be loaded, if a custom configuration is provided.
      */
     @Test
-    void preferCustomOverDefaultPropertiesFile() throws Exception {
-        restoreSystemProperties(() -> {
-            createTextFile("tinylog-custom.properties", "custom = yes");
-            createTextFile("tinylog.properties", "production = yes");
-            createTextFile("tinylog-test.properties", "test = yes");
-            createTextFile("tinylog-dev.properties", "development = yes");
+    void preferCustomOverDefaultPropertiesFile() throws IOException {
+        createTextFile("tinylog-custom.properties", "custom = yes");
+        createTextFile("tinylog.properties", "production = yes");
+        createTextFile("tinylog-test.properties", "test = yes");
+        createTextFile("tinylog-dev.properties", "development = yes");
 
-            System.setProperty("tinylog.configuration", "tinylog-custom.properties");
+        System.setProperty("tinylog.configuration", "tinylog-custom.properties");
 
-            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
-            assertThat(configuration).containsExactly(entry("custom", "yes"));
-        });
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
+        assertThat(properties).containsExactly(entry("custom", "yes"));
     }
 
     /**
@@ -182,18 +199,16 @@ class PropertiesLoaderTest {
      * if the defined custom configuration does not exist.
      */
     @Test
-    void printErrorIfCustomPropertiesFileDoesNotExist() throws Exception {
-        restoreSystemProperties(() -> {
-            createTextFile("tinylog.properties", "production = yes");
-            System.setProperty("tinylog.configuration", "tinylog-custom.properties");
+    void printErrorIfCustomPropertiesFileDoesNotExist() throws IOException {
+        createTextFile("tinylog.properties", "production = yes");
+        System.setProperty("tinylog.configuration", "tinylog-custom.properties");
 
-            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
-            assertThat(configuration).containsExactly(entry("production", "yes"));
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
+        assertThat(properties).containsExactly(entry("production", "yes"));
 
-            assertThat(log.consume()).hasSize(1).allSatisfy(entry -> {
-                assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-                assertThat(entry.getMessage()).contains("tinylog-custom.properties");
-            });
+        assertThat(log.consume()).singleElement().satisfies(entry -> {
+            assertThat(entry.getSeverityLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getFormattedMessage(configuration)).contains("tinylog-custom.properties");
         });
     }
 
@@ -201,8 +216,8 @@ class PropertiesLoaderTest {
      * Verifies that an error message will be output, if a resource stream throws an {@link IOException}.
      */
     @Test
-    void printErrorIfLoadingPropertiesFileFails() {
-        classLoader = new URLClassLoader(new URL[0], Thread.currentThread().getContextClassLoader()) {
+    void printErrorIfLoadingPropertiesFileFails() throws IOException {
+        URLClassLoader classLoader = new URLClassLoader(new URL[0], this.classLoader) {
             @Override
             public InputStream getResourceAsStream(String name) {
                 try {
@@ -215,12 +230,14 @@ class PropertiesLoaderTest {
             }
         };
 
-        new PropertiesLoader().load(classLoader);
+        try (classLoader) {
+            new PropertiesLoader().load(classLoader, logger);
 
-        assertThat(log.consume()).hasSize(3).allSatisfy(entry -> {
-            assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-            assertThat(entry.getThrowable()).hasMessage("Invalid resource");
-        });
+            assertThat(log.consume()).hasSize(3).allSatisfy(entry -> {
+                assertThat(entry.getSeverityLevel()).isEqualTo(Level.ERROR);
+                assertThat(entry.getThrowable()).hasMessage("Invalid resource");
+            });
+        }
     }
 
     /**
@@ -230,41 +247,37 @@ class PropertiesLoaderTest {
     void preserveOrderOfProperties() throws IOException {
         createTextFile("tinylog.properties", "b=1", "c=2", "a=3");
 
-        Map<String, String> configuration = new PropertiesLoader().load(classLoader);
-        assertThat(configuration).containsExactly(entry("b", "1"), entry("c", "2"), entry("a", "3"));
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
+        assertThat(properties).containsExactly(entry("b", "1"), entry("c", "2"), entry("a", "3"));
     }
 
     /**
      * Verifies that a system property without any default value can be resolved.
      */
     @Test
-    void resolveExistingSystemPropertyWithoutDefault() throws Exception {
+    void resolveExistingSystemPropertyWithoutDefault() throws IOException {
         createTextFile("tinylog.properties", "example = #{foo}");
 
-        restoreSystemProperties(() -> {
-            System.setProperty("foo", "42");
-            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
+        System.setProperty("foo", "42");
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
 
-            assertThat(configuration).containsExactly(entry("example", "42"));
-        });
+        assertThat(properties).containsExactly(entry("example", "42"));
     }
 
     /**
      * Verifies that a system property without any default value will be kept unchanged, if it cannot be resolved.
      */
     @Test
-    void resolveMissingSystemPropertyWithoutDefault() throws Exception {
+    void resolveMissingSystemPropertyWithoutDefault() throws IOException {
         createTextFile("tinylog.properties", "example = #{foo}");
 
-        restoreSystemProperties(() -> {
-            System.clearProperty("foo");
-            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
+        System.clearProperty("foo");
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
 
-            assertThat(configuration).containsExactly(entry("example", "#{foo}"));
-            assertThat(log.consume()).singleElement().satisfies(entry -> {
-                assertThat(entry.getLevel()).isEqualTo(Level.WARN);
-                assertThat(entry.getMessage()).contains("foo");
-            });
+        assertThat(properties).containsExactly(entry("example", "#{foo}"));
+        assertThat(log.consume()).singleElement().satisfies(entry -> {
+            assertThat(entry.getSeverityLevel()).isEqualTo(Level.WARN);
+            assertThat(entry.getFormattedMessage(configuration)).contains("foo");
         });
     }
 
@@ -272,15 +285,13 @@ class PropertiesLoaderTest {
      * Verifies that a system property with a defined default value can be resolved.
      */
     @Test
-    void resolveExistingSystemPropertyWithDefault() throws Exception {
+    void resolveExistingSystemPropertyWithDefault() throws IOException {
         createTextFile("tinylog.properties", "example = #{ foo | default }");
 
-        restoreSystemProperties(() -> {
-            System.setProperty("foo", "42");
-            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
+        System.setProperty("foo", "42");
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
 
-            assertThat(configuration).containsExactly(entry("example", "42"));
-        });
+        assertThat(properties).containsExactly(entry("example", "42"));
     }
 
     /**
@@ -288,40 +299,27 @@ class PropertiesLoaderTest {
      * property cannot be resolved.
      */
     @Test
-    void resolveMissingSystemPropertyWithDefault() throws Exception {
+    void resolveMissingSystemPropertyWithDefault() throws IOException {
         createTextFile("tinylog.properties", "example = #{ foo | default }");
 
-        restoreSystemProperties(() -> {
-            System.clearProperty("foo");
-            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
+        System.clearProperty("foo");
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
 
-            assertThat(configuration).containsExactly(entry("example", "default"));
-        });
+        assertThat(properties).containsExactly(entry("example", "default"));
     }
 
     /**
      * Verifies that multiple system properties can be resolved.
      */
     @Test
-    void resolveMultipleSystemProperties() throws Exception {
+    void resolveMultipleSystemProperties() throws IOException {
         createTextFile("tinylog.properties", "example = <#{foo}> <#{bar}>");
 
-        restoreSystemProperties(() -> {
-            System.setProperty("foo", "1");
-            System.setProperty("bar", "2");
-            Map<String, String> configuration = new PropertiesLoader().load(classLoader);
+        System.setProperty("foo", "1");
+        System.setProperty("bar", "2");
+        Map<String, String> properties = new PropertiesLoader().load(classLoader, logger);
 
-            assertThat(configuration).containsExactly(entry("example", "<1> <2>"));
-        });
-    }
-
-    /**
-     * Verifies that the loader is registered as service.
-     */
-    @Test
-    void service() {
-        assertThat(ServiceLoader.load(ConfigurationLoader.class))
-            .anyMatch(loader -> loader instanceof PropertiesLoader);
+        assertThat(properties).containsExactly(entry("example", "<1> <2>"));
     }
 
     /**
@@ -330,7 +328,6 @@ class PropertiesLoaderTest {
      * @param fileName File name for the text file
      * @param lines Lines to write to the text file
      * @return The created file
-     * @throws IOException Failed to create a text file
      */
     private Path createTextFile(String fileName, String... lines) throws IOException {
         Path file = folder.resolve(fileName);

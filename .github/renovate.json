@@ -1,17 +1,34 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": [ "config:base" ],
+    "extends": [
+        "config:recommended"
+    ],
     "packageRules": [
         {
-            "matchUpdateTypes": [ "minor", "patch" ],
+            "matchUpdateTypes": [
+                "minor",
+                "patch"
+            ],
             "automerge": true,
             "automergeType": "branch",
             "automergeStrategy": "rebase"
         },
         {
-            "matchPackagePatterns": ["^org.tinylog:"],
+            "matchUpdateTypes": [
+                "major",
+                "minor"
+            ],
+            "enabled": false,
+            "matchPackageNames": [
+                "/^org.robolectric:android-all/"
+            ]
+        },
+        {
             "matchCurrentValue": "/-SNAPSHOT$/",
-            "enabled": false
+            "enabled": false,
+            "matchPackageNames": [
+                "/^org.tinylog:/"
+            ]
         }
     ]
 }

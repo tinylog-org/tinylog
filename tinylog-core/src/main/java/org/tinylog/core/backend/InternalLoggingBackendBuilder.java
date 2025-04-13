@@ -1,7 +1,5 @@
 package org.tinylog.core.backend;
 
-import org.tinylog.core.internal.LoggingContext;
-
 /**
  * Builder for {@link InternalLoggingBackend}.
  */
@@ -17,8 +15,8 @@ public class InternalLoggingBackendBuilder implements LoggingBackendBuilder {
     }
 
     @Override
-    public LoggingBackend create(LoggingContext context) {
-        return new InternalLoggingBackend(context);
+    public LoggingBackend create(TinylogContext context) {
+        return new InternalLoggingBackend(context.getConfiguration());
     }
 
 }

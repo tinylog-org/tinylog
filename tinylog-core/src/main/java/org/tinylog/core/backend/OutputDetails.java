@@ -13,7 +13,7 @@ public enum OutputDetails {
     /**
      * Output is enabled, but no stack trace location information of the caller are required.
      */
-    ENABLED_WITHOUT_LOCATION_INFORMATION,
+    ENABLED_WITHOUT_LOCATION_INFO,
 
     /**
      * Output is enabled and the class name of the caller is required.
@@ -23,6 +23,6 @@ public enum OutputDetails {
     /**
      * Output is enabled and all stack trace location information of the caller are required.
      */
-    ENABLED_WITH_FULL_LOCATION_INFORMATION
+    ENABLED_WITH_FULL_LOCATION_INFO
 
 }

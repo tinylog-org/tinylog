@@ -6,9 +6,9 @@ import java.util.function.Supplier;
 
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.Tinylog;
 import org.tinylog.core.backend.LevelVisibility;
-import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.format.message.EnhancedMessageFormatter;
 import org.tinylog.core.format.message.MessageFormatter;
@@ -20,10 +20,8 @@ import org.tinylog.core.runtime.RuntimeFlavor;
 public final class Logger {
 
     private static final ConcurrentMap<String, TaggedLogger> taggedLoggers;
-
     private static final Framework framework;
     private static final RuntimeFlavor runtime;
-    private static final LoggingBackend backend;
     private static final MessageFormatter formatter;
 
     private static final OutputDetails visibilityTrace;
@@ -34,14 +32,11 @@ public final class Logger {
 
     static {
         taggedLoggers = new ConcurrentHashMap<>();
-
         framework = Tinylog.getFramework();
         runtime = framework.getRuntime();
-        backend = framework.getLoggingBackend();
-        formatter = new EnhancedMessageFormatter(framework.getClassLoader());
+        formatter = new EnhancedMessageFormatter(framework.getClassLoader(), framework.getInternalLogger());
 
-        LevelVisibility visibility = backend.getLevelVisibilityByTag(null);
-
+        LevelVisibility visibility = framework.getLevelVisibilityByTag(null);
         visibilityTrace = visibility.getTrace();
         visibilityDebug = visibility.getDebug();
         visibilityInfo = visibility.getInfo();
@@ -66,12 +61,12 @@ public final class Logger {
         if (tag == null || tag.isEmpty()) {
             return taggedLoggers.computeIfAbsent(
                 "",
-                key -> new TaggedLogger(null, framework)
+                key -> new TaggedLogger(null, framework, formatter)
             );
         } else {
             return taggedLoggers.computeIfAbsent(
                 tag,
-                key -> new TaggedLogger(key, framework)
+                key -> new TaggedLogger(key, framework, formatter)
             );
         }
     }
@@ -88,7 +83,7 @@ public final class Logger {
      */
     public static boolean isTraceEnabled() {
         return visibilityTrace != OutputDetails.DISABLED
-            && backend.isEnabled(runtime.getDirectCaller(visibilityTrace), null, Level.TRACE);
+            && framework.isEnabled(runtime.getDirectCaller(visibilityTrace), null, Level.TRACE);
     }
 
     /**
@@ -107,7 +102,7 @@ public final class Logger {
     public static void trace(Object message) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
-            backend.log(location.get(), null, Level.TRACE, null, message, null, null);
+            submit(location.get(), Level.TRACE, null, message, null);
         }
     }
 
@@ -128,7 +123,7 @@ public final class Logger {
     public static void trace(Supplier<?> message) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
-            backend.log(location.get(), null, Level.TRACE, null, message, null, null);
+            submit(location.get(), Level.TRACE, null, message, null);
         }
     }
 
@@ -150,7 +145,7 @@ public final class Logger {
     public static void trace(String message, Object... arguments) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
-            backend.log(location.get(), null, Level.TRACE, null, message, arguments, formatter);
+            submit(location.get(), Level.TRACE, null, message, arguments);
         }
     }
 
@@ -173,7 +168,7 @@ public final class Logger {
     public static void trace(String message, Supplier<?>... arguments) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
-            backend.log(location.get(), null, Level.TRACE, null, message, arguments, formatter);
+            submit(location.get(), Level.TRACE, null, message, arguments);
         }
     }
 
@@ -188,7 +183,7 @@ public final class Logger {
     public static void trace(Throwable exception) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
-            backend.log(location.get(), null, Level.TRACE, exception, null, null, null);
+            submit(location.get(), Level.TRACE, exception, null, null);
         }
     }
 
@@ -205,7 +200,7 @@ public final class Logger {
     public static void trace(Throwable exception, String message) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
-            backend.log(location.get(), null, Level.TRACE, exception, message, null, null);
+            submit(location.get(), Level.TRACE, exception, message, null);
         }
     }
 
@@ -227,7 +222,7 @@ public final class Logger {
     public static void trace(Throwable exception, Supplier<String> message) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
-            backend.log(location.get(), null, Level.TRACE, exception, message, null, null);
+            submit(location.get(), Level.TRACE, exception, message, null);
         }
     }
 
@@ -251,7 +246,7 @@ public final class Logger {
     public static void trace(Throwable exception, String message, Object... arguments) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
-            backend.log(location.get(), null, Level.TRACE, exception, message, arguments, formatter);
+            submit(location.get(), Level.TRACE, exception, message, arguments);
         }
     }
 
@@ -276,7 +271,7 @@ public final class Logger {
     public static void trace(Throwable exception, String message, Supplier<?>... arguments) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityTrace);
-            backend.log(location.get(), null, Level.TRACE, exception, message, arguments, formatter);
+            submit(location.get(), Level.TRACE, exception, message, arguments);
         }
     }
 
@@ -292,7 +287,7 @@ public final class Logger {
      */
     public static boolean isDebugEnabled() {
         return visibilityDebug != OutputDetails.DISABLED
-            && backend.isEnabled(runtime.getDirectCaller(visibilityDebug), null, Level.DEBUG);
+            && framework.isEnabled(runtime.getDirectCaller(visibilityDebug), null, Level.DEBUG);
     }
 
     /**
@@ -311,7 +306,7 @@ public final class Logger {
     public static void debug(Object message) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
-            backend.log(location.get(), null, Level.DEBUG, null, message, null, null);
+            submit(location.get(), Level.DEBUG, null, message, null);
         }
     }
 
@@ -332,7 +327,7 @@ public final class Logger {
     public static void debug(Supplier<?> message) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
-            backend.log(location.get(), null, Level.DEBUG, null, message, null, null);
+            submit(location.get(), Level.DEBUG, null, message, null);
         }
     }
 
@@ -354,7 +349,7 @@ public final class Logger {
     public static void debug(String message, Object... arguments) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
-            backend.log(location.get(), null, Level.DEBUG, null, message, arguments, formatter);
+            submit(location.get(), Level.DEBUG, null, message, arguments);
         }
     }
 
@@ -377,7 +372,7 @@ public final class Logger {
     public static void debug(String message, Supplier<?>... arguments) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
-            backend.log(location.get(), null, Level.DEBUG, null, message, arguments, formatter);
+            submit(location.get(), Level.DEBUG, null, message, arguments);
         }
     }
 
@@ -392,7 +387,7 @@ public final class Logger {
     public static void debug(Throwable exception) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
-            backend.log(location.get(), null, Level.DEBUG, exception, null, null, null);
+            submit(location.get(), Level.DEBUG, exception, null, null);
         }
     }
 
@@ -409,7 +404,7 @@ public final class Logger {
     public static void debug(Throwable exception, String message) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
-            backend.log(location.get(), null, Level.DEBUG, exception, message, null, null);
+            submit(location.get(), Level.DEBUG, exception, message, null);
         }
     }
 
@@ -431,7 +426,7 @@ public final class Logger {
     public static void debug(Throwable exception, Supplier<String> message) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
-            backend.log(location.get(), null, Level.DEBUG, exception, message, null, null);
+            submit(location.get(), Level.DEBUG, exception, message, null);
         }
     }
 
@@ -455,7 +450,7 @@ public final class Logger {
     public static void debug(Throwable exception, String message, Object... arguments) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
-            backend.log(location.get(), null, Level.DEBUG, exception, message, arguments, formatter);
+            submit(location.get(), Level.DEBUG, exception, message, arguments);
         }
     }
 
@@ -480,7 +475,7 @@ public final class Logger {
     public static void debug(Throwable exception, String message, Supplier<?>... arguments) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityDebug);
-            backend.log(location.get(), null, Level.DEBUG, exception, message, arguments, formatter);
+            submit(location.get(), Level.DEBUG, exception, message, arguments);
         }
     }
 
@@ -496,7 +491,7 @@ public final class Logger {
      */
     public static boolean isInfoEnabled() {
         return visibilityInfo != OutputDetails.DISABLED
-            && backend.isEnabled(runtime.getDirectCaller(visibilityInfo), null, Level.INFO);
+            && framework.isEnabled(runtime.getDirectCaller(visibilityInfo), null, Level.INFO);
     }
 
     /**
@@ -515,7 +510,7 @@ public final class Logger {
     public static void info(Object message) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
-            backend.log(location.get(), null, Level.INFO, null, message, null, null);
+            submit(location.get(), Level.INFO, null, message, null);
         }
     }
 
@@ -536,7 +531,7 @@ public final class Logger {
     public static void info(Supplier<?> message) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
-            backend.log(location.get(), null, Level.INFO, null, message, null, null);
+            submit(location.get(), Level.INFO, null, message, null);
         }
     }
 
@@ -558,7 +553,7 @@ public final class Logger {
     public static void info(String message, Object... arguments) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
-            backend.log(location.get(), null, Level.INFO, null, message, arguments, formatter);
+            submit(location.get(), Level.INFO, null, message, arguments);
         }
     }
 
@@ -581,7 +576,7 @@ public final class Logger {
     public static void info(String message, Supplier<?>... arguments) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
-            backend.log(location.get(), null, Level.INFO, null, message, arguments, formatter);
+            submit(location.get(), Level.INFO, null, message, arguments);
         }
     }
 
@@ -596,7 +591,7 @@ public final class Logger {
     public static void info(Throwable exception) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
-            backend.log(location.get(), null, Level.INFO, exception, null, null, null);
+            submit(location.get(), Level.INFO, exception, null, null);
         }
     }
 
@@ -613,7 +608,7 @@ public final class Logger {
     public static void info(Throwable exception, String message) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
-            backend.log(location.get(), null, Level.INFO, exception, message, null, null);
+            submit(location.get(), Level.INFO, exception, message, null);
         }
     }
 
@@ -635,7 +630,7 @@ public final class Logger {
     public static void info(Throwable exception, Supplier<String> message) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
-            backend.log(location.get(), null, Level.INFO, exception, message, null, null);
+            submit(location.get(), Level.INFO, exception, message, null);
         }
     }
 
@@ -659,7 +654,7 @@ public final class Logger {
     public static void info(Throwable exception, String message, Object... arguments) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
-            backend.log(location.get(), null, Level.INFO, exception, message, arguments, formatter);
+            submit(location.get(), Level.INFO, exception, message, arguments);
         }
     }
 
@@ -684,7 +679,7 @@ public final class Logger {
     public static void info(Throwable exception, String message, Supplier<?>... arguments) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityInfo);
-            backend.log(location.get(), null, Level.INFO, exception, message, arguments, formatter);
+            submit(location.get(), Level.INFO, exception, message, arguments);
         }
     }
 
@@ -700,7 +695,7 @@ public final class Logger {
      */
     public static boolean isWarnEnabled() {
         return visibilityWarn != OutputDetails.DISABLED
-            && backend.isEnabled(runtime.getDirectCaller(visibilityWarn), null, Level.WARN);
+            && framework.isEnabled(runtime.getDirectCaller(visibilityWarn), null, Level.WARN);
     }
 
     /**
@@ -719,7 +714,7 @@ public final class Logger {
     public static void warn(Object message) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
-            backend.log(location.get(), null, Level.WARN, null, message, null, null);
+            submit(location.get(), Level.WARN, null, message, null);
         }
     }
 
@@ -740,7 +735,7 @@ public final class Logger {
     public static void warn(Supplier<?> message) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
-            backend.log(location.get(), null, Level.WARN, null, message, null, null);
+            submit(location.get(), Level.WARN, null, message, null);
         }
     }
 
@@ -762,7 +757,7 @@ public final class Logger {
     public static void warn(String message, Object... arguments) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
-            backend.log(location.get(), null, Level.WARN, null, message, arguments, formatter);
+            submit(location.get(), Level.WARN, null, message, arguments);
         }
     }
 
@@ -785,7 +780,7 @@ public final class Logger {
     public static void warn(String message, Supplier<?>... arguments) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
-            backend.log(location.get(), null, Level.WARN, null, message, arguments, formatter);
+            submit(location.get(), Level.WARN, null, message, arguments);
         }
     }
 
@@ -800,7 +795,7 @@ public final class Logger {
     public static void warn(Throwable exception) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
-            backend.log(location.get(), null, Level.WARN, exception, null, null, null);
+            submit(location.get(), Level.WARN, exception, null, null);
         }
     }
 
@@ -817,7 +812,7 @@ public final class Logger {
     public static void warn(Throwable exception, String message) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
-            backend.log(location.get(), null, Level.WARN, exception, message, null, null);
+            submit(location.get(), Level.WARN, exception, message, null);
         }
     }
 
@@ -839,7 +834,7 @@ public final class Logger {
     public static void warn(Throwable exception, Supplier<String> message) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
-            backend.log(location.get(), null, Level.WARN, exception, message, null, null);
+            submit(location.get(), Level.WARN, exception, message, null);
         }
     }
 
@@ -863,7 +858,7 @@ public final class Logger {
     public static void warn(Throwable exception, String message, Object... arguments) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
-            backend.log(location.get(), null, Level.WARN, exception, message, arguments, formatter);
+            submit(location.get(), Level.WARN, exception, message, arguments);
         }
     }
 
@@ -888,7 +883,7 @@ public final class Logger {
     public static void warn(Throwable exception, String message, Supplier<?>... arguments) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityWarn);
-            backend.log(location.get(), null, Level.WARN, exception, message, arguments, formatter);
+            submit(location.get(), Level.WARN, exception, message, arguments);
         }
     }
 
@@ -904,7 +899,7 @@ public final class Logger {
      */
     public static boolean isErrorEnabled() {
         return visibilityError != OutputDetails.DISABLED
-            && backend.isEnabled(runtime.getDirectCaller(visibilityError), null, Level.ERROR);
+            && framework.isEnabled(runtime.getDirectCaller(visibilityError), null, Level.ERROR);
     }
 
     /**
@@ -923,7 +918,7 @@ public final class Logger {
     public static void error(Object message) {
         if (visibilityError != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityError);
-            backend.log(location.get(), null, Level.ERROR, null, message, null, null);
+            submit(location.get(), Level.ERROR, null, message, null);
         }
     }
 
@@ -944,7 +939,7 @@ public final class Logger {
     public static void error(Supplier<?> message) {
         if (visibilityError != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityError);
-            backend.log(location.get(), null, Level.ERROR, null, message, null, null);
+            submit(location.get(), Level.ERROR, null, message, null);
         }
     }
 
@@ -966,7 +961,7 @@ public final class Logger {
     public static void error(String message, Object... arguments) {
         if (visibilityError != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityError);
-            backend.log(location.get(), null, Level.ERROR, null, message, arguments, formatter);
+            submit(location.get(), Level.ERROR, null, message, arguments);
         }
     }
 
@@ -989,7 +984,7 @@ public final class Logger {
     public static void error(String message, Supplier<?>... arguments) {
         if (visibilityError != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityError);
-            backend.log(location.get(), null, Level.ERROR, null, message, arguments, formatter);
+            submit(location.get(), Level.ERROR, null, message, arguments);
         }
     }
 
@@ -1004,7 +999,7 @@ public final class Logger {
     public static void error(Throwable exception) {
         if (visibilityError != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityError);
-            backend.log(location.get(), null, Level.ERROR, exception, null, null, null);
+            submit(location.get(), Level.ERROR, exception, null, null);
         }
     }
 
@@ -1021,7 +1016,7 @@ public final class Logger {
     public static void error(Throwable exception, String message) {
         if (visibilityError != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityError);
-            backend.log(location.get(), null, Level.ERROR, exception, message, null, null);
+            submit(location.get(), Level.ERROR, exception, message, null);
         }
     }
 
@@ -1043,7 +1038,7 @@ public final class Logger {
     public static void error(Throwable exception, Supplier<String> message) {
         if (visibilityError != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityError);
-            backend.log(location.get(), null, Level.ERROR, exception, message, null, null);
+            submit(location.get(), Level.ERROR, exception, message, null);
         }
     }
 
@@ -1067,7 +1062,7 @@ public final class Logger {
     public static void error(Throwable exception, String message, Object... arguments) {
         if (visibilityError != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityError);
-            backend.log(location.get(), null, Level.ERROR, exception, message, arguments, formatter);
+            submit(location.get(), Level.ERROR, exception, message, arguments);
         }
     }
 
@@ -1092,8 +1087,35 @@ public final class Logger {
     public static void error(Throwable exception, String message, Supplier<?>... arguments) {
         if (visibilityError != OutputDetails.DISABLED) {
             Supplier<?> location = runtime.getDirectCaller(visibilityError);
-            backend.log(location.get(), null, Level.ERROR, exception, message, arguments, formatter);
+            submit(location.get(), Level.ERROR, exception, message, arguments);
         }
+    }
+
+    /**
+     * Submits a new log entry to the framework.
+     *
+     * @param location The location information of the caller
+     * @param level The severity level of the log entry
+     * @param throwable The throwable to log
+     * @param message The message to log
+     * @param arguments The replacements for potential placeholders in the message
+     */
+    private static void submit(Object location, Level level, Throwable throwable, Object message, Object[] arguments) {
+        if (message instanceof Supplier<?>) {
+            message = ((Supplier<?>) message).get();
+        }
+
+        framework.submit(new LogEntry(
+            Thread.currentThread(),
+            framework.getContextStorage().getMapping(),
+            location,
+            null,
+            level,
+            throwable,
+            formatter,
+            message == null ? null : message.toString(),
+            arguments
+        ));
     }
 
 }

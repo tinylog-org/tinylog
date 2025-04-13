@@ -1,0 +1,5 @@
+org.tinylog.impl.policy.DailyPolicyBuilder
+org.tinylog.impl.policy.MonthlyPolicyBuilder
+org.tinylog.impl.policy.SizePolicyBuilder
+org.tinylog.impl.policy.StartupPolicyBuilder
+org.tinylog.impl.policy.WeeklyPolicyBuilder

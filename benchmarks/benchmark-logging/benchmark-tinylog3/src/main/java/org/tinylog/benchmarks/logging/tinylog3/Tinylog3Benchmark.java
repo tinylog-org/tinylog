@@ -69,8 +69,8 @@ public class Tinylog3Benchmark extends AbstractLoggingBenchmark {
 
     @TearDown(Level.Trial)
     @Override
-    public void shutdown() {
-        Tinylog.shutDown();
+    public void shutdown() throws InterruptedException {
+        Tinylog.getFramework().stop();
     }
 
     @Benchmark

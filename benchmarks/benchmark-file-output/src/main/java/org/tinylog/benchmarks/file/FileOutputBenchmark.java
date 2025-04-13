@@ -8,7 +8,7 @@ import java.io.Writer;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
-import org.tinylog.impl.writers.file.LogFile;
+import org.tinylog.impl.writer.file.LogFile;
 
 /**
  * Benchmark for comparing the performance of different approaches for writing strings into files.
@@ -34,7 +34,7 @@ public class FileOutputBenchmark {
      * Uses a {@link LogFile} for writing.
      *
      * @param state The state with the {@link LogFile} instance to use
-     * @throws IOException Failed to write into the current file
+     * @throws IOException If failed to write into the current file
      */
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
@@ -46,7 +46,7 @@ public class FileOutputBenchmark {
      * Uses a {@link FileOutputStream} for writing.
      *
      * @param state The state with the {@link FileOutputStream} instance to use
-     * @throws IOException Failed to write into the current file
+     * @throws IOException If failed to write into the current file
      */
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
@@ -58,7 +58,7 @@ public class FileOutputBenchmark {
      * Uses a {@link RandomAccessFile} for writing.
      *
      * @param state The state with the {@link RandomAccessFile} instance to use
-     * @throws IOException Failed to write into the current file
+     * @throws IOException If failed to write into the current file
      */
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
@@ -70,7 +70,7 @@ public class FileOutputBenchmark {
      * Uses a {@link Writer} for writing.
      *
      * @param state The state with the {@link Writer} instance to use
-     * @throws IOException Failed to write into the current file
+     * @throws IOException If failed to write into the current file
      */
     @Benchmark
     @BenchmarkMode(Mode.Throughput)

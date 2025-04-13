@@ -2,25 +2,23 @@ package org.tinylog.core;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
-
-import javax.inject.Inject;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.core.test.log.Log;
+import org.tinylog.test.junit.log.Log;
+import org.tinylog.test.junit.log.Tinylog;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonMap;
+import jakarta.inject.Inject;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
-@CaptureLogEntries
+@Tinylog
 class ConfigurationTest {
+
+    @Inject
+    private Configuration configuration;
 
     @Inject
     private Log log;
@@ -34,67 +32,48 @@ class ConfigurationTest {
         /**
          * Verifies that all present values can be received.
          */
+        @Tinylog(configuration = {"foo=42", "bar=0"})
         @Test
         void allValues() {
-            Map<String, String> properties = new LinkedHashMap<>();
-            properties.put("foo", "42");
-            properties.put("bar", "0");
-
-            Configuration configuration = new Configuration(properties);
-            assertThat(configuration.getAllValues()).containsExactly(entry("foo", "42"), entry("bar", "0"));
-        }
-
-        /**
-         * Verifies that the check for presence of an existing value returns {@code true}.
-         */
-        @Test
-        void checkPresenceOfExistingValue() {
-            Configuration configuration = new Configuration(singletonMap("foo", "42"));
-            assertThat(configuration.isPresent("foo")).isTrue();
-        }
-
-        /**
-         * Verifies that the check for presence of a missing value returns {@code false}.
-         */
-        @Test
-        void checkPresenceOfMissingValue() {
-            Configuration configuration = new Configuration(emptyMap());
-            assertThat(configuration.isPresent("foo")).isFalse();
+            assertThat(configuration.getAllValues()).containsExactly(
+                entry("foo", "42"),
+                entry("bar", "0")
+            );
         }
 
         /**
          * Verifies that an empty value for property "locale" is interpreted as {@link Locale#ROOT}.
          */
+        @Tinylog(configuration = "locale=")
         @Test
         void getExistingEmptyLocale() {
-            Configuration configuration = new Configuration(singletonMap("locale", ""));
             assertThat(configuration.getLocale()).isEqualTo(Locale.ROOT);
         }
 
         /**
          * Verifies that a locale that contains only the language can be created from property "locale".
          */
+        @Tinylog(configuration = "locale=de")
         @Test
         void getExistingLocaleWithLanguageOnly() {
-            Configuration configuration = new Configuration(singletonMap("locale", "de"));
             assertThat(configuration.getLocale()).isEqualTo(new Locale("de"));
         }
 
         /**
          * Verifies that a locale that contains language and country can be created from property "locale".
          */
+        @Tinylog(configuration = "locale=it_CH")
         @Test
         void getExistingLocaleWithLanguageAndCountry() {
-            Configuration configuration = new Configuration(singletonMap("locale", "it_CH"));
             assertThat(configuration.getLocale()).isEqualTo(new Locale("it", "CH"));
         }
 
         /**
          * Verifies that a locale that contains language, country, and variant can be created from property "locale".
          */
+        @Tinylog(configuration = "locale=en_US_UNIX")
         @Test
         void getExistingFullLocale() {
-            Configuration configuration = new Configuration(singletonMap("locale", "en_US_UNIX"));
             assertThat(configuration.getLocale()).isEqualTo(new Locale("en", "US", "UNIX"));
         }
 
@@ -103,67 +82,62 @@ class ConfigurationTest {
          */
         @Test
         void getMissingLocale() {
-            Configuration configuration = new Configuration(emptyMap());
             assertThat(configuration.getLocale()).isSameAs(Locale.getDefault());
         }
 
         /**
          * Verifies that the locale of the parent configuration is inherited in a child configuration by default.
          */
+        @Tinylog(configuration = "locale=fr")
         @Test
         void inheritLocaleFromParent() {
-            Configuration parent = new Configuration(singletonMap("locale", "en"));
-            Configuration child = parent.getSubConfiguration("foo");
-            assertThat(child.getLocale()).isEqualTo(Locale.ENGLISH);
+            Configuration child = configuration.getSubConfiguration("foo");
+            assertThat(child.getLocale()).isEqualTo(Locale.FRENCH);
         }
 
         /**
          * Verifies that the locale of the parent configuration can be overridden by the child configuration prefix.
          */
+        @Tinylog(configuration = {"locale=en", "foo.locale=de"})
         @Test
         void overrideLocaleFromParent() {
-            Map<String, String> properties = new HashMap<>();
-            properties.put("locale", "en");
-            properties.put("foo.locale", "de");
-
-            Configuration parent = new Configuration(properties);
-            Configuration child = parent.getSubConfiguration("foo");
+            Configuration child = configuration.getSubConfiguration("foo");
             assertThat(child.getLocale()).isEqualTo(Locale.GERMAN);
         }
 
         /**
          * Verifies that UTC can be set as time zone via property "zone".
          */
+        @Tinylog(configuration = "zone=UTC")
         @Test
         void getUtcZone() {
-            Configuration configuration = new Configuration(singletonMap("zone", "UTC"));
             assertThat(configuration.getZone().normalized()).isEqualTo(ZoneOffset.UTC);
         }
 
         /**
          * Verifies that an offset time zone can be set relative to UTC via property "zone".
          */
+        @Tinylog(configuration = "zone=UTC+01:30")
         @Test
         void getOffsetZone() {
-            Configuration configuration = new Configuration(singletonMap("zone", "UTC+01:30"));
             assertThat(configuration.getZone().normalized()).isEqualTo(ZoneOffset.ofHoursMinutes(1, 30));
         }
 
         /**
          * Verifies that Europe/London can be set as time zone via property "zone".
          */
+        @Tinylog(configuration = "zone=Europe/London")
         @Test
         void getBritishZone() {
-            Configuration configuration = new Configuration(singletonMap("zone", "Europe/London"));
             assertThat(configuration.getZone()).isEqualTo(ZoneId.of("Europe/London"));
         }
 
         /**
          * Verifies that Europe/Berlin can be set as time zone via property "zone".
          */
+        @Tinylog(configuration = "zone=Europe/Berlin")
         @Test
         void getGermanZone() {
-            Configuration configuration = new Configuration(singletonMap("zone", "Europe/Berlin"));
             assertThat(configuration.getZone()).isEqualTo(ZoneId.of("Europe/Berlin"));
         }
 
@@ -171,13 +145,13 @@ class ConfigurationTest {
          * Verifies that {@link ZoneOffset#systemDefault()} will be returned if property "zone" contains an invalid
          * value.
          */
+        @Tinylog(configuration = "zone=Invalid/Foo")
         @Test
         void getInvalidZone() {
-            Configuration configuration = new Configuration(singletonMap("zone", "Invalid/Foo"));
             assertThat(configuration.getZone()).isEqualTo(ZoneOffset.systemDefault());
             assertThat(log.consume()).singleElement().satisfies(entry -> {
-                assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-                assertThat(entry.getMessage()).contains("Invalid/Foo");
+                assertThat(entry.getSeverityLevel()).isEqualTo(Level.ERROR);
+                assertThat(entry.getFormattedMessage(configuration)).contains("Invalid/Foo");
             });
         }
 
@@ -186,40 +160,35 @@ class ConfigurationTest {
          */
         @Test
         void getMissingZone() {
-            Configuration configuration = new Configuration(emptyMap());
             assertThat(configuration.getZone()).isEqualTo(ZoneOffset.systemDefault());
         }
 
         /**
          * Verifies that the zone of the parent configuration is inherited in a child configuration by default.
          */
+        @Tinylog(configuration = "zone=Europe/London")
         @Test
         void inheritZoneFromParent() {
-            Configuration parent = new Configuration(singletonMap("zone", "Europe/London"));
-            Configuration child = parent.getSubConfiguration("foo");
+            Configuration child = configuration.getSubConfiguration("foo");
             assertThat(child.getZone()).isEqualTo(ZoneId.of("Europe/London"));
         }
 
         /**
          * Verifies that the zone of the parent configuration can be overridden by the child configuration prefix.
          */
+        @Tinylog(configuration = {"zone=Europe/London", "foo.zone=Europe/Berlin"})
         @Test
         void overrideZoneFromParent() {
-            Map<String, String> properties = new HashMap<>();
-            properties.put("zone", "Europe/London");
-            properties.put("foo.zone", "Europe/Berlin");
-
-            Configuration parent = new Configuration(properties);
-            Configuration child = parent.getSubConfiguration("foo");
+            Configuration child = configuration.getSubConfiguration("foo");
             assertThat(child.getZone()).isEqualTo(ZoneId.of("Europe/Berlin"));
         }
 
         /**
          * Verifies that an existing value can be received.
          */
+        @Tinylog(configuration = "foo=42")
         @Test
         void getExistingStringValueWithoutDefault() {
-            Configuration configuration = new Configuration(singletonMap("foo", "42"));
             assertThat(configuration.getValue("foo")).isEqualTo("42");
         }
 
@@ -228,25 +197,24 @@ class ConfigurationTest {
          */
         @Test
         void getMissingStringValueWithoutDefault() {
-            Configuration configuration = new Configuration(emptyMap());
             assertThat(configuration.getValue("foo")).isNull();
         }
 
         /**
          * Verifies that leading and trailing spaces of values are removed.
          */
+        @Tinylog(configuration = "foo= bar ")
         @Test
         void trimStringValueWithoutDefault() {
-            Configuration configuration = new Configuration(singletonMap("foo", " bar "));
             assertThat(configuration.getValue("foo")).isEqualTo("bar");
         }
 
         /**
          * Verifies that an existing value can be received.
          */
+        @Tinylog(configuration = "foo=42")
         @Test
         void getExistingStringValueWithDefault() {
-            Configuration configuration = new Configuration(singletonMap("foo", "42"));
             assertThat(configuration.getValue("foo", "-")).isEqualTo("42");
         }
 
@@ -255,43 +223,42 @@ class ConfigurationTest {
          */
         @Test
         void getMissingStringValueWithDefault() {
-            Configuration configuration = new Configuration(emptyMap());
             assertThat(configuration.getValue("foo", "-")).isEqualTo("-");
         }
 
         /**
          * Verifies that leading and trailing spaces of values are removed.
          */
+        @Tinylog(configuration = "foo= bar ")
         @Test
         void trimStringValueWithDefault() {
-            Configuration configuration = new Configuration(singletonMap("foo", " bar "));
             assertThat(configuration.getValue("foo", "other")).isEqualTo("bar");
         }
 
         /**
          * Verifies that a single value can be returned as list.
          */
+        @Tinylog(configuration = "foo=42")
         @Test
         void getSingleListValue() {
-            Configuration configuration = new Configuration(singletonMap("foo", "42"));
             assertThat(configuration.getList("foo")).containsExactly("42");
         }
 
         /**
          * Verifies that multiple values, which are separated by commas, can be returned as list.
          */
+        @Tinylog(configuration = "foo=1,2,3")
         @Test
         void getMultipleListValues() {
-            Configuration configuration = new Configuration(singletonMap("foo", "1, 2, 3"));
             assertThat(configuration.getList("foo")).containsExactly("1", "2", "3");
         }
 
         /**
          * Verifies that an empty value is returned as empty list.
          */
+        @Tinylog(configuration = "foo=")
         @Test
         void getEmptyListValue() {
-            Configuration configuration = new Configuration(singletonMap("foo", ""));
             assertThat(configuration.getList("foo")).isEmpty();
         }
 
@@ -300,7 +267,6 @@ class ConfigurationTest {
          */
         @Test
         void getMissingListValue() {
-            Configuration configuration = new Configuration(emptyMap());
             assertThat(configuration.getList("foo")).isEmpty();
         }
 
@@ -316,36 +282,36 @@ class ConfigurationTest {
          * Verifies that an existing prefixed subset of the configuration can be retrieved using the default separator
          * character ".".
          */
+        @Tinylog(configuration = {
+            "bar=1",
+            "foo=2",
+            "foo.alice=3",
+            "foo.bob=4",
+            "foo@fred=5",
+            "foobar=6"
+        })
         @Test
         void getDefaultSubConfiguration() {
-            Map<String, String> properties = new LinkedHashMap<>();
-            properties.put("bar", "1");
-            properties.put("foo", "2");
-            properties.put("foo.alice", "3");
-            properties.put("foo.bob", "4");
-            properties.put("foo@fred", "5");
-            properties.put("foobar", "6");
-
-            Configuration configuration = new Configuration(properties).getSubConfiguration("foo");
-            assertThat(configuration.getKeys()).containsExactly("alice", "bob");
+            Configuration child = configuration.getSubConfiguration("foo");
+            assertThat(child.getKeys()).containsExactly("alice", "bob");
         }
 
         /**
          * Verifies that an existing prefixed subset of the configuration can be retrieved using a custom separator
          * character.
          */
+        @Tinylog(configuration = {
+            "bar=1",
+            "foo=2",
+            "foo@alice=3",
+            "foo@bob=4",
+            "foo.fred=5",
+            "foobar=6"
+        })
         @Test
         void getCustomSubConfiguration() {
-            Map<String, String> properties = new LinkedHashMap<>();
-            properties.put("bar", "1");
-            properties.put("foo", "2");
-            properties.put("foo@alice", "3");
-            properties.put("foo@bob", "4");
-            properties.put("foo.fred", "5");
-            properties.put("foobar", "6");
-
-            Configuration configuration = new Configuration(properties).getSubConfiguration("foo", '@');
-            assertThat(configuration.getKeys()).containsExactly("alice", "bob");
+            Configuration child = configuration.getSubConfiguration("foo", '@');
+            assertThat(child.getKeys()).containsExactly("alice", "bob");
         }
 
     }
@@ -359,33 +325,31 @@ class ConfigurationTest {
         /**
          * Verifies that all root keys are collected completely and in order.
          */
+        @Tinylog(configuration = {
+            "bar=1",
+            "foo.alice=2",
+            "foo.bob=3",
+            "foobar=4",
+            "baz=5"
+        })
         @Test
         void getRootKeys() {
-            Map<String, String> properties = new LinkedHashMap<>();
-            properties.put("bar", "1");
-            properties.put("foo.alice", "2");
-            properties.put("foo.bob", "3");
-            properties.put("foobar", "4");
-            properties.put("boo", "5");
-
-            Configuration configuration = new Configuration(properties);
-            assertThat(configuration.getRootKeys()).containsExactly("bar", "foo", "foobar", "boo");
+            assertThat(configuration.getRootKeys()).containsExactly("bar", "foo", "foobar", "baz");
         }
 
         /**
          * Verifies that all keys are collected completely and in order.
          */
+        @Tinylog(configuration = {
+            "bar=1",
+            "foo.alice=2",
+            "foo.bob=3",
+            "foobar=4",
+            "baz=5"
+        })
         @Test
         void getKeys() {
-            Map<String, String> properties = new LinkedHashMap<>();
-            properties.put("bar", "1");
-            properties.put("foo.alice", "2");
-            properties.put("foo.bob", "3");
-            properties.put("foobar", "4");
-            properties.put("boo", "5");
-
-            Configuration configuration = new Configuration(properties);
-            assertThat(configuration.getKeys()).containsExactly("bar", "foo.alice", "foo.bob", "foobar", "boo");
+            assertThat(configuration.getKeys()).containsExactly("bar", "foo.alice", "foo.bob", "foobar", "baz");
         }
 
     }
@@ -401,7 +365,6 @@ class ConfigurationTest {
          */
         @Test
         void rootConfiguration() {
-            Configuration configuration = new Configuration(emptyMap());
             assertThat(configuration.resolveFullKey("foo")).isEqualTo("foo");
         }
 
@@ -410,8 +373,8 @@ class ConfigurationTest {
          */
         @Test
         void childConfiguration() {
-            Configuration configuration = new Configuration(emptyMap()).getSubConfiguration("bar");
-            assertThat(configuration.resolveFullKey("foo")).isEqualTo("bar.foo");
+            Configuration child = configuration.getSubConfiguration("bar");
+            assertThat(child.resolveFullKey("foo")).isEqualTo("bar.foo");
         }
 
         /**
@@ -419,11 +382,10 @@ class ConfigurationTest {
          */
         @Test
         void grandchildConfiguration() {
-            Configuration configuration = new Configuration(emptyMap())
-                .getSubConfiguration("boo")
+            Configuration child = configuration
+                .getSubConfiguration("baz")
                 .getSubConfiguration("bar");
-
-            assertThat(configuration.resolveFullKey("foo")).isEqualTo("boo.bar.foo");
+            assertThat(child.resolveFullKey("foo")).isEqualTo("baz.bar.foo");
         }
 
     }

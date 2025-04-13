@@ -1,4 +1,4 @@
 /**
- * Format pattern parser for parsing format patterns for log entries.
+ * Format pattern based output for rendering log entries as human-readable text.
  */
 package org.tinylog.impl.format.pattern;

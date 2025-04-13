@@ -8,11 +8,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import org.tinylog.core.Configuration;
+import org.tinylog.core.Level;
 import org.tinylog.core.format.value.ValueFormat;
 import org.tinylog.core.internal.AbstractPatternParser;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.internal.LoggingContext;
-import org.tinylog.core.internal.SafeServiceLoader;
 
 /**
  * Enhanced message formatter that replaces '{}' placeholders with passed arguments and optionally accepts format
@@ -31,31 +31,34 @@ import org.tinylog.core.internal.SafeServiceLoader;
 public class EnhancedMessageFormatter extends AbstractPatternParser implements MessageFormatter {
 
     private final List<ValueFormat> formats;
+    private final InternalLogger logger;
 
     /**
-     * @param loader The class loader to use for loading service files and service implementation classes
+     * @param loader The class loader to use for loading service implementations
+     * @param logger The internal logger instance for issuing internal tinylog log entries
      */
-    public EnhancedMessageFormatter(ClassLoader loader) {
-        formats = SafeServiceLoader.asList(loader, ValueFormat.class, "value formats");
+    public EnhancedMessageFormatter(ClassLoader loader, InternalLogger logger) {
+        this.formats = ValueFormat.load(loader);
+        this.logger = logger;
     }
 
     @Override
-    public String format(LoggingContext context, String message, Object... arguments) {
-        return format(context, message, Arrays.stream(arguments).iterator());
+    public String format(Configuration configuration, String message, Object... arguments) {
+        return format(configuration, message, Arrays.stream(arguments).iterator());
     }
 
     /**
      * Replaces all placeholders with real values.
      *
-     * @param context The current logging context
+     * @param configuration The current tinylog configuration
      * @param message A text message with placeholders
      * @param arguments The actual replacement values for placeholders
      * @return Formatted text message
      */
-    private String format(LoggingContext context, String message, Iterator<Object> arguments) {
+    private String format(Configuration configuration, String message, Iterator<Object> arguments) {
         BiConsumer<StringBuilder, String> groupConsumer = (builder, group) -> {
             if (arguments.hasNext()) {
-                builder.append(render(context, group, arguments.next()));
+                builder.append(render(configuration, group, arguments.next()));
             } else {
                 builder.append('{').append(group).append('}');
             }
@@ -67,12 +70,12 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
     /**
      * Renders a value as string.
      *
-     * @param context The current logging context
+     * @param configuration The current tinylog configuration
      * @param pattern The format pattern for rendering the passed value
      * @param value The object to render
      * @return The formatted representation of the passed value
      */
-    private String render(LoggingContext context, String pattern, Object value) {
+    private String render(Configuration configuration, String pattern, Object value) {
         if (value instanceof Supplier<?>) {
             value = ((Supplier<?>) value).get();
         }
@@ -82,17 +85,29 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
                 try {
                     Object singleton = value;
                     Iterator<Object> iterator = Stream.generate(() -> singleton).iterator();
-                    return new ChoiceFormat(format(context, pattern, iterator)).format(value);
+                    return new ChoiceFormat(format(configuration, pattern, iterator)).format(value);
                 } catch (RuntimeException ex) {
-                    InternalLogger.error(ex, "Invalid choice format pattern \"{}\" for value \"{}\"", pattern, value);
+                    logger.log(
+                        Level.ERROR,
+                        ex,
+                        "Invalid choice format pattern \"{}\" for value \"{}\"",
+                        pattern,
+                        value
+                    );
                 }
             } else {
                 for (ValueFormat format : formats) {
                     if (format.isSupported(value)) {
                         try {
-                            return format.format(context, pattern, value);
+                            return format.format(configuration, pattern, value);
                         } catch (RuntimeException ex) {
-                            InternalLogger.error(ex, "Failed to apply pattern \"{}\" for value \"{}\"", pattern, value);
+                            logger.log(
+                                Level.ERROR,
+                                ex,
+                                "Failed to apply pattern \"{}\" for value \"{}\"",
+                                pattern,
+                                value
+                            );
                         }
                     }
                 }

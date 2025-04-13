@@ -7,76 +7,69 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import org.mockito.ArgumentCaptor
 import org.mockito.MockedStatic
-import org.mockito.Mockito.atMostOnce
 import org.mockito.Mockito.mockStatic
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.argThat
+import org.mockito.kotlin.any
+import org.mockito.kotlin.atMost
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.isA
 import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.notNull
-import org.mockito.kotlin.same
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import org.tinylog.core.Framework
 import org.tinylog.core.Level
+import org.tinylog.core.LogEntry
 import org.tinylog.core.Tinylog
 import org.tinylog.core.backend.LevelVisibility
-import org.tinylog.core.backend.LoggingBackend
 import org.tinylog.core.backend.OutputDetails
-import org.tinylog.core.format.message.EnhancedMessageFormatter
-import org.tinylog.core.test.isolate.IsolatedExecution
-import java.util.function.Supplier
+import org.tinylog.core.context.NopContextStorage
+import org.tinylog.core.runtime.JavaRuntime
+import org.tinylog.test.junit.isolate.IsolatedExecution
 
 @IsolatedExecution(classes = [Logger::class, TaggedLogger::class])
-internal class LoggerTest {
+class LoggerTest {
     private lateinit var tinylogMock: MockedStatic<Tinylog>
-    private lateinit var backend: LoggingBackend
+    private lateinit var framework: Framework
     private lateinit var visibility: LevelVisibility
 
     /**
      * Initializes all mocks.
      */
     @BeforeEach
-    fun create() {
-        tinylogMock = mockStatic(Tinylog::class.java)
-        backend = mock()
+    fun init() {
+        val javaRuntime = JavaRuntime(mock())
+        val nopContextStorage = NopContextStorage()
 
-        tinylogMock.`when`<Framework> {
-            Tinylog.getFramework()
-        }.thenReturn(
-            object : Framework(false, false) {
-                override fun getLoggingBackend() = backend
-            },
-        )
+        visibility =
+            mock<LevelVisibility>().apply {
+                whenever(trace).thenReturn(OutputDetails.DISABLED)
+                whenever(debug).thenReturn(OutputDetails.DISABLED)
+                whenever(info).thenReturn(OutputDetails.DISABLED)
+                whenever(warn).thenReturn(OutputDetails.DISABLED)
+                whenever(error).thenReturn(OutputDetails.DISABLED)
+            }
 
-        visibility = mock()
-        whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
-        whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
-        whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
-        whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
-        whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
+        framework =
+            mock<Framework>().apply {
+                whenever(runtime).thenReturn(javaRuntime)
+                whenever(contextStorage).thenReturn(nopContextStorage)
+                whenever(getLevelVisibilityByTag(isNull())).thenReturn(visibility)
+            }
 
-        val visibilityForTags = mock<LevelVisibility>()
-        whenever(visibilityForTags.trace).thenReturn(OutputDetails.DISABLED)
-        whenever(visibilityForTags.debug).thenReturn(OutputDetails.DISABLED)
-        whenever(visibilityForTags.info).thenReturn(OutputDetails.DISABLED)
-        whenever(visibilityForTags.warn).thenReturn(OutputDetails.DISABLED)
-        whenever(visibilityForTags.error).thenReturn(OutputDetails.DISABLED)
-
-        whenever(backend.getLevelVisibilityByTag(anyOrNull())).thenAnswer {
-            if (it.getArgument<Any?>(0) == null) visibility else visibilityForTags
-        }
+        tinylogMock =
+            mockStatic(Tinylog::class.java).apply {
+                `when`<Framework>(Tinylog::getFramework).thenReturn(framework)
+            }
     }
 
     /**
      * Restores the mocked tinylog class.
      */
     @AfterEach
-    fun dispose() {
+    fun reset() {
         tinylogMock.close()
     }
 
@@ -86,13 +79,21 @@ internal class LoggerTest {
     @Nested
     inner class Tags {
         /**
+         * Sets the level visibility for any kind of tagged loggers.
+         */
+        @BeforeEach
+        fun init() {
+            whenever(framework.getLevelVisibilityByTag(any())).thenReturn(visibility)
+        }
+
+        /**
          * Verifies that the same logger instance is returned for the same tag.
          */
         @Test
         fun sameLoggerInstanceForSameTag() {
             val first = Logger.tag("foo")
             val second = Logger.tag("foo")
-            assertThat(first).isNotNull.isSameAs(second)
+            assertThat(first).isNotNull().isSameAs(second)
         }
 
         /**
@@ -101,9 +102,10 @@ internal class LoggerTest {
         @Test
         fun differentLoggerInstanceForDifferentTag() {
             val first = Logger.tag("foo")
-            val second = Logger.tag("boo")
-            assertThat(first).isNotNull
-            assertThat(second).isNotNull
+            val second = Logger.tag("bar")
+
+            assertThat(first).isNotNull()
+            assertThat(second).isNotNull()
             assertThat(first).isNotSameAs(second)
         }
 
@@ -114,10 +116,12 @@ internal class LoggerTest {
         fun sameUntaggedRootLoggerForNullAndEmptyTags() {
             val nullTag = Logger.tag(null)
             val emptyTag = Logger.tag("")
-            assertThat(nullTag).isNotNull
+
+            assertThat(nullTag).isNotNull()
             assertThat(nullTag.tag).isNull()
-            assertThat(emptyTag).isNotNull
+            assertThat(emptyTag).isNotNull()
             assertThat(emptyTag.tag).isNull()
+
             assertThat(nullTag).isSameAs(emptyTag)
         }
     }
@@ -128,136 +132,136 @@ internal class LoggerTest {
     @Nested
     inner class Levels {
         /**
-         * Verifies the results of the [Logger.isTraceEnabled] method.
+         * Verifies the results of the [TaggedLogger.isTraceEnabled] method.
          *
-         * @param enabled The value for [LoggingBackend.isEnabled]
-         * @param outputDetails The value for [LevelVisibility.trace]
+         * @param enabled The value for [Framework.isEnabled]
+         * @param outputDetails The value for [LevelVisibility.getTrace]
          */
         @ParameterizedTest
         @CsvSource(
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO",
         )
         fun isTraceEnabled(
             enabled: Boolean,
             outputDetails: OutputDetails,
         ) {
             whenever(visibility.trace).thenReturn(outputDetails)
-            whenever(backend.isEnabled(notNull(), isNull(), eq(Level.TRACE))).thenReturn(enabled)
+            whenever(framework.isEnabled(notNull(), isNull(), eq(Level.TRACE))).thenReturn(enabled)
 
             assertThat(Logger.isTraceEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
         }
 
         /**
-         * Verifies the results of the [Logger.isDebugEnabled] method.
+         * Verifies the results of the [TaggedLogger.isDebugEnabled] method.
          *
-         * @param enabled The value for [LoggingBackend.isEnabled]
-         * @param outputDetails The value for [LevelVisibility.debug]
+         * @param enabled The value for [Framework.isEnabled]
+         * @param outputDetails The value for [LevelVisibility.getDebug]
          */
         @ParameterizedTest
         @CsvSource(
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO",
         )
         fun isDebugEnabled(
             enabled: Boolean,
             outputDetails: OutputDetails,
         ) {
             whenever(visibility.debug).thenReturn(outputDetails)
-            whenever(backend.isEnabled(notNull(), isNull(), eq(Level.DEBUG))).thenReturn(enabled)
+            whenever(framework.isEnabled(notNull(), isNull(), eq(Level.DEBUG))).thenReturn(enabled)
 
             assertThat(Logger.isDebugEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
         }
 
         /**
-         * Verifies the results of the [Logger.isInfoEnabled] method.
+         * Verifies the results of the [TaggedLogger.isInfoEnabled] method.
          *
-         * @param enabled The value for [LoggingBackend.isEnabled]
-         * @param outputDetails The value for [LevelVisibility.info]
+         * @param enabled The value for [Framework.isEnabled]
+         * @param outputDetails The value for [LevelVisibility.getInfo]
          */
         @ParameterizedTest
         @CsvSource(
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO",
         )
         fun isInfoEnabled(
             enabled: Boolean,
             outputDetails: OutputDetails,
         ) {
             whenever(visibility.info).thenReturn(outputDetails)
-            whenever(backend.isEnabled(notNull(), isNull(), eq(Level.INFO))).thenReturn(enabled)
+            whenever(framework.isEnabled(notNull(), isNull(), eq(Level.INFO))).thenReturn(enabled)
 
             assertThat(Logger.isInfoEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
         }
 
         /**
-         * Verifies the results of the [Logger.isWarnEnabled] method.
+         * Verifies the results of the [TaggedLogger.isWarnEnabled] method.
          *
-         * @param enabled The value for [LoggingBackend.isEnabled]
-         * @param outputDetails The value for [LevelVisibility.warn]
+         * @param enabled The value for [Framework.isEnabled]
+         * @param outputDetails The value for [LevelVisibility.getWarn]
          */
         @ParameterizedTest
         @CsvSource(
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO",
         )
         fun isWarnEnabled(
             enabled: Boolean,
             outputDetails: OutputDetails,
         ) {
             whenever(visibility.warn).thenReturn(outputDetails)
-            whenever(backend.isEnabled(notNull(), isNull(), eq(Level.WARN))).thenReturn(enabled)
+            whenever(framework.isEnabled(notNull(), isNull(), eq(Level.WARN))).thenReturn(enabled)
 
             assertThat(Logger.isWarnEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
         }
 
         /**
-         * Verifies the results of the [Logger.isErrorEnabled] method.
+         * Verifies the results of the [TaggedLogger.isErrorEnabled] method.
          *
-         * @param enabled The value for [LoggingBackend.isEnabled]
-         * @param outputDetails The value for [LevelVisibility.error]
+         * @param enabled The value for [Framework.isEnabled]
+         * @param outputDetails The value for [LevelVisibility.getError]
          */
         @ParameterizedTest
         @CsvSource(
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION",
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO",
         )
         fun isErrorEnabled(
             enabled: Boolean,
             outputDetails: OutputDetails,
         ) {
             whenever(visibility.error).thenReturn(outputDetails)
-            whenever(backend.isEnabled(notNull(), isNull(), eq(Level.ERROR))).thenReturn(enabled)
+            whenever(framework.isEnabled(notNull(), isNull(), eq(Level.ERROR))).thenReturn(enabled)
 
             assertThat(Logger.isErrorEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled)
         }
@@ -281,7 +285,8 @@ internal class LoggerTest {
                 whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.trace(42)
-                verifyLogEntry(Level.TRACE, null, 42)
+
+                verifyLogEntry(Level.TRACE, null, "42")
             }
 
             /**
@@ -292,6 +297,7 @@ internal class LoggerTest {
                 whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.trace("Hello World!")
+
                 verifyLogEntry(Level.TRACE, null, "Hello World!")
             }
 
@@ -303,7 +309,8 @@ internal class LoggerTest {
                 whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.trace { "Hello World!" }
-                verifyLogEntry(Level.TRACE, null, { "Hello World!" })
+
+                verifyLogEntry(Level.TRACE, null, "Hello World!")
             }
 
             /**
@@ -314,7 +321,8 @@ internal class LoggerTest {
                 whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.trace("Hello {}!", "Alice")
-                verifyLogEntry(Level.TRACE, null, "Hello {}!", "Alice")
+
+                verifyLogEntry(Level.TRACE, null, "Hello Alice!")
             }
 
             /**
@@ -325,7 +333,8 @@ internal class LoggerTest {
                 whenever(visibility.trace).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.trace("Hello {}!", { "Alice" })
-                verifyLogEntry(Level.TRACE, null, "Hello {}!", { "Alice" })
+
+                verifyLogEntry(Level.TRACE, null, "Hello Alice!")
             }
 
             /**
@@ -337,6 +346,7 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.trace(exception)
+
                 verifyLogEntry(Level.TRACE, exception, null)
             }
 
@@ -349,6 +359,7 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.trace(exception, "Oops!")
+
                 verifyLogEntry(Level.TRACE, exception, "Oops!")
             }
 
@@ -361,7 +372,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.trace(exception) { "Oops!" }
-                verifyLogEntry(Level.TRACE, exception, { "Oops!" })
+
+                verifyLogEntry(Level.TRACE, exception, "Oops!")
             }
 
             /**
@@ -373,7 +385,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.trace(exception, "Hello {}!", "Alice")
-                verifyLogEntry(Level.TRACE, exception, "Hello {}!", "Alice")
+
+                verifyLogEntry(Level.TRACE, exception, "Hello Alice!")
             }
 
             /**
@@ -386,7 +399,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.trace(exception, "Hello {}!", { "Alice" })
-                verifyLogEntry(Level.TRACE, exception, "Hello {}!", { "Alice" })
+
+                verifyLogEntry(Level.TRACE, exception, "Hello Alice!")
             }
 
             /**
@@ -397,7 +411,8 @@ internal class LoggerTest {
                 whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.debug(42)
-                verifyLogEntry(Level.DEBUG, null, 42)
+
+                verifyLogEntry(Level.DEBUG, null, "42")
             }
 
             /**
@@ -408,6 +423,7 @@ internal class LoggerTest {
                 whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.debug("Hello World!")
+
                 verifyLogEntry(Level.DEBUG, null, "Hello World!")
             }
 
@@ -419,7 +435,8 @@ internal class LoggerTest {
                 whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.debug { "Hello World!" }
-                verifyLogEntry(Level.DEBUG, null, { "Hello World!" })
+
+                verifyLogEntry(Level.DEBUG, null, "Hello World!")
             }
 
             /**
@@ -430,7 +447,8 @@ internal class LoggerTest {
                 whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.debug("Hello {}!", "Alice")
-                verifyLogEntry(Level.DEBUG, null, "Hello {}!", "Alice")
+
+                verifyLogEntry(Level.DEBUG, null, "Hello Alice!")
             }
 
             /**
@@ -441,7 +459,8 @@ internal class LoggerTest {
                 whenever(visibility.debug).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.debug("Hello {}!", { "Alice" })
-                verifyLogEntry(Level.DEBUG, null, "Hello {}!", { "Alice" })
+
+                verifyLogEntry(Level.DEBUG, null, "Hello Alice!")
             }
 
             /**
@@ -453,6 +472,7 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.debug(exception)
+
                 verifyLogEntry(Level.DEBUG, exception, null)
             }
 
@@ -465,6 +485,7 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.debug(exception, "Oops!")
+
                 verifyLogEntry(Level.DEBUG, exception, "Oops!")
             }
 
@@ -477,7 +498,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.debug(exception) { "Oops!" }
-                verifyLogEntry(Level.DEBUG, exception, { "Oops!" })
+
+                verifyLogEntry(Level.DEBUG, exception, "Oops!")
             }
 
             /**
@@ -489,7 +511,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.debug(exception, "Hello {}!", "Alice")
-                verifyLogEntry(Level.DEBUG, exception, "Hello {}!", "Alice")
+
+                verifyLogEntry(Level.DEBUG, exception, "Hello Alice!")
             }
 
             /**
@@ -502,7 +525,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.debug(exception, "Hello {}!", { "Alice" })
-                verifyLogEntry(Level.DEBUG, exception, "Hello {}!", { "Alice" })
+
+                verifyLogEntry(Level.DEBUG, exception, "Hello Alice!")
             }
 
             /**
@@ -513,7 +537,8 @@ internal class LoggerTest {
                 whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.info(42)
-                verifyLogEntry(Level.INFO, null, 42)
+
+                verifyLogEntry(Level.INFO, null, "42")
             }
 
             /**
@@ -524,6 +549,7 @@ internal class LoggerTest {
                 whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.info("Hello World!")
+
                 verifyLogEntry(Level.INFO, null, "Hello World!")
             }
 
@@ -535,7 +561,8 @@ internal class LoggerTest {
                 whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.info { "Hello World!" }
-                verifyLogEntry(Level.INFO, null, { "Hello World!" })
+
+                verifyLogEntry(Level.INFO, null, "Hello World!")
             }
 
             /**
@@ -546,7 +573,8 @@ internal class LoggerTest {
                 whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.info("Hello {}!", "Alice")
-                verifyLogEntry(Level.INFO, null, "Hello {}!", "Alice")
+
+                verifyLogEntry(Level.INFO, null, "Hello Alice!")
             }
 
             /**
@@ -557,7 +585,8 @@ internal class LoggerTest {
                 whenever(visibility.info).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.info("Hello {}!", { "Alice" })
-                verifyLogEntry(Level.INFO, null, "Hello {}!", { "Alice" })
+
+                verifyLogEntry(Level.INFO, null, "Hello Alice!")
             }
 
             /**
@@ -569,6 +598,7 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.info(exception)
+
                 verifyLogEntry(Level.INFO, exception, null)
             }
 
@@ -581,6 +611,7 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.info(exception, "Oops!")
+
                 verifyLogEntry(Level.INFO, exception, "Oops!")
             }
 
@@ -593,7 +624,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.info(exception) { "Oops!" }
-                verifyLogEntry(Level.INFO, exception, { "Oops!" })
+
+                verifyLogEntry(Level.INFO, exception, "Oops!")
             }
 
             /**
@@ -605,7 +637,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.info(exception, "Hello {}!", "Alice")
-                verifyLogEntry(Level.INFO, exception, "Hello {}!", "Alice")
+
+                verifyLogEntry(Level.INFO, exception, "Hello Alice!")
             }
 
             /**
@@ -618,7 +651,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.info(exception, "Hello {}!", { "Alice" })
-                verifyLogEntry(Level.INFO, exception, "Hello {}!", { "Alice" })
+
+                verifyLogEntry(Level.INFO, exception, "Hello Alice!")
             }
 
             /**
@@ -629,7 +663,8 @@ internal class LoggerTest {
                 whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.warn(42)
-                verifyLogEntry(Level.WARN, null, 42)
+
+                verifyLogEntry(Level.WARN, null, "42")
             }
 
             /**
@@ -640,6 +675,7 @@ internal class LoggerTest {
                 whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.warn("Hello World!")
+
                 verifyLogEntry(Level.WARN, null, "Hello World!")
             }
 
@@ -651,7 +687,8 @@ internal class LoggerTest {
                 whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.warn { "Hello World!" }
-                verifyLogEntry(Level.WARN, null, { "Hello World!" })
+
+                verifyLogEntry(Level.WARN, null, "Hello World!")
             }
 
             /**
@@ -662,7 +699,8 @@ internal class LoggerTest {
                 whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.warn("Hello {}!", "Alice")
-                verifyLogEntry(Level.WARN, null, "Hello {}!", "Alice")
+
+                verifyLogEntry(Level.WARN, null, "Hello Alice!")
             }
 
             /**
@@ -673,7 +711,8 @@ internal class LoggerTest {
                 whenever(visibility.warn).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.warn("Hello {}!", { "Alice" })
-                verifyLogEntry(Level.WARN, null, "Hello {}!", { "Alice" })
+
+                verifyLogEntry(Level.WARN, null, "Hello Alice!")
             }
 
             /**
@@ -685,6 +724,7 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.warn(exception)
+
                 verifyLogEntry(Level.WARN, exception, null)
             }
 
@@ -697,6 +737,7 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.warn(exception, "Oops!")
+
                 verifyLogEntry(Level.WARN, exception, "Oops!")
             }
 
@@ -709,7 +750,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.warn(exception) { "Oops!" }
-                verifyLogEntry(Level.WARN, exception, { "Oops!" })
+
+                verifyLogEntry(Level.WARN, exception, "Oops!")
             }
 
             /**
@@ -721,7 +763,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.warn(exception, "Hello {}!", "Alice")
-                verifyLogEntry(Level.WARN, exception, "Hello {}!", "Alice")
+
+                verifyLogEntry(Level.WARN, exception, "Hello Alice!")
             }
 
             /**
@@ -734,7 +777,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.warn(exception, "Hello {}!", { "Alice" })
-                verifyLogEntry(Level.WARN, exception, "Hello {}!", { "Alice" })
+
+                verifyLogEntry(Level.WARN, exception, "Hello Alice!")
             }
 
             /**
@@ -745,7 +789,8 @@ internal class LoggerTest {
                 whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.error(42)
-                verifyLogEntry(Level.ERROR, null, 42)
+
+                verifyLogEntry(Level.ERROR, null, "42")
             }
 
             /**
@@ -756,6 +801,7 @@ internal class LoggerTest {
                 whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.error("Hello World!")
+
                 verifyLogEntry(Level.ERROR, null, "Hello World!")
             }
 
@@ -767,7 +813,8 @@ internal class LoggerTest {
                 whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.error { "Hello World!" }
-                verifyLogEntry(Level.ERROR, null, { "Hello World!" })
+
+                verifyLogEntry(Level.ERROR, null, "Hello World!")
             }
 
             /**
@@ -778,7 +825,8 @@ internal class LoggerTest {
                 whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.error("Hello {}!", "Alice")
-                verifyLogEntry(Level.ERROR, null, "Hello {}!", "Alice")
+
+                verifyLogEntry(Level.ERROR, null, "Hello Alice!")
             }
 
             /**
@@ -789,7 +837,8 @@ internal class LoggerTest {
                 whenever(visibility.error).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME)
 
                 Logger.error("Hello {}!", { "Alice" })
-                verifyLogEntry(Level.ERROR, null, "Hello {}!", { "Alice" })
+
+                verifyLogEntry(Level.ERROR, null, "Hello Alice!")
             }
 
             /**
@@ -801,6 +850,7 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.error(exception)
+
                 verifyLogEntry(Level.ERROR, exception, null)
             }
 
@@ -813,6 +863,7 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.error(exception, "Oops!")
+
                 verifyLogEntry(Level.ERROR, exception, "Oops!")
             }
 
@@ -825,7 +876,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.error(exception) { "Oops!" }
-                verifyLogEntry(Level.ERROR, exception, { "Oops!" })
+
+                verifyLogEntry(Level.ERROR, exception, "Oops!")
             }
 
             /**
@@ -837,7 +889,8 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.error(exception, "Hello {}!", "Alice")
-                verifyLogEntry(Level.ERROR, exception, "Hello {}!", "Alice")
+
+                verifyLogEntry(Level.ERROR, exception, "Hello Alice!")
             }
 
             /**
@@ -850,94 +903,38 @@ internal class LoggerTest {
 
                 val exception = Exception()
                 Logger.error(exception, "Hello {}!", { "Alice" })
-                verifyLogEntry(Level.ERROR, exception, "Hello {}!", { "Alice" })
+
+                verifyLogEntry(Level.ERROR, exception, "Hello Alice!")
             }
 
             /**
              * Verifies backend mock invocation with expected log entry values.
              *
-             * @param level     Severity level
-             * @param exception Exception or any other kind of throwable
-             * @param message   Message object
-             * @param arguments Optional arguments
+             * @param level The expected severity level
+             * @param exception The expected exception
+             * @param message The expected rendered text message
              */
             private fun verifyLogEntry(
                 level: Level,
-                exception: Throwable?,
-                message: Any?,
-                vararg arguments: Any,
+                exception: Exception?,
+                message: String?,
             ) {
-                verify(backend, atMostOnce()).getLevelVisibilityByTag(null)
-                verify(backend).log(
-                    eq(Enabled::class.java),
-                    isNull(),
-                    same(level),
-                    same(exception),
-                    same(message),
-                    if (arguments.isEmpty()) isNull() else eq(arguments),
-                    if (arguments.isEmpty()) isNull() else isA<EnhancedMessageFormatter>(),
-                )
-            }
+                val captor = ArgumentCaptor.forClass(LogEntry::class.java)
+                verify(framework, atMost(1)).getLevelVisibilityByTag(null)
+                verify(framework).submit(captor.capture())
 
-            /**
-             * Verifies backend mock invocation with expected log entry values.
-             *
-             * @param level     Severity level
-             * @param exception Exception or any other kind of throwable
-             * @param message   Message object supplier
-             * @param arguments Optional arguments
-             */
-            private fun verifyLogEntry(
-                level: Level,
-                exception: Throwable?,
-                message: () -> Any,
-                vararg arguments: Any,
-            ) {
-                verify(backend, atMostOnce()).getLevelVisibilityByTag(null)
-                verify(backend).log(
-                    eq(Enabled::class.java),
-                    isNull(),
-                    same(level),
-                    same(exception),
-                    argThat { this is Supplier<*> && this.get() == message() },
-                    if (arguments.isEmpty()) isNull() else eq(arguments),
-                    if (arguments.isEmpty()) isNull() else isA<EnhancedMessageFormatter>(),
-                )
-            }
-
-            /**
-             * Verifies backend mock invocation with expected log entry values.
-             *
-             * @param level     Severity level
-             * @param exception Exception or any other kind of throwable
-             * @param message   Message object
-             * @param arguments Optional argument suppliers
-             */
-            private fun verifyLogEntry(
-                level: Level,
-                exception: Throwable?,
-                message: Any,
-                vararg arguments: () -> Any,
-            ) {
-                verify(backend, atMostOnce()).getLevelVisibilityByTag(null)
-                verify(backend).log(
-                    eq(Enabled::class.java),
-                    isNull(),
-                    same(level),
-                    same(exception),
-                    same(message),
-                    if (arguments.isEmpty()) {
-                        isNull()
-                    } else {
-                        argThat {
-                            this.size == arguments.size &&
-                                this.withIndex().all { (index, value) ->
-                                    value is Supplier<*> && value.get() == arguments[index]()
-                                }
-                        }
-                    },
-                    if (arguments.isEmpty()) isNull() else isA<EnhancedMessageFormatter>(),
-                )
+                assertThat(captor.allValues).singleElement().satisfies({ entry: LogEntry ->
+                    assertThat(entry.thread).isSameAs(Thread.currentThread())
+                    assertThat(entry.context).isEmpty()
+                    assertThat(entry.className).isEqualTo(Enabled::class.java.name)
+                    assertThat(entry.methodName).isNull()
+                    assertThat(entry.fileName).isNull()
+                    assertThat(entry.lineNumber).isEqualTo(-1)
+                    assertThat(entry.tag).isNull()
+                    assertThat(entry.severityLevel).isEqualTo(level)
+                    assertThat(entry.throwable).isSameAs(exception)
+                    assertThat(entry.getFormattedMessage(mock())).isEqualTo(message)
+                })
             }
         }
 
@@ -951,8 +948,6 @@ internal class LoggerTest {
              */
             @Test
             fun traceObjectMessage() {
-                whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
-
                 Logger.trace(42)
                 verifyNoLogEntry()
             }
@@ -963,8 +958,6 @@ internal class LoggerTest {
              */
             @Test
             fun traceTextMessage() {
-                whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
-
                 Logger.trace("Hello World!")
                 verifyNoLogEntry()
             }
@@ -975,8 +968,6 @@ internal class LoggerTest {
              */
             @Test
             fun traceLazyMessage() {
-                whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
-
                 Logger.trace { "Hello World!" }
                 verifyNoLogEntry()
             }
@@ -987,8 +978,6 @@ internal class LoggerTest {
              */
             @Test
             fun traceFormattedMessageWithArgument() {
-                whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
-
                 Logger.trace("Hello {}!", "Alice")
                 verifyNoLogEntry()
             }
@@ -999,8 +988,6 @@ internal class LoggerTest {
              */
             @Test
             fun traceFormattedMessageWithLazyArgument() {
-                whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
-
                 Logger.trace("Hello {}!", { "Alice" })
                 verifyNoLogEntry()
             }
@@ -1010,8 +997,6 @@ internal class LoggerTest {
              */
             @Test
             fun traceException() {
-                whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
-
                 Logger.trace(Exception())
                 verifyNoLogEntry()
             }
@@ -1022,8 +1007,6 @@ internal class LoggerTest {
              */
             @Test
             fun traceExceptionAndTextMessage() {
-                whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
-
                 Logger.trace(Exception(), "Oops!")
                 verifyNoLogEntry()
             }
@@ -1034,8 +1017,6 @@ internal class LoggerTest {
              */
             @Test
             fun traceExceptionAndLazyMessage() {
-                whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
-
                 Logger.trace(Exception()) { "Oops!" }
                 verifyNoLogEntry()
             }
@@ -1046,8 +1027,6 @@ internal class LoggerTest {
              */
             @Test
             fun traceExceptionAndFormattedMessageWithArgument() {
-                whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
-
                 Logger.trace(Exception(), "Hello {}!", "Alice")
                 verifyNoLogEntry()
             }
@@ -1058,8 +1037,6 @@ internal class LoggerTest {
              */
             @Test
             fun traceExceptionAndFormattedMessageWithLazyArgument() {
-                whenever(visibility.trace).thenReturn(OutputDetails.DISABLED)
-
                 Logger.trace(Exception(), "Hello {}!", { "Alice" })
                 verifyNoLogEntry()
             }
@@ -1069,8 +1046,6 @@ internal class LoggerTest {
              */
             @Test
             fun debugObjectMessage() {
-                whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
-
                 Logger.debug(42)
                 verifyNoLogEntry()
             }
@@ -1081,8 +1056,6 @@ internal class LoggerTest {
              */
             @Test
             fun debugTextMessage() {
-                whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
-
                 Logger.debug("Hello World!")
                 verifyNoLogEntry()
             }
@@ -1093,8 +1066,6 @@ internal class LoggerTest {
              */
             @Test
             fun debugLazyMessage() {
-                whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
-
                 Logger.debug { "Hello World!" }
                 verifyNoLogEntry()
             }
@@ -1105,8 +1076,6 @@ internal class LoggerTest {
              */
             @Test
             fun debugFormattedMessageWithArgument() {
-                whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
-
                 Logger.debug("Hello {}!", "Alice")
                 verifyNoLogEntry()
             }
@@ -1117,8 +1086,6 @@ internal class LoggerTest {
              */
             @Test
             fun debugFormattedMessageWithLazyArgument() {
-                whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
-
                 Logger.debug("Hello {}!", { "Alice" })
                 verifyNoLogEntry()
             }
@@ -1128,8 +1095,6 @@ internal class LoggerTest {
              */
             @Test
             fun debugException() {
-                whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
-
                 Logger.debug(Exception())
                 verifyNoLogEntry()
             }
@@ -1140,8 +1105,6 @@ internal class LoggerTest {
              */
             @Test
             fun debugExceptionAndTextMessage() {
-                whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
-
                 Logger.debug(Exception(), "Oops!")
                 verifyNoLogEntry()
             }
@@ -1152,8 +1115,6 @@ internal class LoggerTest {
              */
             @Test
             fun debugExceptionAndLazyMessage() {
-                whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
-
                 Logger.debug(Exception()) { "Oops!" }
                 verifyNoLogEntry()
             }
@@ -1164,8 +1125,6 @@ internal class LoggerTest {
              */
             @Test
             fun debugExceptionAndFormattedMessageWithArgument() {
-                whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
-
                 Logger.debug(Exception(), "Hello {}!", "Alice")
                 verifyNoLogEntry()
             }
@@ -1176,8 +1135,6 @@ internal class LoggerTest {
              */
             @Test
             fun debugExceptionAndFormattedMessageWithLazyArgument() {
-                whenever(visibility.debug).thenReturn(OutputDetails.DISABLED)
-
                 Logger.debug(Exception(), "Hello {}!", { "Alice" })
                 verifyNoLogEntry()
             }
@@ -1187,8 +1144,6 @@ internal class LoggerTest {
              */
             @Test
             fun infoObjectMessage() {
-                whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
-
                 Logger.info(42)
                 verifyNoLogEntry()
             }
@@ -1199,8 +1154,6 @@ internal class LoggerTest {
              */
             @Test
             fun infoTextMessage() {
-                whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
-
                 Logger.info("Hello World!")
                 verifyNoLogEntry()
             }
@@ -1211,8 +1164,6 @@ internal class LoggerTest {
              */
             @Test
             fun infoLazyMessage() {
-                whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
-
                 Logger.info { "Hello World!" }
                 verifyNoLogEntry()
             }
@@ -1223,8 +1174,6 @@ internal class LoggerTest {
              */
             @Test
             fun infoFormattedMessageWithArgument() {
-                whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
-
                 Logger.info("Hello {}!", "Alice")
                 verifyNoLogEntry()
             }
@@ -1235,8 +1184,6 @@ internal class LoggerTest {
              */
             @Test
             fun infoFormattedMessageWithLazyArgument() {
-                whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
-
                 Logger.info("Hello {}!", { "Alice" })
                 verifyNoLogEntry()
             }
@@ -1246,8 +1193,6 @@ internal class LoggerTest {
              */
             @Test
             fun infoException() {
-                whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
-
                 Logger.info(Exception())
                 verifyNoLogEntry()
             }
@@ -1258,8 +1203,6 @@ internal class LoggerTest {
              */
             @Test
             fun infoExceptionAndTextMessage() {
-                whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
-
                 Logger.info(Exception(), "Oops!")
                 verifyNoLogEntry()
             }
@@ -1270,8 +1213,6 @@ internal class LoggerTest {
              */
             @Test
             fun infoExceptionAndLazyMessage() {
-                whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
-
                 Logger.info(Exception()) { "Oops!" }
                 verifyNoLogEntry()
             }
@@ -1282,8 +1223,6 @@ internal class LoggerTest {
              */
             @Test
             fun infoExceptionAndFormattedMessageWithArgument() {
-                whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
-
                 Logger.info(Exception(), "Hello {}!", "Alice")
                 verifyNoLogEntry()
             }
@@ -1294,8 +1233,6 @@ internal class LoggerTest {
              */
             @Test
             fun infoExceptionAndFormattedMessageWithLazyArgument() {
-                whenever(visibility.info).thenReturn(OutputDetails.DISABLED)
-
                 Logger.info(Exception(), "Hello {}!", { "Alice" })
                 verifyNoLogEntry()
             }
@@ -1305,8 +1242,6 @@ internal class LoggerTest {
              */
             @Test
             fun warnObjectMessage() {
-                whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
-
                 Logger.warn(42)
                 verifyNoLogEntry()
             }
@@ -1317,8 +1252,6 @@ internal class LoggerTest {
              */
             @Test
             fun warnTextMessage() {
-                whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
-
                 Logger.warn("Hello World!")
                 verifyNoLogEntry()
             }
@@ -1329,8 +1262,6 @@ internal class LoggerTest {
              */
             @Test
             fun warnLazyMessage() {
-                whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
-
                 Logger.warn { "Hello World!" }
                 verifyNoLogEntry()
             }
@@ -1341,8 +1272,6 @@ internal class LoggerTest {
              */
             @Test
             fun warnFormattedMessageWithArgument() {
-                whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
-
                 Logger.warn("Hello {}!", "Alice")
                 verifyNoLogEntry()
             }
@@ -1353,8 +1282,6 @@ internal class LoggerTest {
              */
             @Test
             fun warnFormattedMessageWithLazyArgument() {
-                whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
-
                 Logger.warn("Hello {}!", { "Alice" })
                 verifyNoLogEntry()
             }
@@ -1364,8 +1291,6 @@ internal class LoggerTest {
              */
             @Test
             fun warnException() {
-                whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
-
                 Logger.warn(Exception())
                 verifyNoLogEntry()
             }
@@ -1376,8 +1301,6 @@ internal class LoggerTest {
              */
             @Test
             fun warnExceptionAndTextMessage() {
-                whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
-
                 Logger.warn(Exception(), "Oops!")
                 verifyNoLogEntry()
             }
@@ -1388,8 +1311,6 @@ internal class LoggerTest {
              */
             @Test
             fun warnExceptionAndLazyMessage() {
-                whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
-
                 Logger.warn(Exception()) { "Oops!" }
                 verifyNoLogEntry()
             }
@@ -1400,8 +1321,6 @@ internal class LoggerTest {
              */
             @Test
             fun warnExceptionAndFormattedMessageWithArgument() {
-                whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
-
                 Logger.warn(Exception(), "Hello {}!", "Alice")
                 verifyNoLogEntry()
             }
@@ -1412,8 +1331,6 @@ internal class LoggerTest {
              */
             @Test
             fun warnExceptionAndFormattedMessageWithLazyArgument() {
-                whenever(visibility.warn).thenReturn(OutputDetails.DISABLED)
-
                 Logger.warn(Exception(), "Hello {}!", { "Alice" })
                 verifyNoLogEntry()
             }
@@ -1423,8 +1340,6 @@ internal class LoggerTest {
              */
             @Test
             fun errorObjectMessage() {
-                whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
-
                 Logger.error(42)
                 verifyNoLogEntry()
             }
@@ -1435,8 +1350,6 @@ internal class LoggerTest {
              */
             @Test
             fun errorTextMessage() {
-                whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
-
                 Logger.error("Hello World!")
                 verifyNoLogEntry()
             }
@@ -1447,8 +1360,6 @@ internal class LoggerTest {
              */
             @Test
             fun errorLazyMessage() {
-                whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
-
                 Logger.error { "Hello World!" }
                 verifyNoLogEntry()
             }
@@ -1459,8 +1370,6 @@ internal class LoggerTest {
              */
             @Test
             fun errorFormattedMessageWithArgument() {
-                whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
-
                 Logger.error("Hello {}!", "Alice")
                 verifyNoLogEntry()
             }
@@ -1471,8 +1380,6 @@ internal class LoggerTest {
              */
             @Test
             fun errorFormattedMessageWithLazyArgument() {
-                whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
-
                 Logger.error("Hello {}!", { "Alice" })
                 verifyNoLogEntry()
             }
@@ -1482,8 +1389,6 @@ internal class LoggerTest {
              */
             @Test
             fun errorException() {
-                whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
-
                 Logger.error(Exception())
                 verifyNoLogEntry()
             }
@@ -1494,8 +1399,6 @@ internal class LoggerTest {
              */
             @Test
             fun errorExceptionAndTextMessage() {
-                whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
-
                 Logger.error(Exception(), "Oops!")
                 verifyNoLogEntry()
             }
@@ -1506,8 +1409,6 @@ internal class LoggerTest {
              */
             @Test
             fun errorExceptionAndLazyMessage() {
-                whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
-
                 Logger.error(Exception()) { "Oops!" }
                 verifyNoLogEntry()
             }
@@ -1518,8 +1419,6 @@ internal class LoggerTest {
              */
             @Test
             fun errorExceptionAndFormattedMessageWithArgument() {
-                whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
-
                 Logger.error(Exception(), "Hello {}!", "Alice")
                 verifyNoLogEntry()
             }
@@ -1530,18 +1429,15 @@ internal class LoggerTest {
              */
             @Test
             fun errorExceptionAndFormattedMessageWithLazyArgument() {
-                whenever(visibility.error).thenReturn(OutputDetails.DISABLED)
-
                 Logger.error(Exception(), "Hello {}!", { "Alice" })
                 verifyNoLogEntry()
             }
 
             /**
-             * Verifies no invocations of logging methods for mocked backend.
+             * Verifies that no log entry has been submitted.
              */
             private fun verifyNoLogEntry() {
-                verify(backend, atMostOnce()).getLevelVisibilityByTag(null)
-                verifyNoMoreInteractions(backend)
+                verify(framework, never()).submit(any())
             }
         }
     }

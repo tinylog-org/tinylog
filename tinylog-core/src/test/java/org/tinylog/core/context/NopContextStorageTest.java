@@ -1,6 +1,5 @@
 package org.tinylog.core.context;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ class NopContextStorageTest {
     void replaceDoesNothing() {
         NopContextStorage storage = new NopContextStorage();
 
-        storage.replace(Collections.singletonMap("foo", "42"));
+        storage.replace(Map.of("foo", "42"));
 
         assertThat(storage.get("foo")).isNull();
         assertThat(storage.getMapping()).isEmpty();

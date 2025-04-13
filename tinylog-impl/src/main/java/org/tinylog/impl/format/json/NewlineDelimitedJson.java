@@ -1,18 +1,16 @@
 package org.tinylog.impl.format.json;
 
-import java.util.EnumSet;
+import java.util.Comparator;
 import java.util.Formatter;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
-import org.tinylog.impl.LogEntry;
-import org.tinylog.impl.LogEntryValue;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.impl.format.OutputFormat;
-import org.tinylog.impl.format.pattern.ValueType;
-import org.tinylog.impl.format.pattern.placeholders.Placeholder;
+import org.tinylog.impl.format.placeholder.Placeholder;
+import org.tinylog.impl.format.placeholder.ValueType;
 
 /**
  * Output format for rendering log entries as newline-delimited JSON.
@@ -31,10 +29,12 @@ public class NewlineDelimitedJson implements OutputFormat {
     }
 
     @Override
-    public Set<LogEntryValue> getRequiredLogEntryValues() {
-        Set<LogEntryValue> requiredValues = EnumSet.noneOf(LogEntryValue.class);
-        fields.values().forEach(placeholder -> requiredValues.addAll(placeholder.getRequiredLogEntryValues()));
-        return requiredValues;
+    public OutputDetails getOutputDetails() {
+        return fields.values()
+            .stream()
+            .map(OutputFormat::getOutputDetails)
+            .max(Comparator.comparing(Enum::ordinal))
+            .orElse(OutputDetails.DISABLED);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class NewlineDelimitedJson implements OutputFormat {
 
         builder.append("{");
 
-        for (Entry<String, Placeholder> field : fields.entrySet()) {
+        for (Map.Entry<String, Placeholder> field : fields.entrySet()) {
             if (first) {
                 first = false;
             } else {
@@ -86,7 +86,7 @@ public class NewlineDelimitedJson implements OutputFormat {
      *
      * @param builder The JSON value will be added to this string builder
      * @param entry The log entry to render by the passed placeholder
-     * @param placeholder The placeholder value to render
+     * @param placeholder The placeholder to render
      */
     private void renderValue(StringBuilder builder, LogEntry entry, Placeholder placeholder) {
         ValueType type = placeholder.getType();

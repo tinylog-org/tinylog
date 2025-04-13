@@ -1,184 +1,61 @@
 package org.tinylog.core;
 
-import java.time.Clock;
-import java.time.Instant;
-import java.util.Collection;
 import java.util.Map;
 
-import javax.inject.Inject;
-
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.MockedStatic;
-import org.tinylog.core.backend.BundleLoggingBackend;
-import org.tinylog.core.backend.InternalLoggingBackend;
+import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.LoggingBackendBuilder;
-import org.tinylog.core.backend.NopLoggingBackend;
-import org.tinylog.core.backend.NopLoggingBackendBuilder;
+import org.tinylog.core.backend.TinylogContext;
+import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.internal.LoggingContext;
 import org.tinylog.core.loader.ConfigurationLoader;
 import org.tinylog.core.runtime.RuntimeFlavor;
-import org.tinylog.core.test.service.RegisterService;
-import org.tinylog.core.test.system.CaptureSystemOutput;
-import org.tinylog.core.test.system.Output;
+import org.tinylog.test.junit.log.Tinylog;
+import org.tinylog.test.junit.service.RegisterService;
 
-import static java.util.Collections.emptyMap;
-import static java.util.Collections.singletonMap;
+import jakarta.inject.Inject;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.notNull;
-import static org.mockito.Mockito.clearInvocations;
+import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@CaptureSystemOutput(excludes = "TINYLOG WARN:.*tinylog-impl\\.jar.*")
+@Tinylog
 class FrameworkTest {
 
     @Inject
-    private Output output;
+    private InternalLogger logger;
 
     /**
-     * Verifies that a {@link RuntimeFlavor} is provided.
+     * Initializes the logging backend mock.
      */
-    @Test
-    void runtime() {
-        Framework framework = new Framework(false, false);
-        try {
-            assertThat(framework.getRuntime()).isNotNull();
-        } finally {
-            framework.shutDown();
-        }
+    @BeforeEach
+    void init() {
+        TestLoggingBackendBuilder.backend = mock(LoggingBackend.class);
     }
 
     /**
-     * Verifies that a working {@link Clock} is provided.
-     */
-    @Test
-    void clock() throws InterruptedException {
-        Framework framework = new Framework(false, false);
-        try {
-            Clock clock = framework.getClock();
-
-            Instant before = Clock.systemDefaultZone().instant();
-            Thread.sleep(1);
-            Instant instant = clock.instant();
-            Thread.sleep(1);
-            Instant after = Clock.systemDefaultZone().instant();
-
-            assertThat(instant).isStrictlyBetween(before, after);
-        } finally {
-            framework.shutDown();
-        }
-    }
-
-    /**
-     * Tests for receiving, modifying, and applying configurations.
+     * Tests for {@link Framework#getInternalLogger()}.
      */
     @Nested
-    class Configurations {
+    class InternalLoggerGetter {
 
         /**
-         * Verifies that no configuration loader will be used if configuration loading is disabled.
-         */
-        @RegisterService(
-            service = ConfigurationLoader.class,
-            implementations = TestOneConfigurationLoader.class
-        )
-        @Test
-        void useEmptyConfiguration() {
-            TestOneConfigurationLoader.data = singletonMap("foo", "bar");
-
-            Framework framework = new Framework(false, false);
-            try {
-                ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
-                assertThat(configuration.get("foo")).isNull();
-            } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that the configuration loader with the highest priority will be used.
-         */
-        @RegisterService(
-            service = ConfigurationLoader.class,
-            implementations = {TestOneConfigurationLoader.class, TestTwoConfigurationLoader.class}
-        )
-        @Test
-        void useConfigurationLoaderWithHighestPriority() {
-            TestOneConfigurationLoader.data = singletonMap("first", "yes");
-            TestTwoConfigurationLoader.data = singletonMap("second", "yes");
-
-            Framework framework = new Framework(true, false);
-            try {
-                ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
-                assertThat(configuration.get("first")).isNull();
-                assertThat(configuration.get("second")).isEqualTo("yes");
-            } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that a configuration loader that cannot provide a configuration is skipped.
-         */
-        @RegisterService(
-            service = ConfigurationLoader.class,
-            implementations = {TestOneConfigurationLoader.class, TestTwoConfigurationLoader.class}
-        )
-        @Test
-        void skipConfigurationLoaderWithoutResult() {
-            TestOneConfigurationLoader.data = singletonMap("first", "yes");
-            TestTwoConfigurationLoader.data = null;
-
-            Framework framework = new Framework(true, false);
-            try {
-                ConfigurationBuilder configuration = framework.getConfigurationBuilder(true);
-                assertThat(configuration.get("first")).isEqualTo("yes");
-                assertThat(configuration.get("second")).isNull();
-            } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that an empty configuration builder can be received without inheriting the existing configuration.
+         * Verifies that an {@link InternalLogger} instance is provided.
          */
         @Test
-        void receiveEmptyConfigurationBuilder() {
-            Framework framework = new Framework(false, false);
-            try {
-                framework.getConfigurationBuilder(false).set("foo", "bar").activate();
-                ConfigurationBuilder builder = framework.getConfigurationBuilder(false);
-                assertThat(builder.get("foo")).isNull();
-            } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that an inherit configuration builder can be received that contains the existing configuration.
-         */
-        @Test
-        void receiveInheritedConfigurationBuilder() {
-            Framework framework = new Framework(false, false);
-            try {
-                framework.getConfigurationBuilder(false).set("foo", "bar").activate();
-                ConfigurationBuilder builder = framework.getConfigurationBuilder(true);
-                assertThat(builder.get("foo")).isEqualTo("bar");
-            } finally {
-                framework.shutDown();
-            }
+        void receive() {
+            InternalLogger logger = new Framework().getInternalLogger();
+            assertThat(logger).isNotNull();
         }
 
     }
@@ -190,490 +67,449 @@ class FrameworkTest {
     class ClassLoaderGetter {
 
         /**
-         * Verifies that the context class loader from the current thread will be used if available.
+         * Verifies that {@link Thread#getContextClassLoader()} is provided by default.
          */
         @Test
-        void provideFromCurrentThread() {
-            Framework framework = new Framework(false, false);
-            try {
-                ClassLoader classLoader = framework.getClassLoader();
-                assertThat(classLoader).isNotNull().isEqualTo(Thread.currentThread().getContextClassLoader());
-            } finally {
-                framework.shutDown();
-            }
+        void receiveContextClassLoader() {
+            ClassLoader classLoader = new Framework().getClassLoader();
+            assertThat(classLoader).isSameAs(Thread.currentThread().getContextClassLoader());
         }
 
         /**
-         * Verifies that the class loader from {@link Framework} class will be used, if the context class loader from
-         * the current thread is unavailable.
+         * Verifies that {@link Class#getClassLoader()} is provided as fallback.
          */
         @Test
-        void provideFromClass() {
-            Thread thread = Thread.currentThread();
-            ClassLoader threadClassLoader = thread.getContextClassLoader();
-            try {
-                thread.setContextClassLoader(null);
+        void receiveFrameworkClassLoader() {
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(null);
 
-                Framework framework = new Framework(false, false);
-                try {
-                    ClassLoader providedClassLoader = framework.getClassLoader();
-                    assertThat(providedClassLoader).isNotNull().isEqualTo(Framework.class.getClassLoader());
-                } finally {
-                    framework.shutDown();
-                }
+            try {
+                ClassLoader classLoader = new Framework().getClassLoader();
+                assertThat(classLoader).isSameAs(Framework.class.getClassLoader());
             } finally {
-                thread.setContextClassLoader(threadClassLoader);
+                Thread.currentThread().setContextClassLoader(contextClassLoader);
             }
         }
 
     }
 
     /**
-     * Tests for {@link Framework#registerHook(Hook)}, {@link Framework#removeHook(Hook)}, {@link Framework#startUp()},
-     * and {@link Framework#shutDown()}.
+     * Tests for {@link Framework#getRuntime()}.
      */
     @Nested
-    class LifeCycle {
+    class RuntimeGetter {
 
         /**
-         * Verifies that as service registered hooks are loaded.
+         * Verifies that a supported runtime flavor is provided.
          */
-        @RegisterService(service = Hook.class, implementations = TestHook.class)
         @Test
-        void loadServiceHooks() {
-            Framework framework = new Framework(false, true);
-            assertThat(TestHook.running).isFalse();
+        void receive() {
+            RuntimeFlavor runtime = new Framework().getRuntime();
+            assertThat(runtime).isNotNull();
+        }
 
+    }
+
+    /**
+     * Tests for {@link Framework#getContextStorage()}.
+     */
+    @Nested
+    @RegisterService(service = LoggingBackendBuilder.class, implementations = TestLoggingBackendBuilder.class)
+    class ContextStorageGetter {
+
+        /**
+         * Verifies that the context storage can be received if the framework is not started yet.
+         */
+        @Test
+        void getBeforeStarted() throws InterruptedException {
+            ContextStorage storage = mock(ContextStorage.class);
+            when(TestLoggingBackendBuilder.backend.getContextStorage()).thenReturn(storage);
+
+            Framework framework = new Framework();
             try {
-                framework.startUp();
-                assertThat(TestHook.running).isTrue();
+                assertThat(framework.getContextStorage()).isSameAs(storage);
             } finally {
-                framework.shutDown();
-                assertThat(TestHook.running).isFalse();
+                framework.stop();
             }
         }
 
         /**
-         * Verifies that a hook, registered before the framework start up, will be correctly started and shut down.
+         * Verifies that the context storage can be received if the framework is already started.
          */
         @Test
-        void registerHookBeforeStartUp() {
-            Hook hook = mock(Hook.class);
-            Framework framework = new Framework(false, false);
+        void getAfterStarted() throws InterruptedException {
+            ContextStorage storage = mock(ContextStorage.class);
+            when(TestLoggingBackendBuilder.backend.getContextStorage()).thenReturn(storage);
 
-            framework.registerHook(hook);
-            verify(hook, never()).startUp();
-
+            Framework framework = new Framework();
+            framework.start();
             try {
-                framework.startUp();
-                verify(hook).startUp();
+                assertThat(framework.getContextStorage()).isSameAs(storage);
             } finally {
-                framework.shutDown();
-                verify(hook).shutDown();
-            }
-        }
-
-        /**
-         * Verifies that a hook, registered after the framework start up, will be correctly started and shut down.
-         */
-        @Test
-        void registerHookAfterStartUp() {
-            Hook hook = mock(Hook.class);
-            Framework framework = new Framework(false, false);
-
-            try {
-                framework.startUp();
-                framework.registerHook(hook);
-                verify(hook).startUp();
-            } finally {
-                framework.shutDown();
-                verify(hook).shutDown();
-            }
-        }
-
-        /**
-         * Verifies that hooks are called only called during the first startup.
-         */
-        @Test
-        void ignoreSecondStartup() {
-            Hook hook = mock(Hook.class);
-            Framework framework = new Framework(false, false);
-            framework.registerHook(hook);
-
-            try {
-                framework.startUp();
-                verify(hook).startUp();
-                clearInvocations(hook);
-
-                framework.startUp();
-                verify(hook, never()).startUp();
-            } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that hooks are called only called during the first shutdown.
-         */
-        @Test
-        void ignoreSecondShutdown() {
-            Hook hook = mock(Hook.class);
-            Framework framework = new Framework(false, false);
-            framework.registerHook(hook);
-
-            try {
-                framework.startUp();
-            } finally {
-                framework.shutDown();
-                verify(hook).shutDown();
-                clearInvocations(hook);
-
-                framework.shutDown();
-                verify(hook, never()).shutDown();
-            }
-        }
-
-        /**
-         * Verifies that a removed hook will be not called while shutting the framework down.
-         */
-        @Test
-        void removeHookBeforeShutdown() {
-            Hook hook = mock(Hook.class);
-            Framework framework = new Framework(false, false);
-            framework.registerHook(hook);
-
-            try {
-                framework.startUp();
-                framework.removeHook(hook);
-            } finally {
-                framework.shutDown();
-            }
-
-            verify(hook).startUp();
-            verify(hook, never()).shutDown();
-        }
-
-        /**
-         * Verifies that the configuration becomes frozen after startup.
-         */
-        @Test
-        void freezeConfigurationAfterStartup() {
-            Framework framework = new Framework(false, false);
-            try {
-                framework.startUp();
-                assertThatCode(() -> framework.setConfiguration(new Configuration(emptyMap())))
-                    .isInstanceOf(UnsupportedOperationException.class);
-            } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that the internal logger is initialized after startup.
-         */
-        @Test
-        void initializeInternalLoggerAfterStartup() {
-            Framework framework = new Framework(false, false);
-            try {
-                framework.startUp();
-                InternalLogger.warn(null, "Hello World!");
-                assertThat(output.consume()).containsExactly("TINYLOG WARN: Hello World!");
-            } finally {
-                framework.shutDown();
+                framework.stop();
             }
         }
 
     }
 
     /**
-     * Tests for {@link Framework#getLoggingBackend()}.
+     * Tests for {@link Framework#getLevelVisibilityByClass(String)}.
      */
     @Nested
-    class LoggingBackendGetter {
+    @RegisterService(service = LoggingBackendBuilder.class, implementations = TestLoggingBackendBuilder.class)
+    class LevelVisibilityByClassNameGetter {
 
         /**
-         * Verifies that the internal logging backend is loaded if none other is available.
+         * Verifies that the level visibility of a class name can be received if the framework is not started yet.
          */
-        @CaptureSystemOutput // Reset the default excludes
         @Test
-        void loadInternalLoggingBackend() {
-            Framework framework = new Framework(false, false);
+        void getBeforeStarted() throws InterruptedException {
+            LevelVisibility visibility = mock(LevelVisibility.class);
+            when(TestLoggingBackendBuilder.backend.getLevelVisibilityByClass("example.Foo")).thenReturn(visibility);
+
+            Framework framework = new Framework();
             try {
-                assertThat(framework.getLoggingBackend()).isInstanceOf(InternalLoggingBackend.class);
-                assertThat(output.consume())
-                    .hasSize(1)
-                    .allSatisfy(line -> assertThat(line).contains("TINYLOG WARN", "tinylog-impl.jar"));
+                assertThat(framework.getLevelVisibilityByClass("example.Foo")).isEqualTo(visibility);
             } finally {
-                framework.shutDown();
+                framework.stop();
             }
         }
 
         /**
-         * Verifies that a logging backend is loaded if it is the only available.
-         */
-        @RegisterService(service = LoggingBackendBuilder.class, implementations = TestOneLoggingBackendBuilder.class)
-        @Test
-        void loadSingleAvailableProvider() {
-            Framework framework = new Framework(false, false);
-            try {
-                assertThat(framework.getLoggingBackend()).isSameAs(TestOneLoggingBackendBuilder.backend);
-            } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that all available logging backends are loaded and bundled in a {@link BundleLoggingBackend}.
-         */
-        @RegisterService(
-            service = LoggingBackendBuilder.class,
-            implementations = {TestOneLoggingBackendBuilder.class, TestTwoLoggingBackendBuilder.class}
-        )
-        @Test
-        void loadAllAvailableProviders() {
-            Framework framework = new Framework(false, false);
-            try {
-                LoggingBackend backend = framework.getLoggingBackend();
-                assertThat(backend).isInstanceOf(BundleLoggingBackend.class);
-
-                Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getChildren();
-                assertThat(children).containsExactlyInAnyOrder(
-                    TestOneLoggingBackendBuilder.backend,
-                    TestTwoLoggingBackendBuilder.backend
-                );
-            } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that one logging backend can be defined by name if multiple are available.
-         */
-        @RegisterService(
-            service = LoggingBackendBuilder.class,
-            implementations = {TestOneLoggingBackendBuilder.class, TestTwoLoggingBackendBuilder.class}
-        )
-        @Test
-        void loadSingleProviderByName() {
-            Framework framework = new Framework(false, false);
-            try {
-                framework.getConfigurationBuilder(false)
-                    .set("backends", "test2")
-                    .activate();
-
-                assertThat(framework.getLoggingBackend()).isSameAs(TestTwoLoggingBackendBuilder.backend);
-            } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that several logging backends can be defined by name if multiple are available.
-         */
-        @RegisterService(
-            service = LoggingBackendBuilder.class,
-            implementations = {TestOneLoggingBackendBuilder.class, TestTwoLoggingBackendBuilder.class}
-        )
-        @Test
-        void loadMultipleProvidersByName() {
-            Framework framework = new Framework(true, false);
-            try {
-                framework.getConfigurationBuilder(false)
-                    .set("backends", "test1, nop")
-                    .activate();
-
-                LoggingBackend backend = framework.getLoggingBackend();
-                assertThat(backend).isInstanceOf(BundleLoggingBackend.class);
-
-                Collection<LoggingBackend> children = ((BundleLoggingBackend) backend).getChildren();
-                assertThat(children).containsExactlyInAnyOrder(
-                    TestOneLoggingBackendBuilder.backend,
-                    new NopLoggingBackendBuilder().create(null)
-                );
-            } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that logging backends will be created only once, even if multiple times declared.
+         * Verifies that the level visibility of a class name can be received if the framework is already started.
          */
         @Test
-        void loadSameProvidersByName() {
-            Framework framework = new Framework(true, false);
+        void getAfterStarted() throws InterruptedException {
+            LevelVisibility visibility = mock(LevelVisibility.class);
+            when(TestLoggingBackendBuilder.backend.getLevelVisibilityByClass("example.Foo")).thenReturn(visibility);
+
+            Framework framework = new Framework();
+            framework.start();
             try {
-                framework.getConfigurationBuilder(false)
-                    .set("backends", "nop, NOP")
-                    .activate();
-
-                LoggingBackend backend = framework.getLoggingBackend();
-                assertThat(backend).isInstanceOf(NopLoggingBackend.class);
+                assertThat(framework.getLevelVisibilityByClass("example.Foo")).isEqualTo(visibility);
             } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that the available logging backend will be created, if the configured logging backend does not
-         * exist.
-         */
-        @RegisterService(service = LoggingBackendBuilder.class, implementations = TestOneLoggingBackendBuilder.class)
-        @Test
-        void fallbackForEntireInvalidName() {
-            Framework framework = new Framework(true, false);
-            try {
-                framework.getConfigurationBuilder(false)
-                    .set("backends", "test0")
-                    .activate();
-
-                LoggingBackend backend = framework.getLoggingBackend();
-
-                assertThat(backend).isSameAs(TestOneLoggingBackendBuilder.backend);
-                assertThat(output.consume())
-                    .hasSize(1)
-                    .allSatisfy(line -> assertThat(line).contains("TINYLOG ERROR", "test0"));
-            } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that all other configured logging backends will be created, if one of them does not exist.
-         */
-        @RegisterService(
-            service = LoggingBackendBuilder.class,
-            implementations = {TestOneLoggingBackendBuilder.class, TestTwoLoggingBackendBuilder.class}
-        )
-        @Test
-        void fallbackForPartialInvalidName() {
-            Framework framework = new Framework(true, false);
-            try {
-                framework.getConfigurationBuilder(false)
-                    .set("backends", "test2, test3")
-                    .activate();
-
-                LoggingBackend backend = framework.getLoggingBackend();
-
-                assertThat(backend).isSameAs(TestTwoLoggingBackendBuilder.backend);
-                assertThat(output.consume())
-                    .hasSize(1)
-                    .allSatisfy(line -> assertThat(line).contains("TINYLOG ERROR", "test3"));
-            } finally {
-                framework.shutDown();
-            }
-        }
-
-        /**
-         * Verifies that the configuration becomes frozen after providing a logging backend.
-         */
-        @Test
-        void freezeConfigurationAfterProvidingLoggingBackend() {
-            Framework framework = new Framework(false, false);
-            try {
-                assertThat(framework.getLoggingBackend()).isNotNull();
-                assertThatCode(() -> framework.setConfiguration(new Configuration(emptyMap())))
-                    .isInstanceOf(UnsupportedOperationException.class);
-            } finally {
-                framework.shutDown();
+                framework.stop();
             }
         }
 
     }
 
     /**
-     * Tests for shutting down {@link Framework} via shutdown hook.
+     * Tests for {@link Framework#getLevelVisibilityByTag(String)}.
      */
     @Nested
-    class AutoShutdown {
-
-        private MockedStatic<Runtime> runtimeClassMock;
-        private Runtime runtimeInstanceMock;
+    @RegisterService(service = LoggingBackendBuilder.class, implementations = TestLoggingBackendBuilder.class)
+    class LevelVisibilityByTagGetter {
 
         /**
-         * Initializes the runtime mocks.
+         * Verifies that the level visibility of a tag can be received if the framework is not started yet.
          */
-        @SuppressWarnings("ResultOfMethodCallIgnored")
-        @BeforeEach
-        void init() {
-            runtimeClassMock = mockStatic(Runtime.class);
-            runtimeInstanceMock = mock(Runtime.class);
-            runtimeClassMock.when(Runtime::getRuntime).thenReturn(runtimeInstanceMock);
+        @Test
+        void getBeforeStarted() throws InterruptedException {
+            LevelVisibility visibility = mock(LevelVisibility.class);
+            when(TestLoggingBackendBuilder.backend.getLevelVisibilityByTag("foo")).thenReturn(visibility);
+
+            Framework framework = new Framework();
+            try {
+                assertThat(framework.getLevelVisibilityByTag("foo")).isEqualTo(visibility);
+            } finally {
+                framework.stop();
+            }
         }
 
         /**
-         * Closes the static runtime class mock.
+         * Verifies that the level visibility of a tag can be received if the framework is already started.
          */
-        @AfterEach
-        void dispose() {
-            runtimeClassMock.close();
+        @Test
+        void getAfterStarted() throws InterruptedException {
+            LevelVisibility visibility = mock(LevelVisibility.class);
+            when(TestLoggingBackendBuilder.backend.getLevelVisibilityByTag("foo")).thenReturn(visibility);
+
+            Framework framework = new Framework();
+            framework.start();
+            try {
+                assertThat(framework.getLevelVisibilityByTag("foo")).isEqualTo(visibility);
+            } finally {
+                framework.stop();
+            }
         }
 
+    }
+
+    /**
+     * Tests for {@link Framework#isEnabled(Object, String, Level)}.
+     */
+    @Nested
+    @RegisterService(service = LoggingBackendBuilder.class, implementations = TestLoggingBackendBuilder.class)
+    class SeverityLevelStateGetter {
+
         /**
-         * Verifies that a shutdown hook will be registered, if auto-shutdown is enabled.
+         * Verifies that the enabled state of a severity can be received if the framework is not started yet.
          *
-         * @param value The value for the {@code auto-shutdown} property
+         * @param result The enabled state to return
          */
         @ParameterizedTest
-        @NullSource
-        @ValueSource(strings = { "true", "TRUE" })
-        void enableAutoShutdown(String value) {
-            Framework framework = new Framework(false, false);
-            framework.getConfigurationBuilder(false)
-                .set("auto-shutdown", value)
-                .activate();
+        @ValueSource(booleans = {false, true})
+        void getBeforeStarted(boolean result) throws InterruptedException {
+            when(TestLoggingBackendBuilder.backend.isEnabled("MyClass", "foo", Level.INFO)).thenReturn(result);
 
-            framework.startUp();
-            framework.shutDown();
-
-            verify(runtimeInstanceMock).addShutdownHook(notNull());
+            Framework framework = new Framework();
+            try {
+                assertThat(framework.isEnabled("MyClass", "foo", Level.INFO)).isEqualTo(result);
+            } finally {
+                framework.stop();
+            }
         }
 
         /**
-         * Verifies that no shutdown hook will be registered, if auto-shutdown is disabled.
+         * Verifies that the enabled state of a severity can be received if the framework is already started.
          *
-         * @param value The value for the {@code auto-shutdown} property
+         * @param result The enabled state to return
          */
         @ParameterizedTest
-        @ValueSource(strings = { "false", "FALSE" })
-        void disableAutoShutdown(String value) {
-            Framework framework = new Framework(false, false);
-            framework.getConfigurationBuilder(false)
-                .set("auto-shutdown", value)
-                .activate();
+        @ValueSource(booleans = {false, true})
+        void getAfterStarted(boolean result) throws InterruptedException {
+            when(TestLoggingBackendBuilder.backend.isEnabled("MyClass", "foo", Level.INFO)).thenReturn(result);
 
-            framework.startUp();
-            framework.shutDown();
-
-            verify(runtimeInstanceMock, never()).addShutdownHook(any());
+            Framework framework = new Framework();
+            framework.start();
+            try {
+                assertThat(framework.isEnabled("MyClass", "foo", Level.INFO)).isEqualTo(result);
+            } finally {
+                framework.stop();
+            }
         }
 
     }
 
     /**
-     * Additional hook for JUnit tests.
+     * Tests for {@link Framework#submit(LogEntry)}.
      */
-    public static final class TestHook implements Hook {
+    @Nested
+    @RegisterService(service = LoggingBackendBuilder.class, implementations = TestLoggingBackendBuilder.class)
+    class LogEntrySubmission {
 
-        private static boolean running;
+        /**
+         * Verifies that a log entry can be submitted before the framework is initialized.
+         */
+        @Test
+        void submitBeforeStarted() throws InterruptedException {
+            LogEntry entry = mock(LogEntry.class);
+
+            Framework framework = new Framework();
+            framework.submit(entry);
+            framework.start();
+
+            try {
+                await().untilAsserted(
+                    () -> verify(TestLoggingBackendBuilder.backend).output(same(entry), anyBoolean())
+                );
+            } finally {
+                framework.stop();
+            }
+        }
+
+        /**
+         * Verifies that a log entry can be submitted after the framework is initialized.
+         */
+        @Test
+        void submitAfterStarted() throws InterruptedException {
+            Framework framework = new Framework();
+            framework.start();
+
+            try {
+                LogEntry entry = mock(LogEntry.class);
+                framework.submit(entry);
+
+                await().untilAsserted(
+                    () -> verify(TestLoggingBackendBuilder.backend).output(same(entry), anyBoolean())
+                );
+            } finally {
+                framework.stop();
+            }
+        }
+
+    }
+
+    /**
+     * Verifies that the initial configuration is loaded from available {@link ConfigurationLoader} implementations.
+     */
+    @Nested
+    class InitialConfiguration {
+
+        /**
+         * Verifies that the only available configuration loader is used.
+         */
+        @RegisterService(service = ConfigurationLoader.class, implementations = FirstConfigurationLoader.class)
+        @Test
+        void singleConfigurationLoader() throws InterruptedException {
+            Framework framework = new Framework();
+            try {
+                ConfigurationBuilder builder = framework.getConfigurationBuilder(true);
+                assertThat(builder.get("foo")).isEqualTo("1");
+                assertThat(builder.get("bar")).isEqualTo("1");
+                assertThat(builder.get("baz")).isNull();
+            } finally {
+                framework.stop();
+            }
+        }
+
+        /**
+         * Verifies that only the configuration loader with the highest priority is used.
+         */
+        @RegisterService(
+            service = ConfigurationLoader.class,
+            implementations = {FirstConfigurationLoader.class, SecondConfigurationLoader.class}
+        )
+        @Test
+        void multipleConfigurationLoaders() throws InterruptedException {
+            Framework framework = new Framework();
+            try {
+                ConfigurationBuilder builder = framework.getConfigurationBuilder(true);
+                assertThat(builder.get("foo")).isEqualTo("2");
+                assertThat(builder.get("bar")).isNull();
+                assertThat(builder.get("baz")).isEqualTo("2");
+            } finally {
+                framework.stop();
+            }
+        }
+
+    }
+
+    /**
+     * Tests for {@link Framework#getConfigurationBuilder(boolean)}.
+     */
+    @Nested
+    class ConfigurationBuilderGetter {
+
+        /**
+         * Verifies that an empty configuration builder can be received.
+         */
+        @Test
+        void receiveEmptyConfigurationBuilder() throws InterruptedException {
+            Framework framework = new Framework();
+            try {
+                Configuration configuration = new Configuration(Map.of("foo", "bar"), logger);
+                framework.setConfiguration(configuration);
+
+                ConfigurationBuilder builder = framework.getConfigurationBuilder(false);
+                assertThat(builder.get("foo")).isNull();
+            } finally {
+                framework.stop();
+            }
+        }
+
+        /**
+         * Verifies that an inherited configuration builder can be received.
+         */
+        @Test
+        void receiveInheritedConfigurationBuilder() throws InterruptedException {
+            Framework framework = new Framework();
+            try {
+                Configuration configuration = new Configuration(Map.of("foo", "bar"), logger);
+                framework.setConfiguration(configuration);
+
+                ConfigurationBuilder builder = framework.getConfigurationBuilder(true);
+                assertThat(builder.get("foo")).isEqualTo("bar");
+            } finally {
+                framework.stop();
+            }
+        }
+
+    }
+
+    /**
+     * Tests for {@link Framework#setConfiguration(Configuration)}.
+     */
+    @Nested
+    class ConfigurationSetter {
+
+        /**
+         * Verifies that an initial configuration can be set and applied before the framework is initialized.
+         */
+        @Test
+        @RegisterService(service = LoggingBackendBuilder.class, implementations = TestLoggingBackendBuilder.class)
+        void setInitialConfigurationBeforeStarted() throws InterruptedException {
+            ContextStorage storage = mock(ContextStorage.class);
+            when(TestLoggingBackendBuilder.backend.getContextStorage()).thenReturn(storage);
+
+            Framework framework = new Framework();
+            framework.setConfiguration(new Configuration(Map.of("backends", "test1"), logger));
+
+            try {
+                assertThat(framework.getContextStorage()).isSameAs(storage);
+            } finally {
+                framework.stop();
+            }
+        }
+
+        /**
+         * Verifies that configurations can be overridden before the framework is initialized.
+         */
+        @Test
+        @RegisterService(service = LoggingBackendBuilder.class, implementations = TestLoggingBackendBuilder.class)
+        void overrideExistingConfigurationBeforeStarted() throws InterruptedException {
+            ContextStorage storage = mock(ContextStorage.class);
+            when(TestLoggingBackendBuilder.backend.getContextStorage()).thenReturn(storage);
+
+            Framework framework = new Framework();
+            framework.setConfiguration(new Configuration(Map.of("backends", "nop"), logger));
+            framework.setConfiguration(new Configuration(Map.of("backends", "test1"), logger));
+
+            try {
+                assertThat(framework.getContextStorage()).isSameAs(storage);
+            } finally {
+                framework.stop();
+            }
+        }
+
+        /**
+         * Verifies that configurations cannot be overridden after the framework is initialized.
+         */
+        @Test
+        @RegisterService(service = LoggingBackendBuilder.class, implementations = TestLoggingBackendBuilder.class)
+        void preventOverridingConfigurationAfterStarted() throws InterruptedException {
+            ContextStorage storage = mock(ContextStorage.class);
+            when(TestLoggingBackendBuilder.backend.getContextStorage()).thenReturn(storage);
+
+            Framework framework = new Framework();
+            framework.start();
+
+            try {
+                Configuration configuration = new Configuration(Map.of("backends", "test1"), logger);
+                assertThatCode(() -> framework.setConfiguration(configuration))
+                    .isInstanceOf(UnsupportedOperationException.class)
+                    .hasMessageContaining("configuration");
+            } finally {
+                framework.stop();
+            }
+        }
+
+    }
+
+    /**
+     * Logging backend builder with a mocked backend for JUnit tests.
+     */
+    public static final class TestLoggingBackendBuilder implements LoggingBackendBuilder {
+
+        private static LoggingBackend backend;
 
         @Override
-        public void startUp() {
-            running = true;
+        public String getName() {
+            return "test";
         }
 
         @Override
-        public void shutDown() {
-            running = false;
+        public LoggingBackend create(TinylogContext context) {
+            return backend;
         }
 
     }
 
     /**
-     * Additional logging configuration builder for JUnit tests.
+     * First configuration loader service implementation.
      */
-    public static final class TestOneConfigurationLoader implements ConfigurationLoader {
-
-        private static Map<String, String> data;
+    public static final class FirstConfigurationLoader implements ConfigurationLoader {
 
         @Override
         public int getPriority() {
@@ -681,18 +517,16 @@ class FrameworkTest {
         }
 
         @Override
-        public Map<String, String> load(ClassLoader loader) {
-            return data;
+        public Map<String, String> load(ClassLoader loader, InternalLogger logger) {
+            return Map.of("foo", "1", "bar", "1");
         }
 
     }
 
     /**
-     * Additional logging configuration builder for JUnit tests.
+     * Second configuration loader service implementation.
      */
-    public static final class TestTwoConfigurationLoader implements ConfigurationLoader {
-
-        private static Map<String, String> data;
+    public static final class SecondConfigurationLoader implements ConfigurationLoader {
 
         @Override
         public int getPriority() {
@@ -700,46 +534,8 @@ class FrameworkTest {
         }
 
         @Override
-        public Map<String, String> load(ClassLoader loader) {
-            return data;
-        }
-
-    }
-
-    /**
-     * Additional logging backend builder for JUnit tests.
-     */
-    public static final class TestOneLoggingBackendBuilder implements LoggingBackendBuilder {
-
-        private static final LoggingBackend backend = new InternalLoggingBackend(mock(LoggingContext.class));
-
-        @Override
-        public String getName() {
-            return "test1";
-        }
-
-        @Override
-        public LoggingBackend create(LoggingContext context) {
-            return backend;
-        }
-
-    }
-
-    /**
-     * Additional logging backend builder for JUnit tests.
-     */
-    public static final class TestTwoLoggingBackendBuilder implements LoggingBackendBuilder {
-
-        private static final LoggingBackend backend = new InternalLoggingBackend(mock(LoggingContext.class));
-
-        @Override
-        public String getName() {
-            return "test2";
-        }
-
-        @Override
-        public LoggingBackend create(LoggingContext context) {
-            return backend;
+        public Map<String, String> load(ClassLoader loader, InternalLogger logger) {
+            return Map.of("foo", "2", "baz", "2");
         }
 
     }

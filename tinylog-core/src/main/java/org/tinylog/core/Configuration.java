@@ -20,15 +20,20 @@ public class Configuration {
 
     private static final int MAX_LOCALE_ARGUMENTS = 3;
 
+    private final InternalLogger logger;
     private final Configuration parent;
     private final String prefix;
     private final Map<String, String> properties;
 
     /**
      * @param properties All keys and values to store
+     * @param logger The internal logger instance for issuing internal tinylog log entries
      */
-    public Configuration(Map<String, String> properties) {
-        this(null, null, properties);
+    public Configuration(Map<String, String> properties, InternalLogger logger) {
+        this.logger = logger;
+        this.parent = null;
+        this.prefix = null;
+        this.properties = new LinkedHashMap<>(properties);
     }
 
     /**
@@ -37,19 +42,10 @@ public class Configuration {
      * @param properties All keys and values to store
      */
     private Configuration(Configuration parent, String prefix, Map<String, String> properties) {
+        this.logger = parent.logger;
         this.parent = parent;
         this.prefix = prefix;
         this.properties = new LinkedHashMap<>(properties);
-    }
-
-    /**
-     * Checks if a value is stored for the passed key.
-     *
-     * @param key The key to search for
-     * @return {@code true} if a value is stored for the passed key, {@code false} otherwise
-    */
-    public boolean isPresent(String key) {
-        return properties.containsKey(key);
     }
 
     /**
@@ -81,7 +77,8 @@ public class Configuration {
             try {
                 return ZoneId.of(value);
             } catch (DateTimeException ex) {
-                InternalLogger.error(
+                logger.log(
+                    Level.ERROR,
                     ex,
                     "Invalid zone ID \"{}\" in property \"{}\"",
                     value,

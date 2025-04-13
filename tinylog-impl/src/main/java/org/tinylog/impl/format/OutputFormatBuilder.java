@@ -1,7 +1,11 @@
 package org.tinylog.impl.format;
 
-import org.tinylog.core.Configuration;
-import org.tinylog.core.internal.LoggingContext;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ServiceLoader;
+
+import org.tinylog.core.backend.TinylogContext;
 
 /**
  * Builder for creating an instance of an {@link OutputFormat}.
@@ -29,10 +33,25 @@ public interface OutputFormatBuilder {
     /**
      * Creates a new instance of the output format.
      *
-     * @param context The current logging context
-     * @param configuration The configuration properties of the writer for which the output format has to be created
+     * @param context The tinylog context to use for creating a new output format
      * @return New output format instance
      */
-    OutputFormat create(LoggingContext context, Configuration configuration);
+    OutputFormat create(TinylogContext context);
+
+    /**
+     * Loads and creates all available output format builders.
+     *
+     * @param loader The class loader to use for loading the service implementations
+     * @return A map with the names and output format builder instances
+     */
+    static Map<String, OutputFormatBuilder> load(ClassLoader loader) {
+        Map<String, OutputFormatBuilder> builders = new HashMap<>();
+
+        ServiceLoader
+            .load(OutputFormatBuilder.class, loader)
+            .forEach(builder -> builders.put(builder.getName().toLowerCase(Locale.ENGLISH), builder));
+
+        return builders;
+    }
 
 }

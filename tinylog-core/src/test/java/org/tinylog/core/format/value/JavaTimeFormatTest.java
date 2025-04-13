@@ -6,27 +6,36 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-
-import javax.inject.Inject;
+import java.util.ServiceLoader;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.internal.LoggingContext;
-import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.Configuration;
+import org.tinylog.test.junit.log.Tinylog;
+
+import jakarta.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JavaTimeFormatTest {
 
     /**
+     * Verifies that the value format is registered as service.
+     */
+    @Test
+    void service() {
+        assertThat(ServiceLoader.load(ValueFormat.class)).anyMatch(loader -> loader instanceof JavaTimeFormat);
+    }
+
+    /**
      * Tests for all known supported {@code java.time} types.
      */
-    @CaptureLogEntries(configuration = {"locale=en_US", "zone=UTC"})
+    @Tinylog(configuration = {"locale=en_US", "zone=UTC"})
     @Nested
     class JavaTimeTypes {
 
         @Inject
-        private LoggingContext context;
+        private Configuration configuration;
 
         /**
          * Verifies that a {@link LocalTime} can be formatted.
@@ -35,8 +44,9 @@ class JavaTimeFormatTest {
         void localTimeValue() {
             JavaTimeFormat format = new JavaTimeFormat();
             LocalTime time = LocalTime.of(12, 30);
+
             assertThat(format.isSupported(time)).isTrue();
-            assertThat(format.format(context, "HH:mm", time)).isEqualTo("12:30");
+            assertThat(format.format(configuration, "HH:mm", time)).isEqualTo("12:30");
         }
 
         /**
@@ -46,8 +56,10 @@ class JavaTimeFormatTest {
         void localDateValue() {
             JavaTimeFormat format = new JavaTimeFormat();
             LocalDate date = LocalDate.of(2020, 12, 31);
+
             assertThat(format.isSupported(date)).isTrue();
-            assertThat(format.format(context, "dd.MM.yyyy", date)).isEqualTo("31.12.2020");
+            assertThat(format.format(configuration, "dd.MM.yyyy", date))
+                .isEqualTo("31.12.2020");
         }
 
         /**
@@ -57,8 +69,10 @@ class JavaTimeFormatTest {
         void localDateTimeValue() {
             JavaTimeFormat format = new JavaTimeFormat();
             LocalDateTime dateTime = LocalDateTime.of(2020, 12, 31, 12, 30);
+
             assertThat(format.isSupported(dateTime)).isTrue();
-            assertThat(format.format(context, "dd.MM.yyyy, HH:mm", dateTime)).isEqualTo("31.12.2020, 12:30");
+            assertThat(format.format(configuration, "dd.MM.yyyy, HH:mm", dateTime))
+                .isEqualTo("31.12.2020, 12:30");
         }
 
         /**
@@ -73,7 +87,8 @@ class JavaTimeFormatTest {
             ZonedDateTime dateTime = ZonedDateTime.of(date, time, ZoneOffset.ofHours(2));
 
             assertThat(format.isSupported(dateTime)).isTrue();
-            assertThat(format.format(context, "yyyy-MM-dd HH:mm Z", dateTime)).isEqualTo("2020-12-31 12:30 +0200");
+            assertThat(format.format(configuration, "yyyy-MM-dd HH:mm Z", dateTime))
+                .isEqualTo("2020-12-31 12:30 +0200");
         }
 
         /**
@@ -83,8 +98,10 @@ class JavaTimeFormatTest {
         void instantValue() {
             JavaTimeFormat format = new JavaTimeFormat();
             Instant instant = Instant.ofEpochMilli(0);
+
             assertThat(format.isSupported(instant)).isTrue();
-            assertThat(format.format(context, "yyyy-MM-dd HH:mm", instant)).isEqualTo("1970-01-01 00:00");
+            assertThat(format.format(configuration, "yyyy-MM-dd HH:mm", instant))
+                .isEqualTo("1970-01-01 00:00");
         }
 
         /**
@@ -105,27 +122,28 @@ class JavaTimeFormatTest {
     class Languages {
 
         @Inject
-        private LoggingContext context;
+        private Configuration configuration;
 
         /**
          * Verifies that a date can be formatted in the British style.
          */
-        @CaptureLogEntries(configuration = {"locale=en_GB", "zone=UTC"})
+        @Tinylog(configuration = {"locale=en_GB", "zone=UTC"})
         @Test
         void britishFormat() {
             LocalDate date = LocalDate.of(2020, 12, 31);
-            String output = new JavaTimeFormat().format(context, "MMMM d, yyyy", date);
+            String output = new JavaTimeFormat().format(configuration, "MMMM d, yyyy", date);
             assertThat(output).isEqualTo("December 31, 2020");
         }
 
         /**
          * Verifies that a date can be formatted in the German style.
          */
-        @CaptureLogEntries(configuration = {"locale=de_DE", "zone=UTC"})
+        @Tinylog(configuration = {"locale=de_DE", "zone=UTC"})
         @Test
         void germanFormat() {
             LocalDate date = LocalDate.of(2020, 12, 31);
-            String output = new JavaTimeFormat().format(context, "dd. MMMM yyyy", date);
+
+            String output = new JavaTimeFormat().format(configuration, "dd. MMMM yyyy", date);
             assertThat(output).isEqualTo("31. Dezember 2020");
         }
 
@@ -138,41 +156,44 @@ class JavaTimeFormatTest {
     class TimeZones {
 
         @Inject
-        private LoggingContext context;
+        private Configuration configuration;
 
         /**
          * Verifies that instants are correctly output for the time zone {@code GMT-1}.
          */
-        @CaptureLogEntries(configuration = {"locale=en_US", "zone=GMT-1"})
+        @Tinylog(configuration = {"locale=en_US", "zone=GMT-1"})
         @Test
         void gmtMinus1() {
             LocalDateTime date = LocalDateTime.of(2020, 1, 1, 0, 0);
             Instant instant = date.atZone(ZoneOffset.UTC).toInstant();
-            String output = new JavaTimeFormat().format(context, "yyyy-MM-dd HH:mm", instant);
+
+            String output = new JavaTimeFormat().format(configuration, "yyyy-MM-dd HH:mm", instant);
             assertThat(output).isEqualTo("2019-12-31 23:00");
         }
 
         /**
          * Verifies that instants are correctly output for the time zone {@code GMT}.
          */
-        @CaptureLogEntries(configuration = {"locale=en_US", "zone=GMT"})
+        @Tinylog(configuration = {"locale=en_US", "zone=GMT"})
         @Test
         void gmt() {
             LocalDateTime date = LocalDateTime.of(2020, 1, 1, 0, 0);
             Instant instant = date.atZone(ZoneOffset.UTC).toInstant();
-            String output = new JavaTimeFormat().format(context, "yyyy-MM-dd HH:mm", instant);
+
+            String output = new JavaTimeFormat().format(configuration, "yyyy-MM-dd HH:mm", instant);
             assertThat(output).isEqualTo("2020-01-01 00:00");
         }
 
         /**
          * Verifies that instants are correctly output for the time zone {@code GMT+1}.
          */
-        @CaptureLogEntries(configuration = {"locale=en_US", "zone=GMT+1"})
+        @Tinylog(configuration = {"locale=en_US", "zone=GMT+1"})
         @Test
         void gmtPlus1() {
             LocalDateTime date = LocalDateTime.of(2020, 1, 1, 0, 0);
             Instant instant = date.atZone(ZoneOffset.UTC).toInstant();
-            String output = new JavaTimeFormat().format(context, "yyyy-MM-dd HH:mm", instant);
+
+            String output = new JavaTimeFormat().format(configuration, "yyyy-MM-dd HH:mm", instant);
             assertThat(output).isEqualTo("2020-01-01 01:00");
         }
 

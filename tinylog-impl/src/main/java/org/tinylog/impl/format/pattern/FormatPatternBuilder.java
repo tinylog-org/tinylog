@@ -1,10 +1,11 @@
 package org.tinylog.impl.format.pattern;
 
 import org.tinylog.core.Configuration;
-import org.tinylog.core.internal.LoggingContext;
+import org.tinylog.core.backend.TinylogContext;
+import org.tinylog.impl.format.FormatPatternParser;
 import org.tinylog.impl.format.OutputFormat;
 import org.tinylog.impl.format.OutputFormatBuilder;
-import org.tinylog.impl.format.pattern.placeholders.Placeholder;
+import org.tinylog.impl.format.placeholder.Placeholder;
 
 /**
  * Builder for creating an instance of format pattern {@link Placeholder}.
@@ -25,7 +26,8 @@ public class FormatPatternBuilder implements OutputFormatBuilder {
     }
 
     @Override
-    public OutputFormat create(LoggingContext context, Configuration configuration) {
+    public OutputFormat create(TinylogContext context) {
+        Configuration configuration = context.getConfiguration();
         String pattern = configuration.getValue(PATTERN_KEY, DEFAULT_PATTERN) + System.lineSeparator();
         return new FormatPatternParser(context).parse(pattern);
     }

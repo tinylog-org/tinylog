@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.tinylog.core.Level;
 import org.tinylog.core.internal.InternalLogger;
 
 /**
@@ -31,28 +32,28 @@ public class PropertiesLoader extends AbstractConfigurationLoader {
     }
 
     @Override
-    public Map<String, String> load(ClassLoader loader) {
+    public Map<String, String> load(ClassLoader loader, InternalLogger logger) {
         String file = System.getProperty(CONFIGURATION_PROPERTY);
 
         if (file != null) {
             try (InputStream stream = getInputStream(loader, file)) {
-                InternalLogger.info(null, "Load configuration from \"{}\"", file);
-                return load(loader, stream);
+                logger.log(Level.INFO, "Load configuration from \"{}\"", file);
+                return load(loader, logger, stream);
             } catch (IOException ex) {
-                InternalLogger.error(ex, "Failed to load tinylog configuration from \"{}\"", file);
+                logger.log(Level.ERROR, ex, "Failed to load tinylog configuration from \"{}\"", file);
             }
         }
 
         for (String name : CONFIGURATION_FILES) {
             try (InputStream stream = loader.getResourceAsStream(name)) {
                 if (stream == null) {
-                    InternalLogger.debug(null, "Configuration file \"{}\" does not exist", name);
+                    logger.log(Level.DEBUG, "Configuration file \"{}\" does not exist", name);
                 } else {
-                    InternalLogger.info(null, "Load configuration from \"{}\"", name);
-                    return load(loader, stream);
+                    logger.log(Level.INFO, "Load configuration from \"{}\"", name);
+                    return load(loader, logger, stream);
                 }
             } catch (IOException ex) {
-                InternalLogger.error(ex, "Failed to load tinylog configuration from \"{}\"", name);
+                logger.log(Level.ERROR, ex, "Failed to load tinylog configuration from \"{}\"", name);
             }
         }
 
@@ -63,11 +64,16 @@ public class PropertiesLoader extends AbstractConfigurationLoader {
      * Loads the properties from an input stream and resolves all variables.
      *
      * @param loader The class loader to use for loading the service files and service implementation classes
+     * @param logger The internal logger instance for issuing internal tinylog log entries
      * @param stream The input stream of a properties file
      * @return All properties as map
-     * @throws IOException Failed to read from the passed input stream
+     * @throws IOException If failed to read from the passed input stream
      */
-    private Map<String, String> load(ClassLoader loader, InputStream stream) throws IOException {
+    private Map<String, String> load(
+        ClassLoader loader,
+        InternalLogger logger,
+        InputStream stream
+    ) throws IOException {
         Map<String, String> map = new LinkedHashMap<>();
 
         new Properties() {
@@ -77,7 +83,7 @@ public class PropertiesLoader extends AbstractConfigurationLoader {
             }
         }.load(stream);
 
-        resolveVariables(loader, map);
+        resolveVariables(loader, logger, map);
 
         return map;
     }

@@ -116,7 +116,7 @@
         <module name="JavadocTagContinuationIndentation"/>
         <module name="JavadocType"/>
         <module name="JavadocVariable">
-            <property name="scope" value="package"/>
+            <property name="accessModifiers" value="package"/>
         </module>
         <module name="JavaNCSS"/>
         <module name="LambdaParameterName"/>
@@ -163,7 +163,6 @@
         <module name="OperatorWrap"/>
         <module name="OuterTypeFilename"/>
         <module name="OuterTypeNumber"/>
-        <module name="OverloadMethodsDeclarationOrder"/>
         <module name="PackageAnnotation"/>
         <module name="PackageDeclaration"/>
         <module name="PackageName"/>

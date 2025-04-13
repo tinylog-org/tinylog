@@ -1,32 +1,27 @@
 package org.tinylog.core.backend;
 
 import org.tinylog.core.Level;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.context.ContextStorage;
 import org.tinylog.core.context.NopContextStorage;
-import org.tinylog.core.format.message.MessageFormatter;
 
 /**
  * A no operation implementation of {@link LoggingBackend}. All issued log entries are silently ignored.
  */
 public class NopLoggingBackend implements LoggingBackend {
 
-    private static final ContextStorage STORAGE = new NopContextStorage();
+    private static final LevelVisibility VISIBILITY = new LevelVisibility(OutputDetails.DISABLED);
 
-    private static final LevelVisibility VISIBILITY = new LevelVisibility(
-        OutputDetails.DISABLED,
-        OutputDetails.DISABLED,
-        OutputDetails.DISABLED,
-        OutputDetails.DISABLED,
-        OutputDetails.DISABLED
-    );
+    private final ContextStorage contextStorage;
 
     /** */
     public NopLoggingBackend() {
+        this.contextStorage = new NopContextStorage();
     }
 
     @Override
     public ContextStorage getContextStorage() {
-        return STORAGE;
+        return contextStorage;
     }
 
     @Override
@@ -45,14 +40,13 @@ public class NopLoggingBackend implements LoggingBackend {
     }
 
     @Override
-    public void log(Object location, String tag, Level level, Throwable throwable, Object message, Object[] arguments,
-            MessageFormatter formatter) {
+    public void output(LogEntry entry, boolean last) {
         // Ignore
     }
 
     @Override
-    public LoggingBackend reconfigure() {
-        return this;
+    public void close() {
+        // Ignore
     }
 
 }

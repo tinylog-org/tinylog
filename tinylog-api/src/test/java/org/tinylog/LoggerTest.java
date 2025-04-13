@@ -1,42 +1,43 @@
 package org.tinylog;
 
-import java.util.function.Supplier;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.Tinylog;
 import org.tinylog.core.backend.LevelVisibility;
-import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.OutputDetails;
-import org.tinylog.core.format.message.EnhancedMessageFormatter;
-import org.tinylog.core.test.isolate.IsolatedExecution;
+import org.tinylog.core.context.ContextStorage;
+import org.tinylog.core.context.NopContextStorage;
+import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.runtime.JavaRuntime;
+import org.tinylog.test.junit.isolate.IsolatedExecution;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.notNull;
-import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-@IsolatedExecution(classes = { Logger.class, TaggedLogger.class })
+@IsolatedExecution(classes = {Logger.class, TaggedLogger.class})
 class LoggerTest {
 
     private MockedStatic<Tinylog> tinylogMock;
-    private LoggingBackend backend;
+    private Framework framework;
     private LevelVisibility visibility;
 
     /**
@@ -46,32 +47,26 @@ class LoggerTest {
     @BeforeEach
     void init() {
         tinylogMock = mockStatic(Tinylog.class);
-        backend = mock(LoggingBackend.class);
-
-        tinylogMock.when(Tinylog::getFramework).thenReturn(new Framework(false, false) {
-            @Override
-            public LoggingBackend getLoggingBackend() {
-                return backend;
-            }
-        });
-
+        framework = mock(Framework.class);
         visibility = mock(LevelVisibility.class);
+
+        JavaRuntime runtime = new JavaRuntime(mock(InternalLogger.class));
+        ContextStorage storage = new NopContextStorage();
+
         when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
         when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
         when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
         when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
         when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
 
-        LevelVisibility visibilityForTags = mock(LevelVisibility.class);
-        when(visibilityForTags.getTrace()).thenReturn(OutputDetails.DISABLED);
-        when(visibilityForTags.getDebug()).thenReturn(OutputDetails.DISABLED);
-        when(visibilityForTags.getInfo()).thenReturn(OutputDetails.DISABLED);
-        when(visibilityForTags.getWarn()).thenReturn(OutputDetails.DISABLED);
-        when(visibilityForTags.getError()).thenReturn(OutputDetails.DISABLED);
+        when(framework.getRuntime()).thenReturn(runtime);
+        when(framework.getContextStorage()).thenReturn(storage);
+        when(framework.getLevelVisibilityByTag(isNull())).thenReturn(visibility);
+        when(framework.getLevelVisibilityByTag(notNull())).thenReturn(mock(LevelVisibility.class));
 
-        when(backend.getLevelVisibilityByTag(any()))
-            .thenAnswer(answer -> answer.getArgument(0) == null ? visibility : visibilityForTags);
+        tinylogMock.when(Tinylog::getFramework).thenReturn(framework);
     }
+
 
     /**
      * Restores the mocked tinylog class.
@@ -103,7 +98,7 @@ class LoggerTest {
         @Test
         void differentLoggerInstanceForDifferentTag() {
             TaggedLogger first = Logger.tag("foo");
-            TaggedLogger second = Logger.tag("boo");
+            TaggedLogger second = Logger.tag("bar");
 
             assertThat(first).isNotNull();
             assertThat(second).isNotNull();
@@ -137,23 +132,23 @@ class LoggerTest {
         /**
          * Verifies the results of the {@link Logger#isTraceEnabled()} method.
          *
-         * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getTrace()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isTraceEnabled(boolean enabled, OutputDetails outputDetails) {
             when(visibility.getTrace()).thenReturn(outputDetails);
-            when(backend.isEnabled(notNull(), isNull(), eq(Level.TRACE))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), isNull(), eq(Level.TRACE))).thenReturn(enabled);
 
             assertThat(Logger.isTraceEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
@@ -161,23 +156,23 @@ class LoggerTest {
         /**
          * Verifies the results of the {@link Logger#isDebugEnabled()} method.
          *
-         * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getDebug()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isDebugEnabled(boolean enabled, OutputDetails outputDetails) {
             when(visibility.getDebug()).thenReturn(outputDetails);
-            when(backend.isEnabled(notNull(), isNull(), eq(Level.DEBUG))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), isNull(), eq(Level.DEBUG))).thenReturn(enabled);
 
             assertThat(Logger.isDebugEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
@@ -185,23 +180,23 @@ class LoggerTest {
         /**
          * Verifies the results of the {@link Logger#isInfoEnabled()} method.
          *
-         * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getInfo()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isInfoEnabled(boolean enabled, OutputDetails outputDetails) {
             when(visibility.getInfo()).thenReturn(outputDetails);
-            when(backend.isEnabled(notNull(), isNull(), eq(Level.INFO))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), isNull(), eq(Level.INFO))).thenReturn(enabled);
 
             assertThat(Logger.isInfoEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
@@ -209,23 +204,23 @@ class LoggerTest {
         /**
          * Verifies the results of the {@link Logger#isWarnEnabled()} method.
          *
-         * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getWarn()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isWarnEnabled(boolean enabled, OutputDetails outputDetails) {
             when(visibility.getWarn()).thenReturn(outputDetails);
-            when(backend.isEnabled(notNull(), isNull(), eq(Level.WARN))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), isNull(), eq(Level.WARN))).thenReturn(enabled);
 
             assertThat(Logger.isWarnEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
@@ -233,23 +228,23 @@ class LoggerTest {
         /**
          * Verifies the results of the {@link Logger#isErrorEnabled()} method.
          *
-         * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getError()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isErrorEnabled(boolean enabled, OutputDetails outputDetails) {
             when(visibility.getError()).thenReturn(outputDetails);
-            when(backend.isEnabled(notNull(), isNull(), eq(Level.ERROR))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), isNull(), eq(Level.ERROR))).thenReturn(enabled);
 
             assertThat(Logger.isErrorEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
@@ -289,7 +284,7 @@ class LoggerTest {
 
                 Logger.trace(42);
 
-                verifyLogEntry(Level.TRACE, null, 42);
+                verifyLogEntry(Level.TRACE, null, "42");
             }
 
             /**
@@ -299,10 +294,9 @@ class LoggerTest {
             void traceLazyMessage() {
                 when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
-                Supplier<String> supplier = () -> "Hello World!";
-                Logger.trace(supplier);
+                Logger.trace(() -> "Hello World!");
 
-                verifyLogEntry(Level.TRACE, null, supplier);
+                verifyLogEntry(Level.TRACE, null, "Hello World!");
             }
 
             /**
@@ -314,7 +308,7 @@ class LoggerTest {
 
                 Logger.trace("Hello {}!", "Alice");
 
-                verifyLogEntry(Level.TRACE, null, "Hello {}!", "Alice");
+                verifyLogEntry(Level.TRACE, null, "Hello Alice!");
             }
 
             /**
@@ -324,10 +318,9 @@ class LoggerTest {
             void traceFormattedMessageWithLazyArgument() {
                 when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
-                Supplier<String> supplier = () -> "Alice";
-                Logger.trace("Hello {}!", supplier);
+                Logger.trace("Hello {}!", () -> "Alice");
 
-                verifyLogEntry(Level.TRACE, null, "Hello {}!", supplier);
+                verifyLogEntry(Level.TRACE, null, "Hello Alice!");
             }
 
             /**
@@ -364,10 +357,9 @@ class LoggerTest {
                 when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
                 Exception exception = new Exception();
-                Supplier<String> supplier = () -> "Oops!";
-                Logger.trace(exception, supplier);
+                Logger.trace(exception, () -> "Oops!");
 
-                verifyLogEntry(Level.TRACE, exception, supplier);
+                verifyLogEntry(Level.TRACE, exception, "Oops!");
             }
 
             /**
@@ -380,7 +372,7 @@ class LoggerTest {
                 Exception exception = new Exception();
                 Logger.trace(exception, "Hello {}!", "Alice");
 
-                verifyLogEntry(Level.TRACE, exception, "Hello {}!", "Alice");
+                verifyLogEntry(Level.TRACE, exception, "Hello Alice!");
             }
 
             /**
@@ -392,10 +384,9 @@ class LoggerTest {
                 when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
                 Exception exception = new Exception();
-                Supplier<String> supplier = () -> "Alice";
-                Logger.trace(exception, "Hello {}!", supplier);
+                Logger.trace(exception, "Hello {}!", () -> "Alice");
 
-                verifyLogEntry(Level.TRACE, exception, "Hello {}!", supplier);
+                verifyLogEntry(Level.TRACE, exception, "Hello Alice!");
             }
 
             /**
@@ -419,7 +410,7 @@ class LoggerTest {
 
                 Logger.debug(42);
 
-                verifyLogEntry(Level.DEBUG, null, 42);
+                verifyLogEntry(Level.DEBUG, null, "42");
             }
 
             /**
@@ -429,10 +420,9 @@ class LoggerTest {
             void debugLazyMessage() {
                 when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
-                Supplier<String> supplier = () -> "Hello World!";
-                Logger.debug(supplier);
+                Logger.debug(() -> "Hello World!");
 
-                verifyLogEntry(Level.DEBUG, null, supplier);
+                verifyLogEntry(Level.DEBUG, null, "Hello World!");
             }
 
             /**
@@ -444,7 +434,7 @@ class LoggerTest {
 
                 Logger.debug("Hello {}!", "Alice");
 
-                verifyLogEntry(Level.DEBUG, null, "Hello {}!", "Alice");
+                verifyLogEntry(Level.DEBUG, null, "Hello Alice!");
             }
 
             /**
@@ -454,10 +444,9 @@ class LoggerTest {
             void debugFormattedMessageWithLazyArgument() {
                 when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
-                Supplier<String> supplier = () -> "Alice";
-                Logger.debug("Hello {}!", supplier);
+                Logger.debug("Hello {}!", () -> "Alice");
 
-                verifyLogEntry(Level.DEBUG, null, "Hello {}!", supplier);
+                verifyLogEntry(Level.DEBUG, null, "Hello Alice!");
             }
 
             /**
@@ -494,10 +483,9 @@ class LoggerTest {
                 when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
                 Exception exception = new Exception();
-                Supplier<String> supplier = () -> "Oops!";
-                Logger.debug(exception, supplier);
+                Logger.debug(exception, () -> "Oops!");
 
-                verifyLogEntry(Level.DEBUG, exception, supplier);
+                verifyLogEntry(Level.DEBUG, exception, "Oops!");
             }
 
             /**
@@ -510,7 +498,7 @@ class LoggerTest {
                 Exception exception = new Exception();
                 Logger.debug(exception, "Hello {}!", "Alice");
 
-                verifyLogEntry(Level.DEBUG, exception, "Hello {}!", "Alice");
+                verifyLogEntry(Level.DEBUG, exception, "Hello Alice!");
             }
 
             /**
@@ -522,10 +510,9 @@ class LoggerTest {
                 when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
                 Exception exception = new Exception();
-                Supplier<String> supplier = () -> "Alice";
-                Logger.debug(exception, "Hello {}!", supplier);
+                Logger.debug(exception, "Hello {}!", () -> "Alice");
 
-                verifyLogEntry(Level.DEBUG, exception, "Hello {}!", supplier);
+                verifyLogEntry(Level.DEBUG, exception, "Hello Alice!");
             }
 
             /**
@@ -549,7 +536,7 @@ class LoggerTest {
 
                 Logger.info(42);
 
-                verifyLogEntry(Level.INFO, null, 42);
+                verifyLogEntry(Level.INFO, null, "42");
             }
 
             /**
@@ -559,10 +546,9 @@ class LoggerTest {
             void infoLazyMessage() {
                 when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
-                Supplier<String> supplier = () -> "Hello World!";
-                Logger.info(supplier);
+                Logger.info(() -> "Hello World!");
 
-                verifyLogEntry(Level.INFO, null, supplier);
+                verifyLogEntry(Level.INFO, null, "Hello World!");
             }
 
             /**
@@ -574,7 +560,7 @@ class LoggerTest {
 
                 Logger.info("Hello {}!", "Alice");
 
-                verifyLogEntry(Level.INFO, null, "Hello {}!", "Alice");
+                verifyLogEntry(Level.INFO, null, "Hello Alice!");
             }
 
             /**
@@ -584,10 +570,9 @@ class LoggerTest {
             void infoFormattedMessageWithLazyArgument() {
                 when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
-                Supplier<String> supplier = () -> "Alice";
-                Logger.info("Hello {}!", supplier);
+                Logger.info("Hello {}!", () -> "Alice");
 
-                verifyLogEntry(Level.INFO, null, "Hello {}!", supplier);
+                verifyLogEntry(Level.INFO, null, "Hello Alice!");
             }
 
             /**
@@ -624,10 +609,9 @@ class LoggerTest {
                 when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
                 Exception exception = new Exception();
-                Supplier<String> supplier = () -> "Oops!";
-                Logger.info(exception, supplier);
+                Logger.info(exception, () -> "Oops!");
 
-                verifyLogEntry(Level.INFO, exception, supplier);
+                verifyLogEntry(Level.INFO, exception, "Oops!");
             }
 
             /**
@@ -640,7 +624,7 @@ class LoggerTest {
                 Exception exception = new Exception();
                 Logger.info(exception, "Hello {}!", "Alice");
 
-                verifyLogEntry(Level.INFO, exception, "Hello {}!", "Alice");
+                verifyLogEntry(Level.INFO, exception, "Hello Alice!");
             }
 
             /**
@@ -652,10 +636,9 @@ class LoggerTest {
                 when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
                 Exception exception = new Exception();
-                Supplier<String> supplier = () -> "Alice";
-                Logger.info(exception, "Hello {}!", supplier);
+                Logger.info(exception, "Hello {}!", () -> "Alice");
 
-                verifyLogEntry(Level.INFO, exception, "Hello {}!", supplier);
+                verifyLogEntry(Level.INFO, exception, "Hello Alice!");
             }
 
             /**
@@ -679,7 +662,7 @@ class LoggerTest {
 
                 Logger.warn(42);
 
-                verifyLogEntry(Level.WARN, null, 42);
+                verifyLogEntry(Level.WARN, null, "42");
             }
 
             /**
@@ -689,10 +672,9 @@ class LoggerTest {
             void warnLazyMessage() {
                 when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
-                Supplier<String> supplier = () -> "Hello World!";
-                Logger.warn(supplier);
+                Logger.warn(() -> "Hello World!");
 
-                verifyLogEntry(Level.WARN, null, supplier);
+                verifyLogEntry(Level.WARN, null, "Hello World!");
             }
 
             /**
@@ -704,7 +686,7 @@ class LoggerTest {
 
                 Logger.warn("Hello {}!", "Alice");
 
-                verifyLogEntry(Level.WARN, null, "Hello {}!", "Alice");
+                verifyLogEntry(Level.WARN, null, "Hello Alice!");
             }
 
             /**
@@ -714,10 +696,9 @@ class LoggerTest {
             void warnFormattedMessageWithLazyArgument() {
                 when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
-                Supplier<String> supplier = () -> "Alice";
-                Logger.warn("Hello {}!", supplier);
+                Logger.warn("Hello {}!", () -> "Alice");
 
-                verifyLogEntry(Level.WARN, null, "Hello {}!", supplier);
+                verifyLogEntry(Level.WARN, null, "Hello Alice!");
             }
 
             /**
@@ -754,10 +735,9 @@ class LoggerTest {
                 when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
                 Exception exception = new Exception();
-                Supplier<String> supplier = () -> "Oops!";
-                Logger.warn(exception, supplier);
+                Logger.warn(exception, () -> "Oops!");
 
-                verifyLogEntry(Level.WARN, exception, supplier);
+                verifyLogEntry(Level.WARN, exception, "Oops!");
             }
 
             /**
@@ -770,7 +750,7 @@ class LoggerTest {
                 Exception exception = new Exception();
                 Logger.warn(exception, "Hello {}!", "Alice");
 
-                verifyLogEntry(Level.WARN, exception, "Hello {}!", "Alice");
+                verifyLogEntry(Level.WARN, exception, "Hello Alice!");
             }
 
             /**
@@ -782,10 +762,9 @@ class LoggerTest {
                 when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
                 Exception exception = new Exception();
-                Supplier<String> supplier = () -> "Alice";
-                Logger.warn(exception, "Hello {}!", supplier);
+                Logger.warn(exception, "Hello {}!", () -> "Alice");
 
-                verifyLogEntry(Level.WARN, exception, "Hello {}!", supplier);
+                verifyLogEntry(Level.WARN, exception, "Hello Alice!");
             }
 
             /**
@@ -809,7 +788,7 @@ class LoggerTest {
 
                 Logger.error(42);
 
-                verifyLogEntry(Level.ERROR, null, 42);
+                verifyLogEntry(Level.ERROR, null, "42");
             }
 
             /**
@@ -819,10 +798,9 @@ class LoggerTest {
             void errorLazyMessage() {
                 when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
-                Supplier<String> supplier = () -> "Hello World!";
-                Logger.error(supplier);
+                Logger.error(() -> "Hello World!");
 
-                verifyLogEntry(Level.ERROR, null, supplier);
+                verifyLogEntry(Level.ERROR, null, "Hello World!");
             }
 
             /**
@@ -834,7 +812,7 @@ class LoggerTest {
 
                 Logger.error("Hello {}!", "Alice");
 
-                verifyLogEntry(Level.ERROR, null, "Hello {}!", "Alice");
+                verifyLogEntry(Level.ERROR, null, "Hello Alice!");
             }
 
             /**
@@ -844,10 +822,9 @@ class LoggerTest {
             void errorFormattedMessageWithLazyArgument() {
                 when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
-                Supplier<String> supplier = () -> "Alice";
-                Logger.error("Hello {}!", supplier);
+                Logger.error("Hello {}!", () -> "Alice");
 
-                verifyLogEntry(Level.ERROR, null, "Hello {}!", supplier);
+                verifyLogEntry(Level.ERROR, null, "Hello Alice!");
             }
 
             /**
@@ -884,10 +861,9 @@ class LoggerTest {
                 when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
                 Exception exception = new Exception();
-                Supplier<String> supplier = () -> "Oops!";
-                Logger.error(exception, supplier);
+                Logger.error(exception, () -> "Oops!");
 
-                verifyLogEntry(Level.ERROR, exception, supplier);
+                verifyLogEntry(Level.ERROR, exception, "Oops!");
             }
 
             /**
@@ -900,7 +876,7 @@ class LoggerTest {
                 Exception exception = new Exception();
                 Logger.error(exception, "Hello {}!", "Alice");
 
-                verifyLogEntry(Level.ERROR, exception, "Hello {}!", "Alice");
+                verifyLogEntry(Level.ERROR, exception, "Hello Alice!");
             }
 
             /**
@@ -912,32 +888,36 @@ class LoggerTest {
                 when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
 
                 Exception exception = new Exception();
-                Supplier<String> supplier = () -> "Alice";
-                Logger.error(exception, "Hello {}!", supplier);
+                Logger.error(exception, "Hello {}!", () -> "Alice");
 
-                verifyLogEntry(Level.ERROR, exception, "Hello {}!", supplier);
+                verifyLogEntry(Level.ERROR, exception, "Hello Alice!");
             }
 
             /**
-             * Verifies backend mock invocation with expected log entry values.
+             * Verifies framework mock invocation with expected log entry values.
              *
-             * @param level     Severity level
-             * @param exception Exception or any other kind of throwable
-             * @param message   Message object
-             * @param arguments Optional arguments
+             * @param level The expected severity level
+             * @param exception The expected exception
+             * @param message The expected rendered text message
              */
-            private void verifyLogEntry(Level level, Throwable exception, Object message, Object... arguments) {
-                verify(backend, atMostOnce()).getLevelVisibilityByTag(null);
+            private void verifyLogEntry(Level level, Exception exception, String message) {
+                ArgumentCaptor<LogEntry> captor = ArgumentCaptor.forClass(LogEntry.class);
 
-                verify(backend).log(
-                    eq(Enabled.class),
-                    isNull(),
-                    same(level),
-                    same(exception),
-                    same(message),
-                    arguments.length == 0 ? isNull() : eq(arguments),
-                    arguments.length == 0 ? isNull() : isA(EnhancedMessageFormatter.class)
-                );
+                verify(framework, atMostOnce()).getLevelVisibilityByTag(null);
+                verify(framework).submit(captor.capture());
+
+                assertThat(captor.getAllValues()).singleElement().satisfies(entry -> {
+                    assertThat(entry.getThread()).isSameAs(Thread.currentThread());
+                    assertThat(entry.getContext()).isEmpty();
+                    assertThat(entry.getClassName()).isEqualTo(Enabled.class.getName());
+                    assertThat(entry.getMethodName()).isNull();
+                    assertThat(entry.getFileName()).isNull();
+                    assertThat(entry.getLineNumber()).isEqualTo(-1);
+                    assertThat(entry.getTag()).isNull();
+                    assertThat(entry.getSeverityLevel()).isEqualTo(level);
+                    assertThat(entry.getThrowable()).isSameAs(exception);
+                    assertThat(entry.getFormattedMessage(mock(Configuration.class))).isEqualTo(message);
+                });
             }
 
         }
@@ -954,8 +934,6 @@ class LoggerTest {
              */
             @Test
             void traceTextMessage() {
-                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.trace("Hello World!");
                 verifyNoLogEntry();
             }
@@ -965,8 +943,6 @@ class LoggerTest {
              */
             @Test
             void traceMessageObject() {
-                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.trace(42);
                 verifyNoLogEntry();
             }
@@ -977,8 +953,6 @@ class LoggerTest {
              */
             @Test
             void traceLazyMessage() {
-                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.trace(() -> "Hello World!");
                 verifyNoLogEntry();
             }
@@ -989,8 +963,6 @@ class LoggerTest {
              */
             @Test
             void traceFormattedMessageWithArgument() {
-                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.trace("Hello {}!", "Alice");
                 verifyNoLogEntry();
             }
@@ -1001,8 +973,6 @@ class LoggerTest {
              */
             @Test
             void traceFormattedMessageWithLazyArgument() {
-                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.trace("Hello {}!", () -> "Alice");
                 verifyNoLogEntry();
             }
@@ -1012,8 +982,6 @@ class LoggerTest {
              */
             @Test
             void traceException() {
-                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.trace(new Exception());
                 verifyNoLogEntry();
             }
@@ -1024,8 +992,6 @@ class LoggerTest {
              */
             @Test
             void traceExceptionAndTextMessage() {
-                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.trace(new Exception(), "Oops!");
                 verifyNoLogEntry();
             }
@@ -1036,8 +1002,6 @@ class LoggerTest {
              */
             @Test
             void traceExceptionAndLazyMessage() {
-                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.trace(new Exception(), () -> "Oops!");
                 verifyNoLogEntry();
             }
@@ -1048,9 +1012,7 @@ class LoggerTest {
              */
             @Test
             void traceExceptionAndFormattedMessageWithArgument() {
-                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
-
-                Logger.trace(new Exception(), "Hello {}!", "Alice");
+                Logger.trace(new Exception(), "Hello Alice!");
                 verifyNoLogEntry();
             }
 
@@ -1060,8 +1022,6 @@ class LoggerTest {
              */
             @Test
             void traceExceptionAndFormattedMessageWithLazyArgument() {
-                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.trace(new Exception(), "Hello {}!", () -> "Alice");
                 verifyNoLogEntry();
             }
@@ -1072,8 +1032,6 @@ class LoggerTest {
              */
             @Test
             void debugTextMessage() {
-                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.debug("Hello World!");
                 verifyNoLogEntry();
             }
@@ -1083,8 +1041,6 @@ class LoggerTest {
              */
             @Test
             void debugMessageObject() {
-                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.debug(42);
                 verifyNoLogEntry();
             }
@@ -1095,8 +1051,6 @@ class LoggerTest {
              */
             @Test
             void debugLazyMessage() {
-                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.debug(() -> "Hello World!");
                 verifyNoLogEntry();
             }
@@ -1107,8 +1061,6 @@ class LoggerTest {
              */
             @Test
             void debugFormattedMessageWithArgument() {
-                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.debug("Hello {}!", "Alice");
                 verifyNoLogEntry();
             }
@@ -1119,8 +1071,6 @@ class LoggerTest {
              */
             @Test
             void debugFormattedMessageWithLazyArgument() {
-                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.debug("Hello {}!", () -> "Alice");
                 verifyNoLogEntry();
             }
@@ -1130,8 +1080,6 @@ class LoggerTest {
              */
             @Test
             void debugException() {
-                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.debug(new Exception());
                 verifyNoLogEntry();
             }
@@ -1142,8 +1090,6 @@ class LoggerTest {
              */
             @Test
             void debugExceptionAndTextMessage() {
-                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.debug(new Exception(), "Oops!");
                 verifyNoLogEntry();
             }
@@ -1154,8 +1100,6 @@ class LoggerTest {
              */
             @Test
             void debugExceptionAndLazyMessage() {
-                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.debug(new Exception(), () -> "Oops!");
                 verifyNoLogEntry();
             }
@@ -1166,9 +1110,7 @@ class LoggerTest {
              */
             @Test
             void debugExceptionAndFormattedMessageWithArgument() {
-                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
-
-                Logger.debug(new Exception(), "Hello {}!", "Alice");
+                Logger.debug(new Exception(), "Hello Alice!");
                 verifyNoLogEntry();
             }
 
@@ -1178,8 +1120,6 @@ class LoggerTest {
              */
             @Test
             void debugExceptionAndFormattedMessageWithLazyArgument() {
-                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.debug(new Exception(), "Hello {}!", () -> "Alice");
                 verifyNoLogEntry();
             }
@@ -1190,8 +1130,6 @@ class LoggerTest {
              */
             @Test
             void infoTextMessage() {
-                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.info("Hello World!");
                 verifyNoLogEntry();
             }
@@ -1201,8 +1139,6 @@ class LoggerTest {
              */
             @Test
             void infoMessageObject() {
-                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.info(42);
                 verifyNoLogEntry();
             }
@@ -1213,8 +1149,6 @@ class LoggerTest {
              */
             @Test
             void infoLazyMessage() {
-                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.info(() -> "Hello World!");
                 verifyNoLogEntry();
             }
@@ -1225,8 +1159,6 @@ class LoggerTest {
              */
             @Test
             void infoFormattedMessageWithArgument() {
-                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.info("Hello {}!", "Alice");
                 verifyNoLogEntry();
             }
@@ -1237,8 +1169,6 @@ class LoggerTest {
              */
             @Test
             void infoFormattedMessageWithLazyArgument() {
-                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.info("Hello {}!", () -> "Alice");
                 verifyNoLogEntry();
             }
@@ -1248,8 +1178,6 @@ class LoggerTest {
              */
             @Test
             void infoException() {
-                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.info(new Exception());
                 verifyNoLogEntry();
             }
@@ -1260,8 +1188,6 @@ class LoggerTest {
              */
             @Test
             void infoExceptionAndTextMessage() {
-                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.info(new Exception(), "Oops!");
                 verifyNoLogEntry();
             }
@@ -1272,8 +1198,6 @@ class LoggerTest {
              */
             @Test
             void infoExceptionAndLazyMessage() {
-                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.info(new Exception(), () -> "Oops!");
                 verifyNoLogEntry();
             }
@@ -1284,9 +1208,7 @@ class LoggerTest {
              */
             @Test
             void infoExceptionAndFormattedMessageWithArgument() {
-                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
-
-                Logger.info(new Exception(), "Hello {}!", "Alice");
+                Logger.info(new Exception(), "Hello Alice!");
                 verifyNoLogEntry();
             }
 
@@ -1296,8 +1218,6 @@ class LoggerTest {
              */
             @Test
             void infoExceptionAndFormattedMessageWithLazyArgument() {
-                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.info(new Exception(), "Hello {}!", () -> "Alice");
                 verifyNoLogEntry();
             }
@@ -1308,8 +1228,6 @@ class LoggerTest {
              */
             @Test
             void warnTextMessage() {
-                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.warn("Hello World!");
                 verifyNoLogEntry();
             }
@@ -1319,8 +1237,6 @@ class LoggerTest {
              */
             @Test
             void warnMessageObject() {
-                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.warn(42);
                 verifyNoLogEntry();
             }
@@ -1331,8 +1247,6 @@ class LoggerTest {
              */
             @Test
             void warnLazyMessage() {
-                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.warn(() -> "Hello World!");
                 verifyNoLogEntry();
             }
@@ -1343,8 +1257,6 @@ class LoggerTest {
              */
             @Test
             void warnFormattedMessageWithArgument() {
-                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.warn("Hello {}!", "Alice");
                 verifyNoLogEntry();
             }
@@ -1355,8 +1267,6 @@ class LoggerTest {
              */
             @Test
             void warnFormattedMessageWithLazyArgument() {
-                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.warn("Hello {}!", () -> "Alice");
                 verifyNoLogEntry();
             }
@@ -1366,8 +1276,6 @@ class LoggerTest {
              */
             @Test
             void warnException() {
-                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.warn(new Exception());
                 verifyNoLogEntry();
             }
@@ -1378,8 +1286,6 @@ class LoggerTest {
              */
             @Test
             void warnExceptionAndTextMessage() {
-                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.warn(new Exception(), "Oops!");
                 verifyNoLogEntry();
             }
@@ -1390,8 +1296,6 @@ class LoggerTest {
              */
             @Test
             void warnExceptionAndLazyMessage() {
-                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.warn(new Exception(), () -> "Oops!");
                 verifyNoLogEntry();
             }
@@ -1402,9 +1306,7 @@ class LoggerTest {
              */
             @Test
             void warnExceptionAndFormattedMessageWithArgument() {
-                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
-
-                Logger.warn(new Exception(), "Hello {}!", "Alice");
+                Logger.warn(new Exception(), "Hello Alice!");
                 verifyNoLogEntry();
             }
 
@@ -1414,8 +1316,6 @@ class LoggerTest {
              */
             @Test
             void warnExceptionAndFormattedMessageWithLazyArgument() {
-                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.warn(new Exception(), "Hello {}!", () -> "Alice");
                 verifyNoLogEntry();
             }
@@ -1426,8 +1326,6 @@ class LoggerTest {
              */
             @Test
             void errorTextMessage() {
-                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.error("Hello World!");
                 verifyNoLogEntry();
             }
@@ -1437,8 +1335,6 @@ class LoggerTest {
              */
             @Test
             void errorMessageObject() {
-                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.error(42);
                 verifyNoLogEntry();
             }
@@ -1449,8 +1345,6 @@ class LoggerTest {
              */
             @Test
             void errorLazyMessage() {
-                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.error(() -> "Hello World!");
                 verifyNoLogEntry();
             }
@@ -1461,8 +1355,6 @@ class LoggerTest {
              */
             @Test
             void errorFormattedMessageWithArgument() {
-                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.error("Hello {}!", "Alice");
                 verifyNoLogEntry();
             }
@@ -1473,8 +1365,6 @@ class LoggerTest {
              */
             @Test
             void errorFormattedMessageWithLazyArgument() {
-                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.error("Hello {}!", () -> "Alice");
                 verifyNoLogEntry();
             }
@@ -1484,8 +1374,6 @@ class LoggerTest {
              */
             @Test
             void errorException() {
-                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.error(new Exception());
                 verifyNoLogEntry();
             }
@@ -1496,8 +1384,6 @@ class LoggerTest {
              */
             @Test
             void errorExceptionAndTextMessage() {
-                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.error(new Exception(), "Oops!");
                 verifyNoLogEntry();
             }
@@ -1508,8 +1394,6 @@ class LoggerTest {
              */
             @Test
             void errorExceptionAndLazyMessage() {
-                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.error(new Exception(), () -> "Oops!");
                 verifyNoLogEntry();
             }
@@ -1520,9 +1404,7 @@ class LoggerTest {
              */
             @Test
             void errorExceptionAndFormattedMessageWithArgument() {
-                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
-
-                Logger.error(new Exception(), "Hello {}!", "Alice");
+                Logger.error(new Exception(), "Hello Alice!");
                 verifyNoLogEntry();
             }
 
@@ -1532,18 +1414,15 @@ class LoggerTest {
              */
             @Test
             void errorExceptionAndFormattedMessageWithLazyArgument() {
-                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
-
                 Logger.error(new Exception(), "Hello {}!", () -> "Alice");
                 verifyNoLogEntry();
             }
 
             /**
-             * Verifies no invocations of logging methods for mocked backend.
+             * Verifies that no log entry has been submitted.
              */
             private void verifyNoLogEntry() {
-                verify(backend, atMostOnce()).getLevelVisibilityByTag(null);
-                verifyNoMoreInteractions(backend);
+                verify(framework, never()).submit(any());
             }
 
         }

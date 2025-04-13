@@ -8,8 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.google.common.collect.ImmutableMap;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
@@ -36,7 +34,7 @@ class AbstractPatternParserTest {
      */
     @Test
     void singleQuote() {
-        setPlaceholders(ImmutableMap.of("time", "twelve"));
+        setPlaceholders(Map.of("time", "twelve"));
         assertThat(parse("It is {time} o'clock.")).isEqualTo("It is twelve o'clock.");
     }
 
@@ -45,7 +43,7 @@ class AbstractPatternParserTest {
      */
     @Test
     void escapedQuote() {
-        setPlaceholders(ImmutableMap.of("time", "twelve"));
+        setPlaceholders(Map.of("time", "twelve"));
         assertThat(parse("It is {time} o''clock.")).isEqualTo("It is twelve o'clock.");
     }
 
@@ -54,7 +52,7 @@ class AbstractPatternParserTest {
      */
     @Test
     void singlePlaceholder() {
-        setPlaceholders(ImmutableMap.of("foo", "Alice"));
+        setPlaceholders(Map.of("foo", "Alice"));
         assertThat(parse("Hello {foo}!")).isEqualTo("Hello Alice!");
     }
 
@@ -72,7 +70,7 @@ class AbstractPatternParserTest {
      */
     @Test
     void multiplePlaceholders() {
-        setPlaceholders(ImmutableMap.of("foo", "Alice", "bar", "Bob"));
+        setPlaceholders(Map.of("foo", "Alice", "bar", "Bob"));
         assertThat(parse("Hello {foo} and {bar}!")).isEqualTo("Hello Alice and Bob!");
     }
 
@@ -81,7 +79,7 @@ class AbstractPatternParserTest {
      */
     @Test
     void nestedBrackets() {
-        setPlaceholders(ImmutableMap.of("{foo}", "Alice"));
+        setPlaceholders(Map.of("{foo}", "Alice"));
         assertThat(parse("Hello {{foo}}!")).isEqualTo("Hello Alice!");
     }
 
@@ -90,7 +88,7 @@ class AbstractPatternParserTest {
      */
     @Test
     void nestedQuotedBrackets() {
-        setPlaceholders(ImmutableMap.of("'{}'", "Alice"));
+        setPlaceholders(Map.of("'{}'", "Alice"));
         assertThat(parse("Hello {'{}'}!")).isEqualTo("Hello Alice!");
     }
 

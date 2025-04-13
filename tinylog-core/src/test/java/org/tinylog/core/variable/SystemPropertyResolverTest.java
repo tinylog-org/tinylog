@@ -3,11 +3,29 @@ package org.tinylog.core.variable;
 import java.util.ServiceLoader;
 
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.RestoreSystemProperties;
+import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.test.junit.log.Tinylog;
 
-import static com.github.stefanbirkner.systemlambda.SystemLambda.restoreSystemProperties;
+import jakarta.inject.Inject;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Tinylog
+@RestoreSystemProperties
 class SystemPropertyResolverTest {
+
+    @Inject
+    private InternalLogger logger;
+
+    /**
+     * Verifies that the resolver is registered as service.
+     */
+    @Test
+    void service() {
+        assertThat(ServiceLoader.load(VariableResolver.class))
+            .anyMatch(loader -> loader instanceof SystemPropertyResolver);
+    }
 
     /**
      * Verifies that the name is "system property".
@@ -31,35 +49,22 @@ class SystemPropertyResolverTest {
      * Verifies that the value of an existing system property can be resolved.
      */
     @Test
-    void resolveExistingProperty() throws Exception {
-        SystemPropertyResolver resolver = new SystemPropertyResolver();
+    void resolveExistingProperty() {
+        System.setProperty("foo", "bar");
 
-        restoreSystemProperties(() -> {
-            System.setProperty("foo", "bar");
-            assertThat(resolver.resolve("foo")).isEqualTo("bar");
-        });
+        SystemPropertyResolver resolver = new SystemPropertyResolver();
+        assertThat(resolver.resolve("foo", logger)).isEqualTo("bar");
     }
 
     /**
      * Verifies that {@code null} is returned for a non-existent system property.
      */
     @Test
-    void resolveMissingProperty() throws Exception {
+    void resolveMissingProperty() {
+        System.clearProperty("foo");
+
         SystemPropertyResolver resolver = new SystemPropertyResolver();
-
-        restoreSystemProperties(() -> {
-            System.clearProperty("foo");
-            assertThat(resolver.resolve("foo")).isNull();
-        });
-    }
-
-    /**
-     * Verifies that the resolver is registered as service.
-     */
-    @Test
-    void service() {
-        assertThat(ServiceLoader.load(VariableResolver.class))
-            .anyMatch(loader -> loader instanceof SystemPropertyResolver);
+        assertThat(resolver.resolve("foo", logger)).isNull();
     }
 
 }

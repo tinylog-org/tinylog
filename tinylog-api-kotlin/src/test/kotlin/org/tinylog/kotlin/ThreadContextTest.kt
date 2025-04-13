@@ -1,70 +1,50 @@
 package org.tinylog.kotlin
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyMap
 import org.mockito.MockedStatic
 import org.mockito.Mockito.mockStatic
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.tinylog.core.Framework
 import org.tinylog.core.Tinylog
-import org.tinylog.core.backend.LoggingBackend
 import org.tinylog.core.context.ContextStorage
+import org.tinylog.test.junit.isolate.IsolatedExecution
 
-internal class ThreadContextTest {
-    companion object {
-        private lateinit var storage: ContextStorage
-        private lateinit var backend: LoggingBackend
-        private lateinit var tinylogMock: MockedStatic<Tinylog>
+@IsolatedExecution(classes = [ThreadContext::class])
+class ThreadContextTest {
+    private lateinit var storage: ContextStorage
+    private lateinit var tinylogMock: MockedStatic<Tinylog>
 
-        /**
-         * Initializes all mocks.
-         */
-        @BeforeAll
-        @JvmStatic
-        fun create() {
-            storage = mock()
+    /**
+     * Initializes all mocks.
+     */
+    @BeforeEach
+    fun create() {
+        storage = mock()
 
-            backend =
-                mock {
-                    on { contextStorage } doReturn storage
-                }
+        val framework: Framework =
+            mock<Framework>().apply {
+                whenever(contextStorage).thenReturn(storage)
+            }
 
-            tinylogMock =
-                mockStatic(Tinylog::class.java).apply {
-                    `when`<Any> {
-                        Tinylog.getFramework()
-                    }.thenReturn(
-                        object : Framework(false, false) {
-                            override fun getLoggingBackend() = backend
-                        },
-                    )
-                }
-        }
-
-        /**
-         * Restores the mocked tinylog class.
-         */
-        @AfterAll
-        @JvmStatic
-        fun dispose() {
-            tinylogMock.close()
-        }
+        tinylogMock =
+            mockStatic(Tinylog::class.java).apply {
+                `when`<Framework>(Tinylog::getFramework).thenReturn(framework)
+            }
     }
 
     /**
-     * Resets the context storage.
+     * Restores the mocked tinylog class.
      */
     @AfterEach
-    fun reset() {
-        org.mockito.kotlin.reset(storage)
+    fun dispose() {
+        tinylogMock.close()
     }
 
     /**

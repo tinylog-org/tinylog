@@ -16,7 +16,7 @@ import org.tinylog.core.Tinylog
  * [withIndependentContext] or [withEmptyContext].
  */
 object ThreadContext {
-    private val storage = Tinylog.getFramework().loggingBackend.contextStorage
+    private val storage = Tinylog.getFramework().contextStorage
 
     /**
      * Retrieves a copy of all stored context values.
@@ -33,9 +33,7 @@ object ThreadContext {
      * @param key The key of the requested context value
      * @return The stored value for the passed key, or `null` if no value is stored for the passed key
      */
-    operator fun get(key: String): String? {
-        return storage[key]
-    }
+    operator fun get(key: String): String? = storage[key]
 
     /**
      * Stores a new context value for a given key. If a value is already stored for the passed key, the existent value
@@ -66,7 +64,7 @@ object ThreadContext {
     }
 
     /**
-     * Removes all stored context values. Afterwards, the thread context will be empty.
+     * Removes all stored context values. Afterward, the thread context will be empty.
      */
     fun clear() {
         storage.clear()

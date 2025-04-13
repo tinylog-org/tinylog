@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
-import org.tinylog.impl.writers.file.LogFile;
+import org.tinylog.impl.writer.file.LogFile;
 
 /**
  * State for writing strings by using {@link LogFile}.

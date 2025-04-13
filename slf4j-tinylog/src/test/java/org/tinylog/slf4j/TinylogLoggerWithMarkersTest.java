@@ -1,79 +1,80 @@
 package org.tinylog.slf4j;
 
-import javax.inject.Inject;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
+import org.mockito.ArgumentCaptor;
 import org.slf4j.Marker;
 import org.slf4j.helpers.BasicMarkerFactory;
 import org.slf4j.spi.LocationAwareLogger;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.backend.LevelVisibility;
-import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.OutputDetails;
-import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.core.test.log.Log;
-import org.tinylog.core.test.log.LogEntry;
+import org.tinylog.core.context.ContextStorage;
+import org.tinylog.core.context.NopContextStorage;
+import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.runtime.JavaRuntime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.tinylog.core.test.mockito.MockitoMatchers.isStackTraceElement;
 
 class TinylogLoggerWithMarkersTest {
 
-    private final Marker marker = new BasicMarkerFactory().getDetachedMarker("bar");
+    private static final Marker marker = new BasicMarkerFactory().getDetachedMarker("foo");
+
+    private Framework framework;
+
+    /**
+     * Creates the framework.
+     */
+    @BeforeEach
+    void create() {
+        framework = mock(Framework.class);
+
+        JavaRuntime runtime = new JavaRuntime(mock(InternalLogger.class));
+        when(framework.getRuntime()).thenReturn(runtime);
+
+        ContextStorage storage = new NopContextStorage();
+        when(framework.getContextStorage()).thenReturn(storage);
+    }
 
     /**
      * Tests for severity levels.
      */
-    @MockitoSettings(strictness = Strictness.LENIENT)
     @Nested
     class Levels {
 
-        @Mock
-        private LoggingBackend backend;
-
-        private final Framework framework = new Framework(false, false) {
-
-            @Override
-            public LoggingBackend getLoggingBackend() {
-                return backend;
-            }
-
-        };
-
         /**
-         * Verifies the results of the {@link TinylogLogger#isTraceEnabled(Marker)} method.
+         * Verifies the results of the {@link TinylogLogger#isTraceEnabled()} method.
          *
-         * @param enabled       The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getTrace()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isTraceEnabled(boolean enabled, OutputDetails outputDetails) {
-            when(backend.getLevelVisibilityByClass("Foo")).thenReturn(
+            when(framework.getLevelVisibilityByClass(Levels.class.getName())).thenReturn(
                 new LevelVisibility(
                     outputDetails,
                     OutputDetails.DISABLED,
@@ -83,31 +84,31 @@ class TinylogLoggerWithMarkersTest {
                 )
             );
 
-            when(backend.isEnabled(notNull(), eq("bar"), eq(Level.TRACE))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), eq("foo"), eq(Level.TRACE))).thenReturn(enabled);
 
-            TinylogLogger logger = new TinylogLogger("Foo", framework);
+            TinylogLogger logger = new TinylogLogger(Levels.class.getName(), framework);
             assertThat(logger.isTraceEnabled(marker)).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
 
         /**
-         * Verifies the results of the {@link TinylogLogger#isDebugEnabled(Marker)} method.
+         * Verifies the results of the {@link TinylogLogger#isDebugEnabled()} method.
          *
-         * @param enabled       The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getDebug()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isDebugEnabled(boolean enabled, OutputDetails outputDetails) {
-            when(backend.getLevelVisibilityByClass("Foo")).thenReturn(
+            when(framework.getLevelVisibilityByClass(Levels.class.getName())).thenReturn(
                 new LevelVisibility(
                     OutputDetails.DISABLED,
                     outputDetails,
@@ -117,31 +118,31 @@ class TinylogLoggerWithMarkersTest {
                 )
             );
 
-            when(backend.isEnabled(notNull(), eq("bar"), eq(Level.DEBUG))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), eq("foo"), eq(Level.DEBUG))).thenReturn(enabled);
 
-            TinylogLogger logger = new TinylogLogger("Foo", framework);
+            TinylogLogger logger = new TinylogLogger(Levels.class.getName(), framework);
             assertThat(logger.isDebugEnabled(marker)).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
 
         /**
-         * Verifies the results of the {@link TinylogLogger#isInfoEnabled(Marker)} method.
+         * Verifies the results of the {@link TinylogLogger#isInfoEnabled()} method.
          *
-         * @param enabled       The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getInfo()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isInfoEnabled(boolean enabled, OutputDetails outputDetails) {
-            when(backend.getLevelVisibilityByClass("Foo")).thenReturn(
+            when(framework.getLevelVisibilityByClass(Levels.class.getName())).thenReturn(
                 new LevelVisibility(
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
@@ -151,31 +152,31 @@ class TinylogLoggerWithMarkersTest {
                 )
             );
 
-            when(backend.isEnabled(notNull(), eq("bar"), eq(Level.INFO))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), eq("foo"), eq(Level.INFO))).thenReturn(enabled);
 
-            TinylogLogger logger = new TinylogLogger("Foo", framework);
+            TinylogLogger logger = new TinylogLogger(Levels.class.getName(), framework);
             assertThat(logger.isInfoEnabled(marker)).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
 
         /**
-         * Verifies the results of the {@link TinylogLogger#isWarnEnabled(Marker)} method.
+         * Verifies the results of the {@link TinylogLogger#isWarnEnabled()} method.
          *
-         * @param enabled       The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getWarn()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isWarnEnabled(boolean enabled, OutputDetails outputDetails) {
-            when(backend.getLevelVisibilityByClass("Foo")).thenReturn(
+            when(framework.getLevelVisibilityByClass(Levels.class.getName())).thenReturn(
                 new LevelVisibility(
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
@@ -185,31 +186,31 @@ class TinylogLoggerWithMarkersTest {
                 )
             );
 
-            when(backend.isEnabled(notNull(), eq("bar"), eq(Level.WARN))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), eq("foo"), eq(Level.WARN))).thenReturn(enabled);
 
-            TinylogLogger logger = new TinylogLogger("Foo", framework);
+            TinylogLogger logger = new TinylogLogger(Levels.class.getName(), framework);
             assertThat(logger.isWarnEnabled(marker)).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
 
         /**
-         * Verifies the results of the {@link TinylogLogger#isErrorEnabled(Marker)} method.
+         * Verifies the results of the {@link TinylogLogger#isErrorEnabled()} method.
          *
-         * @param enabled       The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getError()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isErrorEnabled(boolean enabled, OutputDetails outputDetails) {
-            when(backend.getLevelVisibilityByClass("Foo")).thenReturn(
+            when(framework.getLevelVisibilityByClass(Levels.class.getName())).thenReturn(
                 new LevelVisibility(
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
@@ -219,9 +220,9 @@ class TinylogLoggerWithMarkersTest {
                 )
             );
 
-            when(backend.isEnabled(notNull(), eq("bar"), eq(Level.ERROR))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), eq("foo"), eq(Level.ERROR))).thenReturn(enabled);
 
-            TinylogLogger logger = new TinylogLogger("Foo", framework);
+            TinylogLogger logger = new TinylogLogger(Levels.class.getName(), framework);
             assertThat(logger.isErrorEnabled(marker)).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
 
@@ -233,120 +234,149 @@ class TinylogLoggerWithMarkersTest {
     @Nested
     class LogEntries {
 
-        @Inject
-        private Framework framework;
-
-        @Inject
-        private Log log;
-
-        private TinylogLogger logger;
-
         /**
-         * Creates the tagged logger instance and clears all trace and debug log entries, which have been issued while
-         * the creation.
+         * Verifies backend mock invocation with expected log entry values.
+         *
+         * @param level The expected severity level
+         * @param exception The expected exception
+         * @param message The expected rendered text message
          */
-        @BeforeEach
-        void init() {
-            logger = new TinylogLogger(TinylogLoggerWithMarkersTest.class.getName(), framework);
-            assertThat(log.consume())
-                .allSatisfy(entry -> assertThat(entry.getLevel()).isGreaterThanOrEqualTo(Level.DEBUG));
+        private void verifyLogEntry(Level level, Exception exception, String message) {
+            ArgumentCaptor<LogEntry> captor = ArgumentCaptor.forClass(LogEntry.class);
+
+            verify(framework, atMostOnce()).getLevelVisibilityByTag(null);
+            verify(framework).submit(captor.capture());
+
+            assertThat(captor.getAllValues()).singleElement().satisfies(entry -> {
+                assertThat(entry.getThread()).isSameAs(Thread.currentThread());
+                assertThat(entry.getContext()).isEmpty();
+                assertThat(entry.getClassName()).isEqualTo(LogEntries.class.getName());
+                assertThat(entry.getMethodName()).isNull();
+                assertThat(entry.getFileName()).isNull();
+                assertThat(entry.getLineNumber()).isEqualTo(-1);
+                assertThat(entry.getTag()).isEqualTo("foo");
+                assertThat(entry.getSeverityLevel()).isEqualTo(level);
+                assertThat(entry.getThrowable()).isSameAs(exception);
+                assertThat(entry.getFormattedMessage(mock(Configuration.class))).isEqualTo(message);
+            });
         }
 
+        /**
+         * Verifies that no log entry has been submitted.
+         */
+        private void verifyNoLogEntry() {
+            verify(framework, never()).submit(any());
+        }
 
         /**
-         * Tests for issuing log entries if the assigned severity level is enabled.
+         * Tests for issuing trace log entries if {@link Level#TRACE} is enabled.
          */
         @Nested
-        class Enabled {
+        class TraceEnabled {
+
+            /**
+             * Initializes severity level visibility.
+             */
+            @BeforeEach
+            void init() {
+                when(framework.getLevelVisibilityByClass(LogEntries.class.getName())).thenReturn(
+                    new LevelVisibility(
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.DISABLED,
+                        OutputDetails.DISABLED,
+                        OutputDetails.DISABLED,
+                        OutputDetails.DISABLED
+                    )
+                );
+            }
 
             /**
              * Verifies that a trace log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceTextMessage() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.trace(marker, "Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, "Hello World!", null));
+
+                verifyLogEntry(Level.TRACE, null, "Hello World!");
             }
 
             /**
              * Verifies that a trace log entry with a plain text message and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceTextMessageAndException() {
                 Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.trace(marker, "Oops!", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, "Oops!", exception));
+
+                verifyLogEntry(Level.TRACE, exception, "Oops!");
             }
 
             /**
              * Verifies that a trace log entry with a message and a single placeholder can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceFormattedMessageWithSingleArgument() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.trace(marker, "Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, "Hello Alice!", null));
+
+                verifyLogEntry(Level.TRACE, null, "Hello Alice!");
             }
 
             /**
              * Verifies that a trace log entry with a message and two arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceFormattedMessageWithTwoArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.trace(marker, "Hello {} and {}!", "Alice", "Bob");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, "Hello Alice and Bob!", null));
+
+                verifyLogEntry(Level.TRACE, null, "Hello Alice and Bob!");
             }
 
             /**
              * Verifies that a trace log entry with a message, a single placeholder, and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceFormattedMessageWithArgumentAndException() {
                 Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.trace(marker, "Oops {}!", "Alice", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, "Oops Alice!", exception));
+
+                verifyLogEntry(Level.TRACE, exception, "Oops Alice!");
             }
 
             /**
              * Verifies that a trace log entry with a message and three arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceFormattedMessageWithThreeArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.trace(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, "Hello Alice, Bob, and Charlie!", null));
+
+                verifyLogEntry(Level.TRACE, null, "Hello Alice, Bob, and Charlie!");
             }
 
             /**
              * Verifies that a trace log entry with a message, two placeholders, and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceFormattedMessageWithArgumentsAndException() {
                 Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.trace(marker, "Oops {} and {}!", "Alice", "Bob", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, "Oops Alice and Bob!", exception));
+
+                verifyLogEntry(Level.TRACE, exception, "Oops Alice and Bob!");
             }
 
             /**
              * Verifies that a full trace log entry can be issued via the generic log method.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void logGenericTraceEntry() {
                 Exception exception = new Exception();
-
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.log(
                     marker,
                     TinylogLogger.class.getName(),
@@ -356,18 +386,16 @@ class TinylogLoggerWithMarkersTest {
                     exception
                 );
 
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, "Oops Alice and Bob!", exception));
+                verifyLogEntry(Level.TRACE, exception, "Oops Alice and Bob!");
             }
 
             /**
              * Verifies that a full trace log entry can be issued via the event log method.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void logEventTraceEntry() {
                 Exception exception = new Exception();
-
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.makeLoggingEventBuilder(org.slf4j.event.Level.TRACE)
                     .addMarker(marker)
                     .setMessage("Oops {} and {}!")
@@ -376,600 +404,120 @@ class TinylogLoggerWithMarkersTest {
                     .setCause(exception)
                     .log();
 
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Verifies that a debug log entry with a plain text message can be issued.
-             */
-            @CaptureLogEntries(level = Level.DEBUG)
-            @Test
-            void debugTextMessage() {
-                logger.debug(marker, "Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, "Hello World!", null));
-            }
-
-            /**
-             * Verifies that a debug log entry with a plain text message and an exception can be issued.
-             */
-            @CaptureLogEntries(level = Level.DEBUG)
-            @Test
-            void debugTextMessageAndException() {
-                Exception exception = new Exception();
-                logger.debug(marker, "Oops!", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, "Oops!", exception));
-            }
-
-            /**
-             * Verifies that a debug log entry with a message and a single placeholder can be issued.
-             */
-            @CaptureLogEntries(level = Level.DEBUG)
-            @Test
-            void debugFormattedMessageWithSingleArgument() {
-                logger.debug(marker, "Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, "Hello Alice!", null));
-            }
-
-            /**
-             * Verifies that a debug log entry with a message and two arguments can be issued.
-             */
-            @CaptureLogEntries(level = Level.DEBUG)
-            @Test
-            void debugFormattedMessageWithTwoArguments() {
-                logger.debug(marker, "Hello {} and {}!", "Alice", "Bob");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, "Hello Alice and Bob!", null));
-            }
-
-            /**
-             * Verifies that a debug log entry with a message, a single placeholder, and an exception can be issued.
-             */
-            @CaptureLogEntries(level = Level.DEBUG)
-            @Test
-            void debugFormattedMessageWithArgumentAndException() {
-                Exception exception = new Exception();
-                logger.debug(marker, "Oops {}!", "Alice", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, "Oops Alice!", exception));
-            }
-
-            /**
-             * Verifies that a debug log entry with a message and three arguments can be issued.
-             */
-            @CaptureLogEntries(level = Level.DEBUG)
-            @Test
-            void debugFormattedMessageWithThreeArguments() {
-                logger.debug(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, "Hello Alice, Bob, and Charlie!", null));
-            }
-
-            /**
-             * Verifies that a debug log entry with a message, two placeholders, and an exception can be issued.
-             */
-            @CaptureLogEntries(level = Level.DEBUG)
-            @Test
-            void debugFormattedMessageWithArgumentsAndException() {
-                Exception exception = new Exception();
-                logger.debug(marker, "Oops {} and {}!", "Alice", "Bob", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Verifies that a full debug log entry can be issued via the generic log method.
-             */
-            @CaptureLogEntries(level = Level.DEBUG)
-            @Test
-            void logGenericDebugEntry() {
-                Exception exception = new Exception();
-
-                logger.log(
-                    marker,
-                    TinylogLogger.class.getName(),
-                    LocationAwareLogger.DEBUG_INT,
-                    "Oops {} and {}!",
-                    new Object[] {"Alice", "Bob"},
-                    exception
-                );
-
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Verifies that a full debug log entry can be issued via the event log method.
-             */
-            @CaptureLogEntries(level = Level.DEBUG)
-            @Test
-            void logEventDebugEntry() {
-                Exception exception = new Exception();
-
-                logger.makeLoggingEventBuilder(org.slf4j.event.Level.DEBUG)
-                    .addMarker(marker)
-                    .setMessage("Oops {} and {}!")
-                    .addArgument("Alice")
-                    .addArgument("Bob")
-                    .setCause(exception)
-                    .log();
-
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Verifies that an info log entry with a plain text message can be issued.
-             */
-            @CaptureLogEntries(level = Level.INFO)
-            @Test
-            void infoTextMessage() {
-                logger.info(marker, "Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, "Hello World!", null));
-            }
-
-            /**
-             * Verifies that an info log entry with a plain text message and an exception can be issued.
-             */
-            @CaptureLogEntries(level = Level.INFO)
-            @Test
-            void infoTextMessageAndException() {
-                Exception exception = new Exception();
-                logger.info(marker, "Oops!", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, "Oops!", exception));
-            }
-
-            /**
-             * Verifies that an info log entry with a message and a single placeholder can be issued.
-             */
-            @CaptureLogEntries(level = Level.INFO)
-            @Test
-            void infoFormattedMessageWithSingleArgument() {
-                logger.info(marker, "Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, "Hello Alice!", null));
-            }
-
-            /**
-             * Verifies that an info log entry with a message and two arguments can be issued.
-             */
-            @CaptureLogEntries(level = Level.INFO)
-            @Test
-            void infoFormattedMessageWithTwoArguments() {
-                logger.info(marker, "Hello {} and {}!", "Alice", "Bob");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, "Hello Alice and Bob!", null));
-            }
-
-            /**
-             * Verifies that an info log entry with a message, a single placeholder, and an exception can be issued.
-             */
-            @CaptureLogEntries(level = Level.INFO)
-            @Test
-            void infoFormattedMessageWithArgumentAndException() {
-                Exception exception = new Exception();
-                logger.info(marker, "Oops {}!", "Alice", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, "Oops Alice!", exception));
-            }
-
-            /**
-             * Verifies that an info log entry with a message and three arguments can be issued.
-             */
-            @CaptureLogEntries(level = Level.INFO)
-            @Test
-            void infoFormattedMessageWithThreeArguments() {
-                logger.info(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, "Hello Alice, Bob, and Charlie!", null));
-            }
-
-            /**
-             * Verifies that an info log entry with a message, two placeholders, and an exception can be issued.
-             */
-            @CaptureLogEntries(level = Level.INFO)
-            @Test
-            void infoFormattedMessageWithArgumentsAndException() {
-                Exception exception = new Exception();
-                logger.info(marker, "Oops {} and {}!", "Alice", "Bob", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Verifies that a full info log entry can be issued via the generic log method.
-             */
-            @CaptureLogEntries(level = Level.INFO)
-            @Test
-            void logGenericInfoEntry() {
-                Exception exception = new Exception();
-
-                logger.log(
-                    marker,
-                    TinylogLogger.class.getName(),
-                    LocationAwareLogger.INFO_INT,
-                    "Oops {} and {}!",
-                    new Object[] {"Alice", "Bob"},
-                    exception
-                );
-
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Verifies that a full info log entry can be issued via the event log method.
-             */
-            @CaptureLogEntries(level = Level.INFO)
-            @Test
-            void logEventInfoEntry() {
-                Exception exception = new Exception();
-
-                logger.makeLoggingEventBuilder(org.slf4j.event.Level.INFO)
-                    .addMarker(marker)
-                    .setMessage("Oops {} and {}!")
-                    .addArgument("Alice")
-                    .addArgument("Bob")
-                    .setCause(exception)
-                    .log();
-
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Verifies that a warning log entry with a plain text message can be issued.
-             */
-            @CaptureLogEntries(level = Level.WARN)
-            @Test
-            void warnTextMessage() {
-                logger.warn(marker, "Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, "Hello World!", null));
-            }
-
-            /**
-             * Verifies that a warning log entry with a plain text message and an exception can be issued.
-             */
-            @CaptureLogEntries(level = Level.WARN)
-            @Test
-            void warnTextMessageAndException() {
-                Exception exception = new Exception();
-                logger.warn(marker, "Oops!", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, "Oops!", exception));
-            }
-
-            /**
-             * Verifies that a warning log entry with a message and a single placeholder can be issued.
-             */
-            @CaptureLogEntries(level = Level.WARN)
-            @Test
-            void warnFormattedMessageWithSingleArgument() {
-                logger.warn(marker, "Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, "Hello Alice!", null));
-            }
-
-            /**
-             * Verifies that a warning log entry with a message and two arguments can be issued.
-             */
-            @CaptureLogEntries(level = Level.WARN)
-            @Test
-            void warnFormattedMessageWithTwoArguments() {
-                logger.warn(marker, "Hello {} and {}!", "Alice", "Bob");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, "Hello Alice and Bob!", null));
-            }
-
-            /**
-             * Verifies that a warning log entry with a message, a single placeholder, and an exception can be issued.
-             */
-            @CaptureLogEntries(level = Level.WARN)
-            @Test
-            void warnFormattedMessageWithArgumentAndException() {
-                Exception exception = new Exception();
-                logger.warn(marker, "Oops {}!", "Alice", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, "Oops Alice!", exception));
-            }
-
-            /**
-             * Verifies that a warning log entry with a message and three arguments can be issued.
-             */
-            @CaptureLogEntries(level = Level.WARN)
-            @Test
-            void warnFormattedMessageWithThreeArguments() {
-                logger.warn(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, "Hello Alice, Bob, and Charlie!", null));
-            }
-
-            /**
-             * Verifies that a warning log entry with a message, two placeholders, and an exception can be issued.
-             */
-            @CaptureLogEntries(level = Level.WARN)
-            @Test
-            void warnFormattedMessageWithArgumentsAndException() {
-                Exception exception = new Exception();
-                logger.warn(marker, "Oops {} and {}!", "Alice", "Bob", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Verifies that a warning error log entry can be issued via the generic log method.
-             */
-            @CaptureLogEntries(level = Level.WARN)
-            @Test
-            void logGenericWarningEntry() {
-                Exception exception = new Exception();
-
-                logger.log(
-                    marker,
-                    TinylogLogger.class.getName(),
-                    LocationAwareLogger.WARN_INT,
-                    "Oops {} and {}!",
-                    new Object[] {"Alice", "Bob"},
-                    exception
-                );
-
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Verifies that a warning error log entry can be issued via the event log method.
-             */
-            @CaptureLogEntries(level = Level.WARN)
-            @Test
-            void logEventWarningEntry() {
-                Exception exception = new Exception();
-
-                logger.makeLoggingEventBuilder(org.slf4j.event.Level.WARN)
-                    .addMarker(marker)
-                    .setMessage("Oops {} and {}!")
-                    .addArgument("Alice")
-                    .addArgument("Bob")
-                    .setCause(exception)
-                    .log();
-
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Verifies that an error log entry with a plain text message can be issued.
-             */
-            @CaptureLogEntries(level = Level.ERROR)
-            @Test
-            void errorTextMessage() {
-                logger.error(marker, "Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, "Hello World!", null));
-            }
-
-            /**
-             * Verifies that an error log entry with a plain text message and an exception can be issued.
-             */
-            @CaptureLogEntries(level = Level.ERROR)
-            @Test
-            void errorTextMessageAndException() {
-                Exception exception = new Exception();
-                logger.error(marker, "Oops!", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, "Oops!", exception));
-            }
-
-            /**
-             * Verifies that an error log entry with a message and a single placeholder can be issued.
-             */
-            @CaptureLogEntries(level = Level.ERROR)
-            @Test
-            void errorFormattedMessageWithSingleArgument() {
-                logger.error(marker, "Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, "Hello Alice!", null));
-            }
-
-            /**
-             * Verifies that an error log entry with a message and two arguments can be issued.
-             */
-            @CaptureLogEntries(level = Level.ERROR)
-            @Test
-            void errorFormattedMessageWithTwoArguments() {
-                logger.error(marker, "Hello {} and {}!", "Alice", "Bob");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, "Hello Alice and Bob!", null));
-            }
-
-            /**
-             * Verifies that an error log entry with a message, a single placeholder, and an exception can be issued.
-             */
-            @CaptureLogEntries(level = Level.ERROR)
-            @Test
-            void errorFormattedMessageWithArgumentAndException() {
-                Exception exception = new Exception();
-                logger.error(marker, "Oops {}!", "Alice", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, "Oops Alice!", exception));
-            }
-
-            /**
-             * Verifies that an error log entry with a message and three arguments can be issued.
-             */
-            @CaptureLogEntries(level = Level.ERROR)
-            @Test
-            void errorFormattedMessageWithThreeArguments() {
-                logger.error(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, "Hello Alice, Bob, and Charlie!", null));
-            }
-
-            /**
-             * Verifies that an error log entry with a message, two placeholders, and an exception can be issued.
-             */
-            @CaptureLogEntries(level = Level.ERROR)
-            @Test
-            void errorFormattedMessageWithArgumentsAndException() {
-                Exception exception = new Exception();
-                logger.error(marker, "Oops {} and {}!", "Alice", "Bob", exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Verifies that a full error log entry can be issued via the generic log method.
-             */
-            @CaptureLogEntries(level = Level.ERROR)
-            @Test
-            void logGenericErrorEntry() {
-                Exception exception = new Exception();
-
-                logger.log(
-                    marker,
-                    TinylogLogger.class.getName(),
-                    LocationAwareLogger.ERROR_INT,
-                    "Oops {} and {}!",
-                    new Object[] {"Alice", "Bob"},
-                    exception
-                );
-
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Verifies that a full error log entry can be issued via the event log method.
-             */
-            @CaptureLogEntries(level = Level.ERROR)
-            @Test
-            void logEventErrorEntry() {
-                Exception exception = new Exception();
-
-                logger.makeLoggingEventBuilder(org.slf4j.event.Level.ERROR)
-                    .addMarker(marker)
-                    .setMessage("Oops {} and {}!")
-                    .addArgument("Alice")
-                    .addArgument("Bob")
-                    .setCause(exception)
-                    .log();
-
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, "Oops Alice and Bob!", exception));
-            }
-
-            /**
-             * Creates a new log entry.
-             *
-             * @param level     Severity level
-             * @param message   Text message
-             * @param exception Exception or any other kind of throwable
-             * @return Created log entry
-             */
-            private LogEntry createLogEntry(Level level, String message, Throwable exception) {
-                return new LogEntry(TinylogLoggerWithMarkersTest.class.getName(), "bar", level, exception, message);
+                verifyLogEntry(Level.TRACE, exception, "Oops Alice and Bob!");
             }
 
         }
 
         /**
-         * Tests discarding log entries if the assigned severity level is disabled.
+         * Tests for issuing trace log entries if {@link Level#TRACE} is disabled.
          */
         @Nested
-        class Disabled {
+        class TraceDisabled {
 
             /**
-             * Verifies that a trace log entry with a plain text message is discarded if the trace severity level is
-             * disabled.
+             * Initializes severity level visibility.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
+            @BeforeEach
+            void init() {
+                when(framework.getLevelVisibilityByClass(LogEntries.class.getName())).thenReturn(
+                    new LevelVisibility(
+                        OutputDetails.DISABLED,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME
+                    )
+                );
+            }
+
+            /**
+             * Verifies that a trace log entry with a plain text message can be issued.
+             */
             @Test
             void traceTextMessage() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.trace(marker, "Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
-             * Verifies that a trace log entry with a plain text message and an exception is discarded if the trace
-             * severity level is disabled.
+             * Verifies that a trace log entry with a plain text message and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceTextMessageAndException() {
-                logger.trace(marker, "Oops!", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.trace(marker, "Oops!", exception);
+
+                verifyNoLogEntry();
             }
 
             /**
-             * Verifies that a trace log entry with a message and a single placeholder is discarded if the trace
-             * severity level is disabled.
+             * Verifies that a trace log entry with a message and a single placeholder can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceFormattedMessageWithSingleArgument() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.trace(marker, "Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
-             * Verifies that a trace log entry with a message and two arguments is discarded if the trace severity level
-             * is disabled.
+             * Verifies that a trace log entry with a message and two arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceFormattedMessageWithTwoArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.trace(marker, "Hello {} and {}!", "Alice", "Bob");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
-             * Verifies that a trace log entry with a message, a single placeholder, and an exception is discarded if
-             * the trace severity level is disabled.
+             * Verifies that a trace log entry with a message, a single placeholder, and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceFormattedMessageWithArgumentAndException() {
-                logger.trace(marker, "Oops {}!", "Alice", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.trace(marker, "Oops {}!", "Alice", exception);
+
+                verifyNoLogEntry();
             }
 
             /**
-             * Verifies that a trace log entry with a message and three arguments is discarded if the trace severity
-             * level is disabled.
+             * Verifies that a trace log entry with a message and three arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceFormattedMessageWithThreeArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.trace(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
-             * Verifies that a trace log entry with a message, two placeholders, and an exception is discarded if the
-             * trace severity level is disabled.
+             * Verifies that a trace log entry with a message, two placeholders, and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceFormattedMessageWithArgumentsAndException() {
-                logger.trace(marker, "Oops {} and {}!", "Alice", "Bob", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.trace(marker, "Oops {} and {}!", "Alice", "Bob", exception);
+
+                verifyNoLogEntry();
             }
 
             /**
-             * Verifies that a trace log entry issued via the generic log method is discarded if the trace severity
-             * level is disabled.
+             * Verifies that a full trace log entry can be issued via the generic log method.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void logGenericTraceEntry() {
                 Exception exception = new Exception();
-
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.log(
                     marker,
                     TinylogLogger.class.getName(),
@@ -979,113 +527,138 @@ class TinylogLoggerWithMarkersTest {
                     exception
                 );
 
-                assertThat(log.consume()).isEmpty();
+                verifyNoLogEntry();
             }
 
             /**
-             * Verifies that a trace log entry issued via the event log method is discarded if the trace severity
-             * level is disabled.
+             * Verifies that a full trace log entry can be issued via the event log method.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void logEventTraceEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.makeLoggingEventBuilder(org.slf4j.event.Level.TRACE)
                     .addMarker(marker)
                     .setMessage("Oops {} and {}!")
                     .addArgument("Alice")
                     .addArgument("Bob")
-                    .setCause(new Exception())
+                    .setCause(exception)
                     .log();
 
-                assertThat(log.consume()).isEmpty();
+                verifyNoLogEntry();
+            }
+
+        }
+
+        /**
+         * Tests for issuing debug log entries if {@link Level#DEBUG} is enabled.
+         */
+        @Nested
+        class DebugEnabled {
+
+            /**
+             * Initializes severity level visibility.
+             */
+            @BeforeEach
+            void init() {
+                when(framework.getLevelVisibilityByClass(LogEntries.class.getName())).thenReturn(
+                    new LevelVisibility(
+                        OutputDetails.DISABLED,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.DISABLED,
+                        OutputDetails.DISABLED,
+                        OutputDetails.DISABLED
+                    )
+                );
             }
 
             /**
-             * Verifies that a debug log entry with a plain text message is discarded if the debug severity level is
-             * disabled.
+             * Verifies that a debug log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugTextMessage() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.debug(marker, "Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.DEBUG, null, "Hello World!");
             }
 
             /**
-             * Verifies that a debug log entry with a plain text message and an exception is discarded if the debug
-             * severity level is disabled.
+             * Verifies that a debug log entry with a plain text message and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugTextMessageAndException() {
-                logger.debug(marker, "Oops!", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.debug(marker, "Oops!", exception);
+
+                verifyLogEntry(Level.DEBUG, exception, "Oops!");
             }
 
             /**
-             * Verifies that a debug log entry with a message and a single placeholder is discarded if the debug
-             * severity level is disabled.
+             * Verifies that a debug log entry with a message and a single placeholder can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugFormattedMessageWithSingleArgument() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.debug(marker, "Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.DEBUG, null, "Hello Alice!");
             }
 
             /**
-             * Verifies that a debug log entry with a message and two arguments is discarded if the debug severity level
-             * is disabled.
+             * Verifies that a debug log entry with a message and two arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugFormattedMessageWithTwoArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.debug(marker, "Hello {} and {}!", "Alice", "Bob");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.DEBUG, null, "Hello Alice and Bob!");
             }
 
             /**
-             * Verifies that a debug log entry with a message, a single placeholder, and an exception is discarded if
-             * the debug severity level is disabled.
+             * Verifies that a debug log entry with a message, a single placeholder, and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugFormattedMessageWithArgumentAndException() {
-                logger.debug(marker, "Oops {}!", "Alice", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.debug(marker, "Oops {}!", "Alice", exception);
+
+                verifyLogEntry(Level.DEBUG, exception, "Oops Alice!");
             }
 
             /**
-             * Verifies that a debug log entry with a message and three arguments is discarded if the debug severity
-             * level is disabled.
+             * Verifies that a debug log entry with a message and three arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugFormattedMessageWithThreeArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.debug(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.DEBUG, null, "Hello Alice, Bob, and Charlie!");
             }
 
             /**
-             * Verifies that a debug log entry with a message, two placeholders, and an exception is discarded if the
-             * debug severity level is disabled.
+             * Verifies that a debug log entry with a message, two placeholders, and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugFormattedMessageWithArgumentsAndException() {
-                logger.debug(marker, "Oops {} and {}!", "Alice", "Bob", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.debug(marker, "Oops {} and {}!", "Alice", "Bob", exception);
+
+                verifyLogEntry(Level.DEBUG, exception, "Oops Alice and Bob!");
             }
 
             /**
-             * Verifies that a debug log entry issued via the generic log method is discarded if the debug severity
-             * level is disabled.
+             * Verifies that a full debug log entry can be issued via the generic log method.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void logGenericDebugEntry() {
                 Exception exception = new Exception();
-
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.log(
                     marker,
                     TinylogLogger.class.getName(),
@@ -1095,113 +668,279 @@ class TinylogLoggerWithMarkersTest {
                     exception
                 );
 
-                assertThat(log.consume()).isEmpty();
+                verifyLogEntry(Level.DEBUG, exception, "Oops Alice and Bob!");
             }
 
             /**
-             * Verifies that a debug log entry issued via the event log method is discarded if the debug severity
-             * level is disabled.
+             * Verifies that a full debug log entry can be issued via the event log method.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void logEventDebugEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.makeLoggingEventBuilder(org.slf4j.event.Level.DEBUG)
                     .addMarker(marker)
                     .setMessage("Oops {} and {}!")
                     .addArgument("Alice")
                     .addArgument("Bob")
-                    .setCause(new Exception())
+                    .setCause(exception)
                     .log();
 
-                assertThat(log.consume()).isEmpty();
+                verifyLogEntry(Level.DEBUG, exception, "Oops Alice and Bob!");
+            }
+
+        }
+
+        /**
+         * Tests for issuing debug log entries if {@link Level#DEBUG} is disabled.
+         */
+        @Nested
+        class DebugDisabled {
+
+            /**
+             * Initializes severity level visibility.
+             */
+            @BeforeEach
+            void init() {
+                when(framework.getLevelVisibilityByClass(LogEntries.class.getName())).thenReturn(
+                    new LevelVisibility(
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.DISABLED,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME
+                    )
+                );
             }
 
             /**
-             * Verifies that an info log entry with a plain text message is discarded if the info severity level is
-             * disabled.
+             * Verifies that a debug log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
+            @Test
+            void debugTextMessage() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.debug(marker, "Hello World!");
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a debug log entry with a plain text message and an exception can be issued.
+             */
+            @Test
+            void debugTextMessageAndException() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.debug(marker, "Oops!", exception);
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a debug log entry with a message and a single placeholder can be issued.
+             */
+            @Test
+            void debugFormattedMessageWithSingleArgument() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.debug(marker, "Hello {}!", "Alice");
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a debug log entry with a message and two arguments can be issued.
+             */
+            @Test
+            void debugFormattedMessageWithTwoArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.debug(marker, "Hello {} and {}!", "Alice", "Bob");
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a debug log entry with a message, a single placeholder, and an exception can be issued.
+             */
+            @Test
+            void debugFormattedMessageWithArgumentAndException() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.debug(marker, "Oops {}!", "Alice", exception);
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a debug log entry with a message and three arguments can be issued.
+             */
+            @Test
+            void debugFormattedMessageWithThreeArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.debug(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a debug log entry with a message, two placeholders, and an exception can be issued.
+             */
+            @Test
+            void debugFormattedMessageWithArgumentsAndException() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.debug(marker, "Oops {} and {}!", "Alice", "Bob", exception);
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a full debug log entry can be issued via the generic log method.
+             */
+            @Test
+            void logGenericDebugEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.log(
+                    marker,
+                    TinylogLogger.class.getName(),
+                    LocationAwareLogger.DEBUG_INT,
+                    "Oops {} and {}!",
+                    new Object[] {"Alice", "Bob"},
+                    exception
+                );
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a full debug log entry can be issued via the event log method.
+             */
+            @Test
+            void logEventDebugEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.makeLoggingEventBuilder(org.slf4j.event.Level.DEBUG)
+                    .addMarker(marker)
+                    .setMessage("Oops {} and {}!")
+                    .addArgument("Alice")
+                    .addArgument("Bob")
+                    .setCause(exception)
+                    .log();
+
+                verifyNoLogEntry();
+            }
+
+        }
+
+        /**
+         * Tests for issuing info log entries if {@link Level#INFO} is enabled.
+         */
+        @Nested
+        class InfoEnabled {
+
+            /**
+             * Initializes severity level visibility.
+             */
+            @BeforeEach
+            void init() {
+                when(framework.getLevelVisibilityByClass(LogEntries.class.getName())).thenReturn(
+                    new LevelVisibility(
+                        OutputDetails.DISABLED,
+                        OutputDetails.DISABLED,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.DISABLED,
+                        OutputDetails.DISABLED
+                    )
+                );
+            }
+
+            /**
+             * Verifies that an info log entry with a plain text message can be issued.
+             */
             @Test
             void infoTextMessage() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.info(marker, "Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.INFO, null, "Hello World!");
             }
 
             /**
-             * Verifies that an info log entry with a plain text message and an exception is discarded if the info
-             * severity level is disabled.
+             * Verifies that an info log entry with a plain text message and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoTextMessageAndException() {
-                logger.info(marker, "Oops!", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.info(marker, "Oops!", exception);
+
+                verifyLogEntry(Level.INFO, exception, "Oops!");
             }
 
             /**
-             * Verifies that an info log entry with a message and a single placeholder is discarded if the info severity
-             * level is disabled.
+             * Verifies that an info log entry with a message and a single placeholder can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoFormattedMessageWithSingleArgument() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.info(marker, "Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.INFO, null, "Hello Alice!");
             }
 
             /**
-             * Verifies that an info log entry with a message and two arguments is discarded if the info severity level
-             * is disabled.
+             * Verifies that an info log entry with a message and two arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoFormattedMessageWithTwoArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.info(marker, "Hello {} and {}!", "Alice", "Bob");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.INFO, null, "Hello Alice and Bob!");
             }
 
             /**
-             * Verifies that an info log entry with a message, a single placeholder, and an exception is discarded if
-             * the info severity level is disabled.
+             * Verifies that an info log entry with a message, a single placeholder, and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoFormattedMessageWithArgumentAndException() {
-                logger.info(marker, "Oops {}!", "Alice", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.info(marker, "Oops {}!", "Alice", exception);
+
+                verifyLogEntry(Level.INFO, exception, "Oops Alice!");
             }
 
             /**
-             * Verifies that an info log entry with a message and three arguments is discarded if the info severity
-             * level is disabled.
+             * Verifies that an info log entry with a message and three arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoFormattedMessageWithThreeArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.info(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.INFO, null, "Hello Alice, Bob, and Charlie!");
             }
 
             /**
-             * Verifies that an info log entry with a message, two placeholders, and an exception is discarded if the
-             * info severity level is disabled.
+             * Verifies that an info log entry with a message, two placeholders, and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoFormattedMessageWithArgumentsAndException() {
-                logger.info(marker, "Oops {} and {}!", "Alice", "Bob", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.info(marker, "Oops {} and {}!", "Alice", "Bob", exception);
+
+                verifyLogEntry(Level.INFO, exception, "Oops Alice and Bob!");
             }
 
             /**
-             * Verifies that an info log entry issued via the generic log method is discarded if the info severity level
-             * is disabled.
+             * Verifies that a full info log entry can be issued via the generic log method.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void logGenericInfoEntry() {
                 Exception exception = new Exception();
-
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.log(
                     marker,
                     TinylogLogger.class.getName(),
@@ -1211,113 +950,279 @@ class TinylogLoggerWithMarkersTest {
                     exception
                 );
 
-                assertThat(log.consume()).isEmpty();
+                verifyLogEntry(Level.INFO, exception, "Oops Alice and Bob!");
             }
 
             /**
-             * Verifies that an info log entry issued via the event log method is discarded if the info severity level
-             * is disabled.
+             * Verifies that a full info log entry can be issued via the event log method.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void logEventInfoEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.makeLoggingEventBuilder(org.slf4j.event.Level.INFO)
                     .addMarker(marker)
                     .setMessage("Oops {} and {}!")
                     .addArgument("Alice")
                     .addArgument("Bob")
-                    .setCause(new Exception())
+                    .setCause(exception)
                     .log();
 
-                assertThat(log.consume()).isEmpty();
+                verifyLogEntry(Level.INFO, exception, "Oops Alice and Bob!");
+            }
+
+        }
+
+        /**
+         * Tests for issuing info log entries if {@link Level#INFO} is disabled.
+         */
+        @Nested
+        class InfoDisabled {
+
+            /**
+             * Initializes severity level visibility.
+             */
+            @BeforeEach
+            void init() {
+                when(framework.getLevelVisibilityByClass(LogEntries.class.getName())).thenReturn(
+                    new LevelVisibility(
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.DISABLED,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME
+                    )
+                );
             }
 
             /**
-             * Verifies that a warning log entry with a plain text message is discarded if the warn severity level is
-             * disabled.
+             * Verifies that an info log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
+            @Test
+            void infoTextMessage() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.info(marker, "Hello World!");
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that an info log entry with a plain text message and an exception can be issued.
+             */
+            @Test
+            void infoTextMessageAndException() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.info(marker, "Oops!", exception);
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that an info log entry with a message and a single placeholder can be issued.
+             */
+            @Test
+            void infoFormattedMessageWithSingleArgument() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.info(marker, "Hello {}!", "Alice");
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that an info log entry with a message and two arguments can be issued.
+             */
+            @Test
+            void infoFormattedMessageWithTwoArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.info(marker, "Hello {} and {}!", "Alice", "Bob");
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that an info log entry with a message, a single placeholder, and an exception can be issued.
+             */
+            @Test
+            void infoFormattedMessageWithArgumentAndException() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.info(marker, "Oops {}!", "Alice", exception);
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that an info log entry with a message and three arguments can be issued.
+             */
+            @Test
+            void infoFormattedMessageWithThreeArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.info(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that an info log entry with a message, two placeholders, and an exception can be issued.
+             */
+            @Test
+            void infoFormattedMessageWithArgumentsAndException() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.info(marker, "Oops {} and {}!", "Alice", "Bob", exception);
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a full info log entry can be issued via the generic log method.
+             */
+            @Test
+            void logGenericInfoEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.log(
+                    marker,
+                    TinylogLogger.class.getName(),
+                    LocationAwareLogger.INFO_INT,
+                    "Oops {} and {}!",
+                    new Object[] {"Alice", "Bob"},
+                    exception
+                );
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a full info log entry can be issued via the event log method.
+             */
+            @Test
+            void logEventInfoEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.makeLoggingEventBuilder(org.slf4j.event.Level.INFO)
+                    .addMarker(marker)
+                    .setMessage("Oops {} and {}!")
+                    .addArgument("Alice")
+                    .addArgument("Bob")
+                    .setCause(exception)
+                    .log();
+
+                verifyNoLogEntry();
+            }
+
+        }
+
+        /**
+         * Tests for issuing warn log entries if {@link Level#WARN} is enabled.
+         */
+        @Nested
+        class WarnEnabled {
+
+            /**
+             * Initializes severity level visibility.
+             */
+            @BeforeEach
+            void init() {
+                when(framework.getLevelVisibilityByClass(LogEntries.class.getName())).thenReturn(
+                    new LevelVisibility(
+                        OutputDetails.DISABLED,
+                        OutputDetails.DISABLED,
+                        OutputDetails.DISABLED,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.DISABLED
+                    )
+                );
+            }
+
+            /**
+             * Verifies that a warn log entry with a plain text message can be issued.
+             */
             @Test
             void warnTextMessage() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.warn(marker, "Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.WARN, null, "Hello World!");
             }
 
             /**
-             * Verifies that a warning log entry with a plain text message and an exception is discarded if the warn
-             * severity level is disabled.
+             * Verifies that a warn log entry with a plain text message and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnTextMessageAndException() {
-                logger.warn(marker, "Oops!", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.warn(marker, "Oops!", exception);
+
+                verifyLogEntry(Level.WARN, exception, "Oops!");
             }
 
             /**
-             * Verifies that a warning log entry with a message and a single placeholder is discarded if the warn
-             * severity level is disabled.
+             * Verifies that a warn log entry with a message and a single placeholder can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnFormattedMessageWithSingleArgument() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.warn(marker, "Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.WARN, null, "Hello Alice!");
             }
 
             /**
-             * Verifies that a warning log entry with a message and two arguments is discarded if the warn severity
-             * level is disabled.
+             * Verifies that a warn log entry with a message and two arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnFormattedMessageWithTwoArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.warn(marker, "Hello {} and {}!", "Alice", "Bob");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.WARN, null, "Hello Alice and Bob!");
             }
 
             /**
-             * Verifies that a warning log entry with a message, a single placeholder, and an exception is discarded if
-             * the warn severity level is disabled.
+             * Verifies that a warn log entry with a message, a single placeholder, and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnFormattedMessageWithArgumentAndException() {
-                logger.warn(marker, "Oops {}!", "Alice", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.warn(marker, "Oops {}!", "Alice", exception);
+
+                verifyLogEntry(Level.WARN, exception, "Oops Alice!");
             }
 
             /**
-             * Verifies that a warning log entry with a message and three arguments is discarded if the warn severity
-             * level is disabled.
+             * Verifies that a warn log entry with a message and three arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnFormattedMessageWithThreeArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.warn(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.WARN, null, "Hello Alice, Bob, and Charlie!");
             }
 
             /**
-             * Verifies that a warning log entry with a message, two placeholders, and an exception is discarded if the
-             * warn severity level is disabled.
+             * Verifies that a warn log entry with a message, two placeholders, and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnFormattedMessageWithArgumentsAndException() {
-                logger.warn(marker, "Oops {} and {}!", "Alice", "Bob", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.warn(marker, "Oops {} and {}!", "Alice", "Bob", exception);
+
+                verifyLogEntry(Level.WARN, exception, "Oops Alice and Bob!");
             }
 
             /**
-             * Verifies that a warning log entry issued via the generic log method is discarded if the warn severity
-             * level is disabled.
+             * Verifies that a full warn log entry can be issued via the generic log method.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
-            void logGenericWarningEntry() {
+            void logGenericWarnEntry() {
                 Exception exception = new Exception();
-
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.log(
                     marker,
                     TinylogLogger.class.getName(),
@@ -1327,113 +1232,279 @@ class TinylogLoggerWithMarkersTest {
                     exception
                 );
 
-                assertThat(log.consume()).isEmpty();
+                verifyLogEntry(Level.WARN, exception, "Oops Alice and Bob!");
             }
 
             /**
-             * Verifies that a warning log entry issued via the event log method is discarded if the warn severity
-             * level is disabled.
+             * Verifies that a full warn log entry can be issued via the event log method.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
-            void logEventWarningEntry() {
+            void logEventWarnEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.makeLoggingEventBuilder(org.slf4j.event.Level.WARN)
                     .addMarker(marker)
                     .setMessage("Oops {} and {}!")
                     .addArgument("Alice")
                     .addArgument("Bob")
-                    .setCause(new Exception())
+                    .setCause(exception)
                     .log();
 
-                assertThat(log.consume()).isEmpty();
+                verifyLogEntry(Level.WARN, exception, "Oops Alice and Bob!");
+            }
+
+        }
+
+        /**
+         * Tests for issuing warn log entries if {@link Level#WARN} is disabled.
+         */
+        @Nested
+        class WarnDisabled {
+
+            /**
+             * Initializes severity level visibility.
+             */
+            @BeforeEach
+            void init() {
+                when(framework.getLevelVisibilityByClass(LogEntries.class.getName())).thenReturn(
+                    new LevelVisibility(
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.DISABLED,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME
+                    )
+                );
             }
 
             /**
-             * Verifies that an error log entry with a plain text message is discarded if the error severity level is
-             * disabled.
+             * Verifies that a warn log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.OFF)
+            @Test
+            void warnTextMessage() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.warn(marker, "Hello World!");
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a warn log entry with a plain text message and an exception can be issued.
+             */
+            @Test
+            void warnTextMessageAndException() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.warn(marker, "Oops!", exception);
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a warn log entry with a message and a single placeholder can be issued.
+             */
+            @Test
+            void warnFormattedMessageWithSingleArgument() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.warn(marker, "Hello {}!", "Alice");
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a warn log entry with a message and two arguments can be issued.
+             */
+            @Test
+            void warnFormattedMessageWithTwoArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.warn(marker, "Hello {} and {}!", "Alice", "Bob");
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a warn log entry with a message, a single placeholder, and an exception can be issued.
+             */
+            @Test
+            void warnFormattedMessageWithArgumentAndException() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.warn(marker, "Oops {}!", "Alice", exception);
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a warn log entry with a message and three arguments can be issued.
+             */
+            @Test
+            void warnFormattedMessageWithThreeArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.warn(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a warn log entry with a message, two placeholders, and an exception can be issued.
+             */
+            @Test
+            void warnFormattedMessageWithArgumentsAndException() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.warn(marker, "Oops {} and {}!", "Alice", "Bob", exception);
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a full warn log entry can be issued via the generic log method.
+             */
+            @Test
+            void logGenericWarnEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.log(
+                    marker,
+                    TinylogLogger.class.getName(),
+                    LocationAwareLogger.WARN_INT,
+                    "Oops {} and {}!",
+                    new Object[] {"Alice", "Bob"},
+                    exception
+                );
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that a full warn log entry can be issued via the event log method.
+             */
+            @Test
+            void logEventWarnEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.makeLoggingEventBuilder(org.slf4j.event.Level.WARN)
+                    .addMarker(marker)
+                    .setMessage("Oops {} and {}!")
+                    .addArgument("Alice")
+                    .addArgument("Bob")
+                    .setCause(exception)
+                    .log();
+
+                verifyNoLogEntry();
+            }
+
+        }
+
+        /**
+         * Tests for issuing error log entries if {@link Level#ERROR} is enabled.
+         */
+        @Nested
+        class ErrorEnabled {
+
+            /**
+             * Initializes severity level visibility.
+             */
+            @BeforeEach
+            void init() {
+                when(framework.getLevelVisibilityByClass(LogEntries.class.getName())).thenReturn(
+                    new LevelVisibility(
+                        OutputDetails.DISABLED,
+                        OutputDetails.DISABLED,
+                        OutputDetails.DISABLED,
+                        OutputDetails.DISABLED,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME
+                    )
+                );
+            }
+
+            /**
+             * Verifies that an error log entry with a plain text message can be issued.
+             */
             @Test
             void errorTextMessage() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.error(marker, "Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.ERROR, null, "Hello World!");
             }
 
             /**
-             * Verifies that an error log entry with a plain text message and an exception is discarded if the error
-             * severity level is disabled.
+             * Verifies that an error log entry with a plain text message and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorTextMessageAndException() {
-                logger.error(marker, "Oops!", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.error(marker, "Oops!", exception);
+
+                verifyLogEntry(Level.ERROR, exception, "Oops!");
             }
 
             /**
-             * Verifies that an error log entry with a message and a single placeholder is discarded if the error
-             * severity level is disabled.
+             * Verifies that an error log entry with a message and a single placeholder can be issued.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorFormattedMessageWithSingleArgument() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.error(marker, "Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.ERROR, null, "Hello Alice!");
             }
 
             /**
-             * Verifies that an error log entry with a message and two arguments is discarded if the error severity
-             * level is disabled.
+             * Verifies that an error log entry with a message and two arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorFormattedMessageWithTwoArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.error(marker, "Hello {} and {}!", "Alice", "Bob");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.ERROR, null, "Hello Alice and Bob!");
             }
 
             /**
-             * Verifies that an error log entry with a message, a single placeholder, and an exception is discarded if
-             * the error severity level is disabled.
+             * Verifies that an error log entry with a message, a single placeholder, and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorFormattedMessageWithArgumentAndException() {
-                logger.error(marker, "Oops {}!", "Alice", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.error(marker, "Oops {}!", "Alice", exception);
+
+                verifyLogEntry(Level.ERROR, exception, "Oops Alice!");
             }
 
             /**
-             * Verifies that an error log entry with a message and three arguments is discarded if the error severity
-             * level is disabled.
+             * Verifies that an error log entry with a message and three arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorFormattedMessageWithThreeArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.error(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
-                assertThat(log.consume()).isEmpty();
+
+                verifyLogEntry(Level.ERROR, null, "Hello Alice, Bob, and Charlie!");
             }
 
             /**
-             * Verifies that an error log entry with a message, two placeholders, and an exception is discarded if the
-             * error severity level is disabled.
+             * Verifies that an error log entry with a message, two placeholders, and an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorFormattedMessageWithArgumentsAndException() {
-                logger.error(marker, "Oops {} and {}!", "Alice", "Bob", new Exception());
-                assertThat(log.consume()).isEmpty();
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.error(marker, "Oops {} and {}!", "Alice", "Bob", exception);
+
+                verifyLogEntry(Level.ERROR, exception, "Oops Alice and Bob!");
             }
 
             /**
-             * Verifies that an error log entry issued via the generic log method is discarded if the error severity
-             * level is disabled.
+             * Verifies that a full error log entry can be issued via the generic log method.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void logGenericErrorEntry() {
                 Exception exception = new Exception();
-
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.log(
                     marker,
                     TinylogLogger.class.getName(),
@@ -1443,261 +1514,168 @@ class TinylogLoggerWithMarkersTest {
                     exception
                 );
 
-                assertThat(log.consume()).isEmpty();
+                verifyLogEntry(Level.ERROR, exception, "Oops Alice and Bob!");
             }
 
             /**
-             * Verifies that an error log entry issued via the event log method is discarded if the error severity
-             * level is disabled.
+             * Verifies that a full error log entry can be issued via the event log method.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void logEventErrorEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
                 logger.makeLoggingEventBuilder(org.slf4j.event.Level.ERROR)
                     .addMarker(marker)
                     .setMessage("Oops {} and {}!")
                     .addArgument("Alice")
                     .addArgument("Bob")
-                    .setCause(new Exception())
+                    .setCause(exception)
                     .log();
 
-                assertThat(log.consume()).isEmpty();
+                verifyLogEntry(Level.ERROR, exception, "Oops Alice and Bob!");
             }
 
         }
 
-    }
+        /**
+         * Tests for issuing error log entries if {@link Level#ERROR} is disabled.
+         */
+        @Nested
+        class ErrorDisabled {
 
-    /**
-     * Tests for providing the expected stack trace information.
-     */
-    @ExtendWith(MockitoExtension.class)
-    @Nested
-    class StackTraceInformation {
-
-        @Mock
-        private LoggingBackend backend;
-
-        private final Framework framework = new Framework(false, false) {
-
-            @Override
-            public LoggingBackend getLoggingBackend() {
-                return backend;
+            /**
+             * Initializes severity level visibility.
+             */
+            @BeforeEach
+            void init() {
+                when(framework.getLevelVisibilityByClass(LogEntries.class.getName())).thenReturn(
+                    new LevelVisibility(
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
+                        OutputDetails.DISABLED
+                    )
+                );
             }
 
-        };
+            /**
+             * Verifies that an error log entry with a plain text message can be issued.
+             */
+            @Test
+            void errorTextMessage() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.error(marker, "Hello World!");
 
-        /**
-         * Verifies that only the category name is passed as location object, if the severity level is enabled and
-         * requires the caller class name.
-         */
-        @Test
-        void infoLogWithCategoryOnly() {
-            when(backend.getLevelVisibilityByClass("Foo")).thenReturn(
-                new LevelVisibility(
-                    OutputDetails.DISABLED,
-                    OutputDetails.DISABLED,
-                    OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
-                    OutputDetails.DISABLED,
-                    OutputDetails.DISABLED
-                )
-            );
+                verifyNoLogEntry();
+            }
 
-            TinylogLogger logger = new TinylogLogger("Foo", framework);
-            logger.info(marker, "Hello World!");
+            /**
+             * Verifies that an error log entry with a plain text message and an exception can be issued.
+             */
+            @Test
+            void errorTextMessageAndException() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.error(marker, "Oops!", exception);
 
-            verify(backend).log(
-                "Foo",
-                "bar",
-                Level.INFO,
-                null,
-                "Hello World!",
-                null,
-                null
-            );
-        }
+                verifyNoLogEntry();
+            }
 
-        /**
-         * Verifies that a complete stack trace element is passed as location object, if the severity level is enabled
-         * and requires the full location information.
-         */
-        @Test
-        void infoLogWithFullStackTraceInformation() {
-            when(backend.getLevelVisibilityByClass(StackTraceInformation.class.getName())).thenReturn(
-                new LevelVisibility(
-                    OutputDetails.DISABLED,
-                    OutputDetails.DISABLED,
-                    OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION,
-                    OutputDetails.DISABLED,
-                    OutputDetails.DISABLED
-                )
-            );
+            /**
+             * Verifies that an error log entry with a message and a single placeholder can be issued.
+             */
+            @Test
+            void errorFormattedMessageWithSingleArgument() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.error(marker, "Hello {}!", "Alice");
 
-            TinylogLogger logger = new TinylogLogger(StackTraceInformation.class.getName(), framework);
-            logger.info(marker, "Hello World!");
+                verifyNoLogEntry();
+            }
 
-            verify(backend).log(
-                isStackTraceElement(
-                    StackTraceInformation.class.getName(),
-                    "infoLogWithFullStackTraceInformation",
-                    TinylogLoggerWithMarkersTest.class.getSimpleName() + ".java",
-                    1537
-                ),
-                eq("bar"),
-                eq(Level.INFO),
-                isNull(),
-                eq("Hello World!"),
-                isNull(),
-                isNull()
-            );
-        }
+            /**
+             * Verifies that an error log entry with a message and two arguments can be issued.
+             */
+            @Test
+            void errorFormattedMessageWithTwoArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.error(marker, "Hello {} and {}!", "Alice", "Bob");
 
-        /**
-         * Verifies that only the category name is passed as location object, if the severity level is enabled and
-         * requires the caller class name.
-         */
-        @Test
-        void genericLogWithCategoryOnly() {
-            when(backend.getLevelVisibilityByClass("Foo")).thenReturn(
-                new LevelVisibility(
-                    OutputDetails.DISABLED,
-                    OutputDetails.DISABLED,
-                    OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
-                    OutputDetails.DISABLED,
-                    OutputDetails.DISABLED
-                )
-            );
+                verifyNoLogEntry();
+            }
 
-            TinylogLogger logger = new TinylogLogger("Foo", framework);
-            logger.log(
-                marker,
-                StackTraceInformation.class.getName(),
-                LocationAwareLogger.INFO_INT,
-                "Hello World!",
-                null,
-                null
-            );
+            /**
+             * Verifies that an error log entry with a message, a single placeholder, and an exception can be issued.
+             */
+            @Test
+            void errorFormattedMessageWithArgumentAndException() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.error(marker, "Oops {}!", "Alice", exception);
 
-            verify(backend).log(
-                "Foo",
-                "bar",
-                Level.INFO,
-                null,
-                "Hello World!",
-                null,
-                null
-            );
-        }
+                verifyNoLogEntry();
+            }
 
-        /**
-         * Verifies that a complete stack trace element is passed as location object, if the severity level is enabled
-         * and requires the full location information.
-         */
-        @Test
-        void genericLogWithFullStackTraceInformation() {
-            when(backend.getLevelVisibilityByClass(StackTraceInformation.class.getName())).thenReturn(
-                new LevelVisibility(
-                    OutputDetails.DISABLED,
-                    OutputDetails.DISABLED,
-                    OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION,
-                    OutputDetails.DISABLED,
-                    OutputDetails.DISABLED
-                )
-            );
+            /**
+             * Verifies that an error log entry with a message and three arguments can be issued.
+             */
+            @Test
+            void errorFormattedMessageWithThreeArguments() {
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.error(marker, "Hello {}, {}, and {}!", "Alice", "Bob", "Charlie");
 
-            TinylogLogger logger = new TinylogLogger(StackTraceInformation.class.getName(), framework);
-            logger.log(
-                marker,
-                StackTraceInformation.class.getName(),
-                LocationAwareLogger.INFO_INT,
-                "Hello World!",
-                null,
-                null
-            );
+                verifyNoLogEntry();
+            }
 
-            verify(backend).log(
-                isStackTraceElement(
-                    StackTraceInformation.class.getName(),
-                    "genericLogWithFullStackTraceInformation",
-                    TinylogLoggerWithMarkersTest.class.getSimpleName() + ".java",
-                    1609
-                ),
-                eq("bar"),
-                eq(Level.INFO),
-                isNull(),
-                eq("Hello World!"),
-                isNull(),
-                isNull()
-            );
-        }
+            /**
+             * Verifies that an error log entry with a message, two placeholders, and an exception can be issued.
+             */
+            @Test
+            void errorFormattedMessageWithArgumentsAndException() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.error(marker, "Oops {} and {}!", "Alice", "Bob", exception);
 
-        /**
-         * Verifies that only the category name is passed as location object, if the severity level is enabled and
-         * requires the caller class name.
-         */
-        @Test
-        void eventLogWithCategoryOnly() {
-            when(backend.getLevelVisibilityByClass("Foo")).thenReturn(
-                new LevelVisibility(
-                    OutputDetails.DISABLED,
-                    OutputDetails.DISABLED,
-                    OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME,
-                    OutputDetails.DISABLED,
-                    OutputDetails.DISABLED
-                )
-            );
+                verifyNoLogEntry();
+            }
 
-            new TinylogLogger("Foo", framework)
-                .makeLoggingEventBuilder(org.slf4j.event.Level.INFO)
-                .addMarker(marker)
-                .log("Hello World!");
+            /**
+             * Verifies that a full error log entry can be issued via the generic log method.
+             */
+            @Test
+            void logGenericErrorEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.log(
+                    marker,
+                    TinylogLogger.class.getName(),
+                    LocationAwareLogger.ERROR_INT,
+                    "Oops {} and {}!",
+                    new Object[] {"Alice", "Bob"},
+                    exception
+                );
 
-            verify(backend).log(
-                "Foo",
-                "bar",
-                Level.INFO,
-                null,
-                "Hello World!",
-                null,
-                null
-            );
-        }
+                verifyNoLogEntry();
+            }
 
-        /**
-         * Verifies that a complete stack trace element is passed as location object, if the severity level is enabled
-         * and requires the full location information.
-         */
-        @Test
-        void eventLogWithFullStackTraceInformation() {
-            when(backend.getLevelVisibilityByClass(StackTraceInformation.class.getName())).thenReturn(
-                new LevelVisibility(
-                    OutputDetails.DISABLED,
-                    OutputDetails.DISABLED,
-                    OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION,
-                    OutputDetails.DISABLED,
-                    OutputDetails.DISABLED
-                )
-            );
+            /**
+             * Verifies that a full error log entry can be issued via the event log method.
+             */
+            @Test
+            void logEventErrorEntry() {
+                Exception exception = new Exception();
+                TinylogLogger logger = new TinylogLogger(LogEntries.class.getName(), framework);
+                logger.makeLoggingEventBuilder(org.slf4j.event.Level.ERROR)
+                    .addMarker(marker)
+                    .setMessage("Oops {} and {}!")
+                    .addArgument("Alice")
+                    .addArgument("Bob")
+                    .setCause(exception)
+                    .log();
 
-            new TinylogLogger(TinylogLoggerWithMarkersTest.StackTraceInformation.class.getName(), framework)
-                .makeLoggingEventBuilder(org.slf4j.event.Level.INFO)
-                .addMarker(marker)
-                .log("Hello World!");
+                verifyNoLogEntry();
+            }
 
-            verify(backend).log(
-                isStackTraceElement(
-                    StackTraceInformation.class.getName(),
-                    "eventLogWithFullStackTraceInformation",
-                    TinylogLoggerWithMarkersTest.class.getSimpleName() + ".java",
-                    1685
-                ),
-                eq("bar"),
-                eq(Level.INFO),
-                isNull(),
-                eq("Hello World!"),
-                isNull(),
-                isNull()
-            );
         }
 
     }

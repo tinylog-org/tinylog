@@ -44,7 +44,7 @@ public class TinylogServiceProvider implements SLF4JServiceProvider {
     public void initialize() {
         loggerFactory = new TinylogLoggerFactory(Tinylog.getFramework());
         markerFactory = new BasicMarkerFactory();
-        mdcAdapter = new TinylogMdcAdapter(Tinylog.getFramework().getLoggingBackend().getContextStorage());
+        mdcAdapter = new TinylogMdcAdapter(Tinylog.getFramework().getContextStorage());
     }
 
 }

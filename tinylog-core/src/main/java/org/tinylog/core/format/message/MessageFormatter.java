@@ -1,20 +1,20 @@
 package org.tinylog.core.format.message;
 
-import org.tinylog.core.internal.LoggingContext;
+import org.tinylog.core.Configuration;
 
 /**
- * Message formatter can replace placeholders with real values in strings.
+ * Message formatters can replace placeholders in strings with real values.
  */
 public interface MessageFormatter {
 
     /**
      * Replaces all placeholders with real values.
      *
-     * @param context The current logging context
+     * @param configuration The current tinylog configuration
      * @param message A text message with placeholders
      * @param arguments The actual replacement values for placeholders
      * @return Formatted text message
      */
-    String format(LoggingContext context, String message, Object... arguments);
+    String format(Configuration configuration, String message, Object... arguments);
 
 }

@@ -2,7 +2,6 @@ package org.tinylog.core.variable;
 
 import java.util.ServiceLoader;
 
-import javax.inject.Inject;
 import javax.naming.InitialContext;
 import javax.naming.InvalidNameException;
 import javax.naming.NameNotFoundException;
@@ -10,18 +9,37 @@ import javax.naming.NamingException;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
-import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.core.test.log.Log;
+import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.test.junit.log.Log;
+import org.tinylog.test.junit.log.Tinylog;
+
+import jakarta.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mockStatic;
 
-@CaptureLogEntries
+@Tinylog
 class JndiValueResolverTest {
 
     @Inject
+    private Configuration configuration;
+
+    @Inject
+    private InternalLogger logger;
+
+    @Inject
     private Log log;
+
+    /**
+     * Verifies that the resolver is registered as service.
+     */
+    @Test
+    void service() {
+        assertThat(ServiceLoader.load(VariableResolver.class))
+            .anyMatch(loader -> loader instanceof JndiValueResolver);
+    }
 
     /**
      * Verifies that the name is "JNDI value".
@@ -50,7 +68,7 @@ class JndiValueResolverTest {
             mock.when(() -> InitialContext.doLookup("java:comp/env/foo")).thenReturn("bar");
 
             JndiValueResolver resolver = new JndiValueResolver();
-            assertThat(resolver.resolve("foo")).isEqualTo("bar");
+            assertThat(resolver.resolve("foo", logger)).isEqualTo("bar");
         }
     }
 
@@ -63,7 +81,7 @@ class JndiValueResolverTest {
             mock.when(() -> InitialContext.doLookup("java:comp/env/foo")).thenReturn(null);
 
             JndiValueResolver resolver = new JndiValueResolver();
-            assertThat(resolver.resolve("foo")).isNull();
+            assertThat(resolver.resolve("foo", logger)).isNull();
         }
     }
 
@@ -76,7 +94,7 @@ class JndiValueResolverTest {
             mock.when(() -> InitialContext.doLookup("java:comp/env/foo")).thenThrow(NameNotFoundException.class);
 
             JndiValueResolver resolver = new JndiValueResolver();
-            assertThat(resolver.resolve("foo")).isNull();
+            assertThat(resolver.resolve("foo", logger)).isNull();
         }
     }
 
@@ -90,22 +108,13 @@ class JndiValueResolverTest {
             mock.when(() -> InitialContext.doLookup("java:comp/env/foo")).thenThrow(InvalidNameException.class);
 
             JndiValueResolver resolver = new JndiValueResolver();
-            assertThat(resolver.resolve("foo")).isNull();
+            assertThat(resolver.resolve("foo", logger)).isNull();
             assertThat(log.consume()).singleElement().satisfies(entry -> {
-                assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
+                assertThat(entry.getSeverityLevel()).isEqualTo(Level.ERROR);
                 assertThat(entry.getThrowable()).isInstanceOf(InvalidNameException.class);
-                assertThat(entry.getMessage()).contains("java:comp/env/foo");
+                assertThat(entry.getFormattedMessage(configuration)).contains("java:comp/env/foo");
             });
         }
-    }
-
-    /**
-     * Verifies that the resolver is registered as service.
-     */
-    @Test
-    void service() {
-        assertThat(ServiceLoader.load(VariableResolver.class))
-            .anyMatch(loader -> loader instanceof JndiValueResolver);
     }
 
 }

@@ -1,28 +1,26 @@
 package org.tinylog.impl.backend;
 
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
-import org.tinylog.core.internal.LoggingContext;
-import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.core.test.log.Log;
-import org.tinylog.impl.writers.Writer;
-import org.tinylog.impl.writers.console.ConsoleWriter;
+import org.tinylog.core.backend.TinylogContext;
+import org.tinylog.impl.writer.Writer;
+import org.tinylog.impl.writer.console.ConsoleWriter;
+import org.tinylog.test.junit.log.Log;
+import org.tinylog.test.junit.log.Tinylog;
 
-import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
 
-import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CaptureLogEntries
+@Tinylog
 class WriterConfigurationTest {
 
     @Inject
-    private LoggingContext context;
+    private TinylogContext context;
+
+    @Inject
+    private Configuration configuration;
 
     @Inject
     private Log log;
@@ -30,11 +28,10 @@ class WriterConfigurationTest {
     /**
      * Verifies that a console writer without any explicit severity level definition can be created.
      */
+    @Tinylog(configuration = "type=console")
     @Test
     void writerCreationWithDefaultSeverityLevel() {
-        Map<String, String> properties = ImmutableMap.of("type", "console");
-        Configuration consoleConfiguration = new Configuration(properties);
-        WriterConfiguration writerConfiguration = new WriterConfiguration(context, consoleConfiguration);
+        WriterConfiguration writerConfiguration = new WriterConfiguration(context);
 
         LevelConfiguration levelConfiguration = writerConfiguration.getLevelConfiguration();
         assertThat(levelConfiguration.getTags()).isEmpty();
@@ -51,11 +48,10 @@ class WriterConfigurationTest {
     /**
      * Verifies that a console writer with a custom severity level definition can be created.
      */
+    @Tinylog(configuration = {"type=console", "level=debug"})
     @Test
     void writerCreationWithCustomSeverityLevel() {
-        Map<String, String> properties = ImmutableMap.of("type", "console", "level", "debug");
-        Configuration consoleConfiguration = new Configuration(properties);
-        WriterConfiguration writerConfiguration = new WriterConfiguration(context, consoleConfiguration);
+        WriterConfiguration writerConfiguration = new WriterConfiguration(context);
 
         LevelConfiguration levelConfiguration = writerConfiguration.getLevelConfiguration();
         assertThat(levelConfiguration.getTags()).isEmpty();
@@ -72,48 +68,45 @@ class WriterConfigurationTest {
     /**
      * Verifies that a missing type property is reported.
      */
+    @Tinylog(configuration = {})
     @Test
     void missingTypeProperty() {
-        WriterConfiguration configuration = new WriterConfiguration(context, new Configuration(emptyMap()));
-        assertThat(configuration.getOrCreateWriter()).isNull();
+        WriterConfiguration writerConfiguration = new WriterConfiguration(context);
+        assertThat(writerConfiguration.getOrCreateWriter()).isNull();
 
         assertThat(log.consume()).singleElement().satisfies(entry -> {
-            assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-            assertThat(entry.getMessage()).contains("type");
+            assertThat(entry.getSeverityLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getFormattedMessage(configuration)).contains("type");
         });
     }
 
     /**
      * Verifies that an invalid writer name is reported.
      */
+    @Tinylog(configuration = "type=foo")
     @Test
     void invalidWriterNameInTypeProperty() {
-        Map<String, String> properties = ImmutableMap.of("type", "foo");
-        Configuration invalidConfiguration = new Configuration(properties);
-
-        WriterConfiguration writerConfiguration = new WriterConfiguration(context, invalidConfiguration);
+        WriterConfiguration writerConfiguration = new WriterConfiguration(context);
         assertThat(writerConfiguration.getOrCreateWriter()).isNull();
 
         assertThat(log.consume()).singleElement().satisfies(entry -> {
-            assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-            assertThat(entry.getMessage()).contains("foo");
+            assertThat(entry.getSeverityLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getFormattedMessage(configuration)).contains("foo");
         });
     }
 
     /**
      * Verifies that a failed writer instantiation is reported.
      */
+    @Tinylog(configuration = "type=file")
     @Test
     void writerCreationFailed() {
-        Map<String, String> properties = ImmutableMap.of("type", "file");
-        Configuration fileWriter = new Configuration(properties);
-
-        WriterConfiguration writerConfiguration = new WriterConfiguration(context, fileWriter);
+        WriterConfiguration writerConfiguration = new WriterConfiguration(context);
         assertThat(writerConfiguration.getOrCreateWriter()).isNull();
 
         assertThat(log.consume()).singleElement().satisfies(entry -> {
-            assertThat(entry.getLevel()).isEqualTo(Level.ERROR);
-            assertThat(entry.getMessage()).contains("file");
+            assertThat(entry.getSeverityLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getFormattedMessage(configuration)).contains("file");
         });
     }
 

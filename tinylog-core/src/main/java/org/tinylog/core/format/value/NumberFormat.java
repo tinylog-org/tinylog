@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
-import org.tinylog.core.internal.LoggingContext;
+import org.tinylog.core.Configuration;
 
 /**
  * Format for numbers.
@@ -21,8 +21,8 @@ public class NumberFormat implements ValueFormat {
     }
 
     @Override
-    public String format(LoggingContext context, String pattern, Object value) {
-        Locale locale = context.getConfiguration().getLocale();
+    public String format(Configuration configuration, String pattern, Object value) {
+        Locale locale = configuration.getLocale();
         DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(locale);
         return new DecimalFormat(pattern, symbols).format(value);
     }

@@ -1,47 +1,65 @@
 package org.tinylog;
 
-import javax.inject.Inject;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
+import org.mockito.ArgumentCaptor;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.backend.LevelVisibility;
-import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.OutputDetails;
-import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.core.test.log.Log;
-import org.tinylog.core.test.log.LogEntry;
+import org.tinylog.core.context.ContextStorage;
+import org.tinylog.core.context.NopContextStorage;
+import org.tinylog.core.format.message.SimpleMessageFormatter;
+import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.runtime.JavaRuntime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.notNull;
+import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class TaggedLoggerTest {
 
+    private Framework framework;
+
+    /**
+     * Creates the framework.
+     */
+    @BeforeEach
+    void create() {
+        framework = mock(Framework.class);
+
+        JavaRuntime runtime = new JavaRuntime(mock(InternalLogger.class));
+        when(framework.getRuntime()).thenReturn(runtime);
+
+        ContextStorage storage = new NopContextStorage();
+        when(framework.getContextStorage()).thenReturn(storage);
+    }
+
     /**
      * Tests for category tags.
      */
-    @CaptureLogEntries
     @Nested
     class Tags {
-
-        @Inject
-        private Framework framework;
 
         /**
          * Verifies that a string can be assigned as tag.
          */
         @Test
         void stringTag() {
-            TaggedLogger logger = new TaggedLogger("dummy", framework);
+            when(framework.getLevelVisibilityByTag("dummy")).thenReturn(new LevelVisibility(OutputDetails.DISABLED));
+
+            TaggedLogger logger = new TaggedLogger("dummy", framework, new SimpleMessageFormatter());
             assertThat(logger.getTag()).isEqualTo("dummy");
         }
 
@@ -49,8 +67,10 @@ class TaggedLoggerTest {
          * Verifies that {@code null} can be passed as tag for creating an untagged logger.
          */
         @Test
-        void nullTag() {
-            TaggedLogger logger = new TaggedLogger(null, framework);
+        void untagged() {
+            when(framework.getLevelVisibilityByTag(null)).thenReturn(new LevelVisibility(OutputDetails.DISABLED));
+
+            TaggedLogger logger = new TaggedLogger(null, framework, new SimpleMessageFormatter());
             assertThat(logger.getTag()).isNull();
         }
 
@@ -59,41 +79,28 @@ class TaggedLoggerTest {
     /**
      * Tests for severity levels.
      */
-    @MockitoSettings(strictness = Strictness.LENIENT)
     @Nested
     class Levels {
-
-        @Mock
-        private LoggingBackend backend;
-
-        private final Framework framework = new Framework(false, false) {
-
-            @Override
-            public LoggingBackend getLoggingBackend() {
-                return backend;
-            }
-
-        };
 
         /**
          * Verifies the results of the {@link TaggedLogger#isTraceEnabled()} method.
          *
-         * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getTrace()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isTraceEnabled(boolean enabled, OutputDetails outputDetails) {
-            when(backend.getLevelVisibilityByTag("test")).thenReturn(
+            when(framework.getLevelVisibilityByTag("test")).thenReturn(
                 new LevelVisibility(
                     outputDetails,
                     OutputDetails.DISABLED,
@@ -103,31 +110,31 @@ class TaggedLoggerTest {
                 )
             );
 
-            when(backend.isEnabled(notNull(), eq("test"), eq(Level.TRACE))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), eq("test"), eq(Level.TRACE))).thenReturn(enabled);
 
-            TaggedLogger logger = new TaggedLogger("test", framework);
+            TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
             assertThat(logger.isTraceEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
 
         /**
          * Verifies the results of the {@link TaggedLogger#isDebugEnabled()} method.
          *
-         * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getDebug()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isDebugEnabled(boolean enabled, OutputDetails outputDetails) {
-            when(backend.getLevelVisibilityByTag("test")).thenReturn(
+            when(framework.getLevelVisibilityByTag("test")).thenReturn(
                 new LevelVisibility(
                     OutputDetails.DISABLED,
                     outputDetails,
@@ -137,31 +144,31 @@ class TaggedLoggerTest {
                 )
             );
 
-            when(backend.isEnabled(notNull(), eq("test"), eq(Level.DEBUG))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), eq("test"), eq(Level.DEBUG))).thenReturn(enabled);
 
-            TaggedLogger logger = new TaggedLogger("test", framework);
+            TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
             assertThat(logger.isDebugEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
 
         /**
          * Verifies the results of the {@link TaggedLogger#isInfoEnabled()} method.
          *
-         * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getInfo()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isInfoEnabled(boolean enabled, OutputDetails outputDetails) {
-            when(backend.getLevelVisibilityByTag("test")).thenReturn(
+            when(framework.getLevelVisibilityByTag("test")).thenReturn(
                 new LevelVisibility(
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
@@ -171,31 +178,31 @@ class TaggedLoggerTest {
                 )
             );
 
-            when(backend.isEnabled(notNull(), eq("test"), eq(Level.INFO))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), eq("test"), eq(Level.INFO))).thenReturn(enabled);
 
-            TaggedLogger logger = new TaggedLogger("test", framework);
+            TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
             assertThat(logger.isInfoEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
 
         /**
          * Verifies the results of the {@link TaggedLogger#isWarnEnabled()} method.
          *
-         * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getWarn()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isWarnEnabled(boolean enabled, OutputDetails outputDetails) {
-            when(backend.getLevelVisibilityByTag("test")).thenReturn(
+            when(framework.getLevelVisibilityByTag("test")).thenReturn(
                 new LevelVisibility(
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
@@ -205,31 +212,31 @@ class TaggedLoggerTest {
                 )
             );
 
-            when(backend.isEnabled(notNull(), eq("test"), eq(Level.WARN))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), eq("test"), eq(Level.WARN))).thenReturn(enabled);
 
-            TaggedLogger logger = new TaggedLogger("test", framework);
+            TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
             assertThat(logger.isWarnEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
 
         /**
          * Verifies the results of the {@link TaggedLogger#isErrorEnabled()} method.
          *
-         * @param enabled The value for {@link LoggingBackend#isEnabled(Object, String, Level)}
+         * @param enabled The value for {@link Framework#isEnabled(Object, String, Level)}
          * @param outputDetails The value for {@link LevelVisibility#getError()}
          */
         @ParameterizedTest
         @CsvSource({
-            "false, DISABLED                              ",
-            "true , DISABLED                              ",
-            "false, ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "true , ENABLED_WITHOUT_LOCATION_INFORMATION  ",
-            "false, ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "true , ENABLED_WITH_CALLER_CLASS_NAME        ",
-            "false, ENABLED_WITH_FULL_LOCATION_INFORMATION",
-            "true , ENABLED_WITH_FULL_LOCATION_INFORMATION"
+            "false, DISABLED                       ",
+            "true , DISABLED                       ",
+            "false, ENABLED_WITHOUT_LOCATION_INFO  ",
+            "true , ENABLED_WITHOUT_LOCATION_INFO  ",
+            "false, ENABLED_WITH_CALLER_CLASS_NAME ",
+            "true , ENABLED_WITH_CALLER_CLASS_NAME ",
+            "false, ENABLED_WITH_FULL_LOCATION_INFO",
+            "true , ENABLED_WITH_FULL_LOCATION_INFO"
         })
         void isErrorEnabled(boolean enabled, OutputDetails outputDetails) {
-            when(backend.getLevelVisibilityByTag("test")).thenReturn(
+            when(framework.getLevelVisibilityByTag("test")).thenReturn(
                 new LevelVisibility(
                     OutputDetails.DISABLED,
                     OutputDetails.DISABLED,
@@ -239,9 +246,9 @@ class TaggedLoggerTest {
                 )
             );
 
-            when(backend.isEnabled(notNull(), eq("test"), eq(Level.ERROR))).thenReturn(enabled);
+            when(framework.isEnabled(notNull(), eq("test"), eq(Level.ERROR))).thenReturn(enabled);
 
-            TaggedLogger logger = new TaggedLogger("test", framework);
+            TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
             assertThat(logger.isErrorEnabled()).isEqualTo(outputDetails != OutputDetails.DISABLED && enabled);
         }
 
@@ -253,25 +260,15 @@ class TaggedLoggerTest {
     @Nested
     class LogEntries {
 
-        private static final String TAG = "test";
-
-        @Inject
-        private Framework framework;
-
-        @Inject
-        private Log log;
-
-        private TaggedLogger logger;
+        private LevelVisibility visibility;
 
         /**
-         * Creates the tagged logger instance and clears all trace and debug log entries, which have been issued while
-         * the creation.
+         * Initializes mock for level visibility.
          */
         @BeforeEach
         void init() {
-            logger = new TaggedLogger(TAG, framework);
-            assertThat(log.consume())
-                .allSatisfy(entry -> assertThat(entry.getLevel()).isGreaterThanOrEqualTo(Level.DEBUG));
+            visibility = mock(LevelVisibility.class);
+            when(framework.getLevelVisibilityByTag("test")).thenReturn(visibility);
         }
 
         /**
@@ -283,596 +280,712 @@ class TaggedLoggerTest {
             /**
              * Verifies that a trace log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceTextMessage() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace("Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, null, "Hello World!"));
+
+                verifyLogEntry(Level.TRACE, null, "Hello World!");
             }
 
             /**
              * Verifies that a trace log entry with an object can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
-            void traceObjectMessage() {
+            void traceMessageObject() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(42);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, null, "42"));
+
+                verifyLogEntry(Level.TRACE, null, "42");
             }
 
             /**
              * Verifies that a trace log entry with a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceLazyMessage() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(() -> "Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, null, "Hello World!"));
+
+                verifyLogEntry(Level.TRACE, null, "Hello World!");
             }
 
             /**
              * Verifies that a trace log entry with a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceFormattedMessageWithArgument() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace("Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, null, "Hello Alice!"));
+
+                verifyLogEntry(Level.TRACE, null, "Hello Alice!");
             }
 
             /**
              * Verifies that a trace log entry with a message with placeholders and lazy arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceFormattedMessageWithLazyArgument() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace("Hello {}!", () -> "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, null, "Hello Alice!"));
+
+                verifyLogEntry(Level.TRACE, null, "Hello Alice!");
             }
 
             /**
              * Verifies that a trace log entry with an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceException() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, exception, null));
+
+                verifyLogEntry(Level.TRACE, exception, null);
             }
 
             /**
              * Verifies that a trace log entry with an exception and a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceExceptionAndTextMessage() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(exception, "Oops!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, exception, "Oops!"));
+
+                verifyLogEntry(Level.TRACE, exception, "Oops!");
             }
 
             /**
              * Verifies that a trace log entry with an exception and a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceExceptionAndLazyMessage() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(exception, () -> "Oops!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, exception, "Oops!"));
+
+                verifyLogEntry(Level.TRACE, exception, "Oops!");
             }
 
             /**
              * Verifies that a trace log entry with an exception and a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceExceptionAndFormattedMessageWithArgument() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(exception, "Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, exception, "Hello Alice!"));
+
+                verifyLogEntry(Level.TRACE, exception, "Hello Alice!");
             }
 
             /**
              * Verifies that a trace log entry with an exception and a message with placeholders and lazy arguments can
              * be issued.
              */
-            @CaptureLogEntries(level = Level.TRACE)
             @Test
             void traceExceptionAndFormattedMessageWithLazyArgument() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(exception, "Hello {}!", () -> "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.TRACE, exception, "Hello Alice!"));
+
+                verifyLogEntry(Level.TRACE, exception, "Hello Alice!");
             }
 
             /**
              * Verifies that a debug log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void debugTextMessage() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug("Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, null, "Hello World!"));
+
+                verifyLogEntry(Level.DEBUG, null, "Hello World!");
             }
 
             /**
              * Verifies that a debug log entry with an object can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
-            void debugObjectMessage() {
+            void debugMessageObject() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(42);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, null, "42"));
+
+                verifyLogEntry(Level.DEBUG, null, "42");
             }
 
             /**
              * Verifies that a debug log entry with a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void debugLazyMessage() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(() -> "Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, null, "Hello World!"));
+
+                verifyLogEntry(Level.DEBUG, null, "Hello World!");
             }
 
             /**
              * Verifies that a debug log entry with a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void debugFormattedMessageWithArgument() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug("Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, null, "Hello Alice!"));
+
+                verifyLogEntry(Level.DEBUG, null, "Hello Alice!");
             }
 
             /**
              * Verifies that a debug log entry with a message with placeholders and lazy arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void debugFormattedMessageWithLazyArgument() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug("Hello {}!", () -> "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, null, "Hello Alice!"));
+
+                verifyLogEntry(Level.DEBUG, null, "Hello Alice!");
             }
 
             /**
              * Verifies that a debug log entry with an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void debugException() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, exception, null));
+
+                verifyLogEntry(Level.DEBUG, exception, null);
             }
 
             /**
              * Verifies that a debug log entry with an exception and a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void debugExceptionAndTextMessage() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(exception, "Oops!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, exception, "Oops!"));
+
+                verifyLogEntry(Level.DEBUG, exception, "Oops!");
             }
 
             /**
              * Verifies that a debug log entry with an exception and a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void debugExceptionAndLazyMessage() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(exception, () -> "Oops!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, exception, "Oops!"));
+
+                verifyLogEntry(Level.DEBUG, exception, "Oops!");
             }
 
             /**
              * Verifies that a debug log entry with an exception and a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void debugExceptionAndFormattedMessageWithArgument() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(exception, "Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, exception, "Hello Alice!"));
+
+                verifyLogEntry(Level.DEBUG, exception, "Hello Alice!");
             }
 
             /**
              * Verifies that a debug log entry with an exception and a message with placeholders and lazy arguments can
              * be issued.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void debugExceptionAndFormattedMessageWithLazyArgument() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(exception, "Hello {}!", () -> "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.DEBUG, exception, "Hello Alice!"));
+
+                verifyLogEntry(Level.DEBUG, exception, "Hello Alice!");
             }
 
             /**
              * Verifies that an info log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void infoTextMessage() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info("Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, null, "Hello World!"));
+
+                verifyLogEntry(Level.INFO, null, "Hello World!");
             }
 
             /**
              * Verifies that an info log entry with an object can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
-            void infoObjectMessage() {
+            void infoMessageObject() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(42);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, null, "42"));
+
+                verifyLogEntry(Level.INFO, null, "42");
             }
 
             /**
              * Verifies that an info log entry with a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void infoLazyMessage() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(() -> "Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, null, "Hello World!"));
+
+                verifyLogEntry(Level.INFO, null, "Hello World!");
             }
 
             /**
              * Verifies that an info log entry with a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void infoFormattedMessageWithArgument() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info("Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, null, "Hello Alice!"));
+
+                verifyLogEntry(Level.INFO, null, "Hello Alice!");
             }
 
             /**
              * Verifies that an info log entry with a message with placeholders and lazy arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void infoFormattedMessageWithLazyArgument() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info("Hello {}!", () -> "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, null, "Hello Alice!"));
+
+                verifyLogEntry(Level.INFO, null, "Hello Alice!");
             }
 
             /**
              * Verifies that an info log entry with an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void infoException() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, exception, null));
+
+                verifyLogEntry(Level.INFO, exception, null);
             }
 
             /**
              * Verifies that an info log entry with an exception and a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void infoExceptionAndTextMessage() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(exception, "Oops!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, exception, "Oops!"));
+
+                verifyLogEntry(Level.INFO, exception, "Oops!");
             }
 
             /**
              * Verifies that an info log entry with an exception and a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void infoExceptionAndLazyMessage() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(exception, () -> "Oops!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, exception, "Oops!"));
+
+                verifyLogEntry(Level.INFO, exception, "Oops!");
             }
 
             /**
              * Verifies that an info log entry with an exception and a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void infoExceptionAndFormattedMessageWithArgument() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(exception, "Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, exception, "Hello Alice!"));
+
+                verifyLogEntry(Level.INFO, exception, "Hello Alice!");
             }
 
             /**
              * Verifies that an info log entry with an exception and a message with placeholders and lazy arguments can
              * be issued.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void infoExceptionAndFormattedMessageWithLazyArgument() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(exception, "Hello {}!", () -> "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.INFO, exception, "Hello Alice!"));
+
+                verifyLogEntry(Level.INFO, exception, "Hello Alice!");
             }
 
             /**
              * Verifies that a warning log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void warnTextMessage() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn("Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, null, "Hello World!"));
+
+                verifyLogEntry(Level.WARN, null, "Hello World!");
             }
 
             /**
              * Verifies that a warning log entry with an object can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
-            void warnObjectMessage() {
+            void warnMessageObject() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(42);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, null, "42"));
+
+                verifyLogEntry(Level.WARN, null, "42");
             }
 
             /**
              * Verifies that a warning log entry with a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void warnLazyMessage() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(() -> "Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, null, "Hello World!"));
+
+                verifyLogEntry(Level.WARN, null, "Hello World!");
             }
 
             /**
              * Verifies that a warning log entry with a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void warnFormattedMessageWithArgument() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn("Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, null, "Hello Alice!"));
+
+                verifyLogEntry(Level.WARN, null, "Hello Alice!");
             }
 
             /**
              * Verifies that a warning log entry with a message with placeholders and lazy arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void warnFormattedMessageWithLazyArgument() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn("Hello {}!", () -> "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, null, "Hello Alice!"));
+
+                verifyLogEntry(Level.WARN, null, "Hello Alice!");
             }
 
             /**
              * Verifies that a warning log entry with an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void warnException() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, exception, null));
+
+                verifyLogEntry(Level.WARN, exception, null);
             }
 
             /**
              * Verifies that a warning log entry with an exception and a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void warnExceptionAndTextMessage() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(exception, "Oops!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, exception, "Oops!"));
+
+                verifyLogEntry(Level.WARN, exception, "Oops!");
             }
 
             /**
              * Verifies that a warning log entry with an exception and a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void warnExceptionAndLazyMessage() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(exception, () -> "Oops!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, exception, "Oops!"));
+
+                verifyLogEntry(Level.WARN, exception, "Oops!");
             }
 
             /**
              * Verifies that a warning log entry with an exception and a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void warnExceptionAndFormattedMessageWithArgument() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(exception, "Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, exception, "Hello Alice!"));
+
+                verifyLogEntry(Level.WARN, exception, "Hello Alice!");
             }
 
             /**
              * Verifies that a warning log entry with an exception and a message with placeholders and lazy arguments
              * can be issued.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void warnExceptionAndFormattedMessageWithLazyArgument() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(exception, "Hello {}!", () -> "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.WARN, exception, "Hello Alice!"));
+
+                verifyLogEntry(Level.WARN, exception, "Hello Alice!");
             }
 
             /**
              * Verifies that an error log entry with a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void errorTextMessage() {
+                when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error("Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, null, "Hello World!"));
+
+                verifyLogEntry(Level.ERROR, null, "Hello World!");
             }
 
             /**
              * Verifies that an error log entry with an object can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
-            void errorObjectMessage() {
+            void errorMessageObject() {
+                when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(42);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, null, "42"));
+
+                verifyLogEntry(Level.ERROR, null, "42");
             }
 
             /**
              * Verifies that an error log entry with a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void errorLazyMessage() {
+                when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(() -> "Hello World!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, null, "Hello World!"));
+
+                verifyLogEntry(Level.ERROR, null, "Hello World!");
             }
 
             /**
              * Verifies that an error log entry with a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void errorFormattedMessageWithArgument() {
+                when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error("Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, null, "Hello Alice!"));
+
+                verifyLogEntry(Level.ERROR, null, "Hello Alice!");
             }
 
             /**
              * Verifies that an error log entry with a message with placeholders and lazy arguments can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void errorFormattedMessageWithLazyArgument() {
+                when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error("Hello {}!", () -> "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, null, "Hello Alice!"));
+
+                verifyLogEntry(Level.ERROR, null, "Hello Alice!");
             }
 
             /**
              * Verifies that an error log entry with an exception can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void errorException() {
+                when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(exception);
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, exception, null));
+
+                verifyLogEntry(Level.ERROR, exception, null);
             }
 
             /**
              * Verifies that an error log entry with an exception and a plain text message can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void errorExceptionAndTextMessage() {
+                when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(exception, "Oops!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, exception, "Oops!"));
+
+                verifyLogEntry(Level.ERROR, exception, "Oops!");
             }
 
             /**
              * Verifies that an error log entry with an exception and a lazy text message can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void errorExceptionAndLazyMessage() {
+                when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(exception, () -> "Oops!");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, exception, "Oops!"));
+
+                verifyLogEntry(Level.ERROR, exception, "Oops!");
             }
 
             /**
              * Verifies that an error log entry with an exception and a message with placeholders can be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void errorExceptionAndFormattedMessageWithArgument() {
+                when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(exception, "Hello {}!", "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, exception, "Hello Alice!"));
+
+                verifyLogEntry(Level.ERROR, exception, "Hello Alice!");
             }
 
             /**
              * Verifies that an error log entry with an exception and a message with placeholders and lazy arguments can
              * be issued.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void errorExceptionAndFormattedMessageWithLazyArgument() {
+                when(visibility.getError()).thenReturn(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
+
                 Exception exception = new Exception();
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(exception, "Hello {}!", () -> "Alice");
-                assertThat(log.consume())
-                    .containsExactly(createLogEntry(Level.ERROR, exception, "Hello Alice!"));
+
+                verifyLogEntry(Level.ERROR, exception, "Hello Alice!");
             }
 
             /**
-             * Creates a new log entry.
+             * Verifies backend mock invocation with expected log entry values.
              *
-             * @param level     Severity level
-             * @param exception Exception or any other kind of throwable
-             * @param message   Text message
-             * @return Created log entry
+             * @param level The expected severity level
+             * @param exception The expected exception
+             * @param message The expected rendered text message
              */
-            private LogEntry createLogEntry(Level level, Throwable exception, String message) {
-                return new LogEntry(Enabled.class.getName(), TAG, level, exception, message);
+            private void verifyLogEntry(Level level, Exception exception, String message) {
+                ArgumentCaptor<LogEntry> captor = ArgumentCaptor.forClass(LogEntry.class);
+
+                verify(framework, atMostOnce()).getLevelVisibilityByTag(null);
+                verify(framework).submit(captor.capture());
+
+                assertThat(captor.getAllValues()).singleElement().satisfies(entry -> {
+                    assertThat(entry.getThread()).isSameAs(Thread.currentThread());
+                    assertThat(entry.getContext()).isEmpty();
+                    assertThat(entry.getClassName()).isEqualTo(TaggedLoggerTest.LogEntries.Enabled.class.getName());
+                    assertThat(entry.getMethodName()).isNull();
+                    assertThat(entry.getFileName()).isNull();
+                    assertThat(entry.getLineNumber()).isEqualTo(-1);
+                    assertThat(entry.getTag()).isEqualTo("test");
+                    assertThat(entry.getSeverityLevel()).isEqualTo(level);
+                    assertThat(entry.getThrowable()).isSameAs(exception);
+                    assertThat(entry.getFormattedMessage(mock(Configuration.class))).isEqualTo(message);
+                });
             }
 
         }
+
 
         /**
          * Tests discarding log entries if the assigned severity level is disabled.
@@ -884,540 +997,697 @@ class TaggedLoggerTest {
              * Verifies that a trace log entry with a plain text message is discarded if the trace severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceTextMessage() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace("Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a trace log entry with an object is discarded if the trace severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
-            void traceObjectMessage() {
+            void traceMessageObject() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(42);
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a trace log entry with a lazy text message is discarded if the trace severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceLazyMessage() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(() -> "Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a trace log entry with a message with placeholders is discarded if the trace severity level
              * is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceFormattedMessageWithArgument() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace("Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a trace log entry with a message with placeholders and lazy arguments is discarded if the
              * trace severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceFormattedMessageWithLazyArgument() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace("Hello {}!", () -> "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a trace log entry with an exception is discarded if the trace severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceException() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(new Exception());
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a trace log entry with an exception and a plain text message is discarded if the trace
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceExceptionAndTextMessage() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(new Exception(), "Oops!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a trace log entry with an exception and a lazy text message is discarded if the trace
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceExceptionAndLazyMessage() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(new Exception(), () -> "Oops!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a trace log entry with an exception and a message with placeholders is discarded if the
              * trace severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceExceptionAndFormattedMessageWithArgument() {
-                logger.trace(new Exception(), "Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
+                logger.trace(new Exception(), "Hello Alice!");
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a trace log entry with an exception and a message with placeholders and lazy arguments is
              * discarded if the trace severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.DEBUG)
             @Test
             void traceExceptionAndFormattedMessageWithLazyArgument() {
+                when(visibility.getTrace()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.trace(new Exception(), "Hello {}!", () -> "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
-             * Verifies that a debug log entry with a plain text message is discarded if the trace severity level is
+             * Verifies that a debug log entry with a plain text message is discarded if the debug severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugTextMessage() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug("Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a debug log entry with an object is discarded if the debug severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
-            void debugObjectMessage() {
+            void debugMessageObject() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(42);
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a debug log entry with a lazy text message is discarded if the debug severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugLazyMessage() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(() -> "Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a debug log entry with a message with placeholders is discarded if the debug severity level
              * is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugFormattedMessageWithArgument() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug("Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a debug log entry with a message with placeholders and lazy arguments is discarded if the
              * debug severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugFormattedMessageWithLazyArgument() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug("Hello {}!", () -> "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a debug log entry with an exception is discarded if the debug severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugException() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(new Exception());
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a debug log entry with an exception and a plain text message is discarded if the debug
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugExceptionAndTextMessage() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(new Exception(), "Oops!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a debug log entry with an exception and a lazy text message is discarded if the debug
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugExceptionAndLazyMessage() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(new Exception(), () -> "Oops!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a debug log entry with an exception and a message with placeholders is discarded if the
              * debug severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugExceptionAndFormattedMessageWithArgument() {
-                logger.debug(new Exception(), "Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
+                logger.debug(new Exception(), "Hello Alice!");
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a debug log entry with an exception and a message with placeholders and lazy arguments is
              * discarded if the debug severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.INFO)
             @Test
             void debugExceptionAndFormattedMessageWithLazyArgument() {
+                when(visibility.getDebug()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.debug(new Exception(), "Hello {}!", () -> "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an info log entry with a plain text message is discarded if the info severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoTextMessage() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info("Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an info log entry with an object is discarded if the info severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
-            void infoObjectMessage() {
+            void infoMessageObject() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(42);
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an info log entry with a lazy text message is discarded if the info severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoLazyMessage() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(() -> "Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an info log entry with a message with placeholders is discarded if the info severity level
              * is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoFormattedMessageWithArgument() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info("Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an info log entry with a message with placeholders and lazy arguments is discarded if the
              * info severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoFormattedMessageWithLazyArgument() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info("Hello {}!", () -> "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an info log entry with an exception is discarded if the info severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoException() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(new Exception());
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an info log entry with an exception and a plain text message is discarded if the info
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoExceptionAndTextMessage() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(new Exception(), "Oops!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an info log entry with an exception and a lazy text message is discarded if the info
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoExceptionAndLazyMessage() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(new Exception(), () -> "Oops!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an info log entry with an exception and a message with placeholders is discarded if the
              * info severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoExceptionAndFormattedMessageWithArgument() {
-                logger.info(new Exception(), "Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
+                logger.info(new Exception(), "Hello Alice!");
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an info log entry with an exception and a message with placeholders and lazy arguments is
              * discarded if the info severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.WARN)
             @Test
             void infoExceptionAndFormattedMessageWithLazyArgument() {
+                when(visibility.getInfo()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.info(new Exception(), "Hello {}!", () -> "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a warning log entry with a plain text message is discarded if the warn severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnTextMessage() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn("Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a warning log entry with an object is discarded if the warn severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
-            void warnObjectMessage() {
+            void warnMessageObject() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(42);
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a warning log entry with a lazy text message is discarded if the warn severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnLazyMessage() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(() -> "Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a warning log entry with a message with placeholders is discarded if the warn severity
              * level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnFormattedMessageWithArgument() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn("Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a warning log entry with a message with placeholders and lazy arguments is discarded if the
              * warn severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnFormattedMessageWithLazyArgument() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn("Hello {}!", () -> "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a warning log entry with an exception is discarded if the warn severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnException() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(new Exception());
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a warning log entry with an exception and a plain text message is discarded if the warn
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnExceptionAndTextMessage() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(new Exception(), "Oops!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a warning log entry with an exception and a lazy text message is discarded if the warn
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnExceptionAndLazyMessage() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(new Exception(), () -> "Oops!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a warning log entry with an exception and a message with placeholders is discarded if the
              * warn severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnExceptionAndFormattedMessageWithArgument() {
-                logger.warn(new Exception(), "Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
+                logger.warn(new Exception(), "Hello Alice!");
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that a warning log entry with an exception and a message with placeholders and lazy arguments is
              * discarded if the warn severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.ERROR)
             @Test
             void warnExceptionAndFormattedMessageWithLazyArgument() {
+                when(visibility.getWarn()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.warn(new Exception(), "Hello {}!", () -> "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an error log entry with a plain text message is discarded if the error severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorTextMessage() {
+                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error("Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an error log entry with an object is discarded if the error severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
-            void errorObjectMessage() {
+            void errorMessageObject() {
+                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(42);
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an error log entry with a lazy text message is discarded if the error severity level is
              * disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorLazyMessage() {
+                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(() -> "Hello World!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an error log entry with a message with placeholders is discarded if the error severity
              * level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorFormattedMessageWithArgument() {
+                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error("Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an error log entry with a message with placeholders and lazy arguments is discarded if the
              * error severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorFormattedMessageWithLazyArgument() {
+                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error("Hello {}!", () -> "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an error log entry with an exception is discarded if the error severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorException() {
+                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(new Exception());
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an error log entry with an exception and a plain text message is discarded if the error
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorExceptionAndTextMessage() {
+                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(new Exception(), "Oops!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an error log entry with an exception and a lazy text message is discarded if the error
              * severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorExceptionAndLazyMessage() {
+                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(new Exception(), () -> "Oops!");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an error log entry with an exception and a message with placeholders is discarded if the
              * error severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorExceptionAndFormattedMessageWithArgument() {
-                logger.error(new Exception(), "Hello {}!", "Alice");
-                assertThat(log.consume()).isEmpty();
+                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
+                logger.error(new Exception(), "Hello Alice!");
+
+                verifyNoLogEntry();
             }
 
             /**
              * Verifies that an error log entry with an exception and a message with placeholders and lazy arguments is
              * discarded if the error severity level is disabled.
              */
-            @CaptureLogEntries(level = Level.OFF)
             @Test
             void errorExceptionAndFormattedMessageWithLazyArgument() {
+                when(visibility.getError()).thenReturn(OutputDetails.DISABLED);
+
+                TaggedLogger logger = new TaggedLogger("test", framework, new SimpleMessageFormatter());
                 logger.error(new Exception(), "Hello {}!", () -> "Alice");
-                assertThat(log.consume()).isEmpty();
+
+                verifyNoLogEntry();
+            }
+
+            /**
+             * Verifies that no log entry has been submitted.
+             */
+            private void verifyNoLogEntry() {
+                verify(framework, never()).submit(any());
             }
 
         }

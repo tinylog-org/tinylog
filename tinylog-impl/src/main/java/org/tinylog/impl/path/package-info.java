@@ -1,4 +1,4 @@
 /**
- * Path parser for generating dynamic paths to the log file for {@link org.tinylog.impl.writers.file.FileWriter}.
+ * Generation of dynamic log file paths for {@link org.tinylog.impl.writer.file.FileWriter}.
  */
 package org.tinylog.impl.path;

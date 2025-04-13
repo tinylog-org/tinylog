@@ -1,9 +1,7 @@
 package org.tinylog.impl.format;
 
-import java.util.Set;
-
-import org.tinylog.impl.LogEntry;
-import org.tinylog.impl.LogEntryValue;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.backend.OutputDetails;
 
 /**
  * Formatter for outputting log entries.
@@ -11,21 +9,16 @@ import org.tinylog.impl.LogEntryValue;
 public interface OutputFormat {
 
     /**
-     * Returns a set with all required log entry properties used by this output format.
+     * Returns the output details for this output format.
      *
      * <p>
-     *     For performance optimization, tinylog may not set properties of {@link LogEntry} instances that are not
-     *     define as required.
+     *     tinylog calls this method only once during the initialization phase and assumes that the output details will
+     *     never change afterwards.
      * </p>
      *
-     * <p>
-     *     tinylog calls this method only once during the initialization phase and assumes that the set of required log
-     *     entry properties will never change afterwards.
-     * </p>
-     *
-     * @return The set of all required log entry properties
+     * @return The output detail for this output format
      */
-    Set<LogEntryValue> getRequiredLogEntryValues();
+    OutputDetails getOutputDetails();
 
     /**
      * Renders this output format for a passed log entry.

@@ -1,12 +1,14 @@
 package org.tinylog.core.format.message;
 
-import org.tinylog.core.internal.LoggingContext;
+import java.util.function.Supplier;
+
+import org.tinylog.core.Configuration;
 
 /**
  * Simple message formatter that just replaces '{}' placeholders with passed arguments.
  *
  * <p>
- *     Neither custom formats nor quoting are supported.
+ *     Neither custom formats nor quoting is supported.
  * </p>
  */
 public class SimpleMessageFormatter implements MessageFormatter {
@@ -16,7 +18,7 @@ public class SimpleMessageFormatter implements MessageFormatter {
     }
 
     @Override
-    public String format(LoggingContext context, String message, Object... arguments) {
+    public String format(Configuration configuration, String message, Object... arguments) {
         int length = message.length();
         StringBuilder builder = new StringBuilder(length);
 
@@ -30,7 +32,8 @@ public class SimpleMessageFormatter implements MessageFormatter {
                 && message.charAt(messageIndex + 1) == '}'
                 && argumentIndex < arguments.length
             ) {
-                builder.append(arguments[argumentIndex++]);
+                String value = render(arguments[argumentIndex++]);
+                builder.append(value);
                 messageIndex += 2;
             } else {
                 builder.append(character);
@@ -39,6 +42,20 @@ public class SimpleMessageFormatter implements MessageFormatter {
         }
 
         return builder.toString();
+    }
+
+    /**
+     * Renders a value as string.
+     *
+     * @param value The object to render
+     * @return The formatted representation of the passed value
+     */
+    private String render(Object value) {
+        if (value instanceof Supplier<?>) {
+            value = ((Supplier<?>) value).get();
+        }
+
+        return String.valueOf(value);
     }
 
 }

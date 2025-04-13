@@ -4,27 +4,27 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 
-import javax.inject.Inject;
-
 import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.tinylog.core.internal.LoggingContext;
-import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.core.test.log.TestClock;
+import org.tinylog.core.backend.TinylogContext;
+import org.tinylog.test.junit.log.TestClock;
+import org.tinylog.test.junit.log.Tinylog;
+
+import jakarta.inject.Inject;
 
 import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CaptureLogEntries(configuration = "zone=UTC")
+@Tinylog
 class DynamicPathTest {
 
     @TempDir
     private Path directory;
 
     @Inject
-    private LoggingContext context;
+    private TinylogContext context;
 
     /**
      * Tests for {@link  DynamicPath#getLatestPath()}.
@@ -118,7 +118,7 @@ class DynamicPathTest {
          */
         @Test
         void generateDynamicPath() throws Exception {
-            clock.setInstant(Instant.EPOCH);
+            clock.fixTo(Instant.EPOCH);
 
             DynamicPath path = new DynamicPath(context, directory + "/{date: yyyy-MM-dd}.log");
             assertThat(path.generateNewPath()).isEqualTo(directory.resolve("1970-01-01.log"));
@@ -131,6 +131,7 @@ class DynamicPathTest {
         void createDirectories() throws Exception {
             Path file = directory.resolve("sub").resolve("folder").resolve("foo.log");
             DynamicPath path = new DynamicPath(context, file.toString());
+
             assertThat(path.generateNewPath())
                 .isEqualTo(file)
                 .doesNotExist()

@@ -4,8 +4,8 @@ import java.util.function.BiConsumer;
 
 /**
  * Abstract parser for parsing format patterns with placeholders in curly brackets. Phrases including curly brackets
- * can be escaped by wrapping them in single quotes ('). Two directly consecutive single quotes ('') are output as one
- * single quote.
+ * can be escaped by wrapping them in single quotes ({@code '}). Two directly consecutive single quotes ({@code ''}) are
+ * output as one single quote.
  *
  * <p>Example format pattern with placeholders:</p>
  * <pre><code>Hello {foo}!</code></pre>
@@ -22,12 +22,12 @@ public abstract class AbstractPatternParser {
 
     /**
      * Parses a format pattern. For each found placeholder that is wrapped in curly brackets, the passed placeholder
-     * consumer is called with the actual used string builder and the found placeholder (without the wrapped curly
+     * consumer is called with the actual used string builder and the found placeholder (without any wrapped curly
      * brackets) as arguments.
      *
      * @param pattern The format pattern to parse
      * @param placeholderConsumer The callback for found placeholders
-     * @return The used string builder containing the resolved text
+     * @return New string builder containing the resolved text
      */
     protected StringBuilder parse(String pattern, BiConsumer<StringBuilder, String> placeholderConsumer) {
         int length = pattern.length();
@@ -60,10 +60,10 @@ public abstract class AbstractPatternParser {
     }
 
     /**
-     * Finds the next single quote (').
+     * Finds the next single quote ({@code '}).
      *
      * @param message The text in which to search for a single quote
-     * @param start The position from which the search is to be started
+     * @param start The position from which to start the search
      * @return Position of the found single quote or -1 if none could be found
      */
     protected static int findClosingQuote(String message, int start) {
@@ -71,11 +71,11 @@ public abstract class AbstractPatternParser {
     }
 
     /**
-     * Finds the next closing curly bracket '{'.
+     * Finds the next closing curly bracket '<code>{</code>'.
      *
      * @param message The text in which to search for a closing curly bracket
-     * @param start The included position from which the search is to be started
-     * @param end The excluded position at which the search is to be stopped
+     * @param start The included position from which to start the search
+     * @param end The excluded position at which to stop the search
      * @return Position of the found closing curly bracket or -1 if none could be found
      */
     protected static int findClosingCurlyBracket(String message, int start, int end) {

@@ -2,6 +2,8 @@ package org.tinylog.core.loader;
 
 import java.util.Map;
 
+import org.tinylog.core.internal.InternalLogger;
+
 /**
  * Service interface for loading configurations.
  *
@@ -24,10 +26,11 @@ public interface ConfigurationLoader {
     /**
      * Tries to load the configuration for tinylog.
      *
-     * @param loader The class loader to use for loading the service files and service implementation classes
+     * @param loader The class loader to use for loading resource files and service implementations
+     * @param logger The internal logger instance for issuing internal tinylog log entries
      * @return The loaded configuration as map if any configuration could be found and successfully loaded, or
      *         {@code null} if there is no suitable configuration
      */
-    Map<String, String> load(ClassLoader loader);
+    Map<String, String> load(ClassLoader loader, InternalLogger logger);
 
 }

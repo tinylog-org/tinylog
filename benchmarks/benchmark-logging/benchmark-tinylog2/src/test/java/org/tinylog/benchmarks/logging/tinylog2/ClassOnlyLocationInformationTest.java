@@ -50,7 +50,7 @@ class ClassOnlyLocationInformationTest {
     @Order(1)
     void discard() throws InterruptedException {
         benchmark.discard();
-        Thread.sleep(10);
+        Thread.sleep(100);
 
         String logFile = benchmark.getLogFile();
         assertThat(logFile).isNotNull();
@@ -66,7 +66,7 @@ class ClassOnlyLocationInformationTest {
     @Order(2)
     void output() throws InterruptedException {
         benchmark.output();
-        Thread.sleep(10);
+        Thread.sleep(100);
 
         String logFile = benchmark.getLogFile();
         assertThat(logFile).isNotNull();

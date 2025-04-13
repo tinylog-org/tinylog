@@ -1,277 +1,173 @@
 package org.tinylog.core.internal;
 
-import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.tinylog.core.Framework;
+import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
-import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.core.test.log.Log;
-import org.tinylog.core.test.log.LogEntry;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.TaskExecutor;
+import org.tinylog.core.backend.LevelVisibility;
+import org.tinylog.core.backend.LoggingBackend;
+import org.tinylog.core.backend.OutputDetails;
+import org.tinylog.core.context.ContextStorage;
+import org.tinylog.core.context.NopContextStorage;
+import org.tinylog.test.util.SynchronousTaskExecutor;
 
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class InternalLoggerTest {
 
-    @Inject
-    private Framework framework;
-
-    @Inject
-    private Log log;
-
     /**
-     * Verifies that a trace log entry with a plain text message can be issued.
+     * Logs a plain text message without any arguments.
      */
-    @CaptureLogEntries(level = Level.TRACE)
     @Test
-    void traceMessage() {
-        InternalLogger.trace(null, "Hello World!");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.TRACE, null, "Hello World!"));
+    void logTextMessageWithoutArguments() {
+        ListLoggingBackend backend = new ListLoggingBackend();
+        TaskExecutor executor = new SynchronousTaskExecutor(backend);
+        InternalLogger logger = new InternalLogger(executor);
+        Configuration configuration = new Configuration(emptyMap(), logger);
+
+        logger.log(Level.INFO, "Hello World!");
+
+        assertThat(backend.entries).singleElement().satisfies(entry -> {
+            assertThat(entry.getThread()).isEqualTo(Thread.currentThread());
+            assertThat(entry.getContext()).isEmpty();
+            assertThat(entry.getClassName()).isEqualTo(InternalLoggerTest.class.getName());
+            assertThat(entry.getMethodName()).isEqualTo("logTextMessageWithoutArguments");
+            assertThat(entry.getFileName()).isEqualTo("InternalLoggerTest.java");
+            assertThat(entry.getLineNumber()).isEqualTo(33);
+            assertThat(entry.getTag()).isEqualTo("tinylog");
+            assertThat(entry.getSeverityLevel()).isEqualTo(Level.INFO);
+            assertThat(entry.getThrowable()).isNull();
+            assertThat(entry.getFormattedMessage(configuration)).isEqualTo("Hello World!");
+        });
     }
 
     /**
-     * Verifies that a trace log entry with a placeholder message and arguments can be issued.
+     * Logs a formatted text message with arguments.
      */
-    @CaptureLogEntries(level = Level.TRACE)
     @Test
-    void traceMessageWithArguments() {
-        InternalLogger.trace(null, "Hello {}!", "Alice");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.TRACE, null, "Hello Alice!"));
+    void logTextMessageWithArguments() {
+        ListLoggingBackend backend = new ListLoggingBackend();
+        TaskExecutor executor = new SynchronousTaskExecutor(backend);
+        InternalLogger logger = new InternalLogger(executor);
+        Configuration configuration = new Configuration(emptyMap(), logger);
+
+        logger.log(Level.DEBUG, "{} + {} = {}", 1, 1, 2);
+
+        assertThat(backend.entries).singleElement().satisfies(entry -> {
+            assertThat(entry.getThread()).isEqualTo(Thread.currentThread());
+            assertThat(entry.getContext()).isEmpty();
+            assertThat(entry.getClassName()).isEqualTo(InternalLoggerTest.class.getName());
+            assertThat(entry.getMethodName()).isEqualTo("logTextMessageWithArguments");
+            assertThat(entry.getFileName()).isEqualTo("InternalLoggerTest.java");
+            assertThat(entry.getLineNumber()).isEqualTo(59);
+            assertThat(entry.getTag()).isEqualTo("tinylog");
+            assertThat(entry.getSeverityLevel()).isEqualTo(Level.DEBUG);
+            assertThat(entry.getThrowable()).isNull();
+            assertThat(entry.getFormattedMessage(configuration)).isEqualTo("1 + 1 = 2");
+        });
     }
 
     /**
-     * Verifies that a trace log entry with an exception and a custom text message can be issued.
+     * Logs an exception and a plain text message without any arguments.
      */
-    @CaptureLogEntries(level = Level.TRACE)
     @Test
-    void traceExceptionAndMessage() {
+    void logExceptionAndMessageWithoutArguments() {
+        ListLoggingBackend backend = new ListLoggingBackend();
+        TaskExecutor executor = new SynchronousTaskExecutor(backend);
+        InternalLogger logger = new InternalLogger(executor);
+        Configuration configuration = new Configuration(emptyMap(), logger);
+
         Exception exception = new Exception();
-        InternalLogger.trace(exception, "Oops!");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.TRACE, exception, "Oops!"));
+        logger.log(Level.ERROR, exception, "Oops!");
+
+        assertThat(backend.entries).singleElement().satisfies(entry -> {
+            assertThat(entry.getThread()).isEqualTo(Thread.currentThread());
+            assertThat(entry.getContext()).isEmpty();
+            assertThat(entry.getClassName()).isEqualTo(InternalLoggerTest.class.getName());
+            assertThat(entry.getMethodName()).isEqualTo("logExceptionAndMessageWithoutArguments");
+            assertThat(entry.getFileName()).isEqualTo("InternalLoggerTest.java");
+            assertThat(entry.getLineNumber()).isEqualTo(86);
+            assertThat(entry.getTag()).isEqualTo("tinylog");
+            assertThat(entry.getSeverityLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getThrowable()).isSameAs(exception);
+            assertThat(entry.getFormattedMessage(configuration)).isEqualTo("Oops!");
+        });
     }
 
     /**
-     * Verifies that no trace log entries wil be issued, if the trace severity level is disabled.
+     * Logs an exception and a formatted text message but with arguments.
      */
-    @CaptureLogEntries(level = Level.DEBUG)
     @Test
-    void traceDisabled() {
-        InternalLogger.trace(null, "Hello World!");
-        InternalLogger.trace(null, "Hello {}!", "Alice");
+    void logExceptionAndMessageWithArguments() {
+        ListLoggingBackend backend = new ListLoggingBackend();
+        TaskExecutor executor = new SynchronousTaskExecutor(backend);
+        InternalLogger logger = new InternalLogger(executor);
+        Configuration configuration = new Configuration(emptyMap(), logger);
 
-        assertThat(log.consume()).isEmpty();
-    }
-
-    /**
-     * Verifies that a debug log entry with a plain text message can be issued.
-     */
-    @CaptureLogEntries(level = Level.DEBUG)
-    @Test
-    void debugMessage() {
-        InternalLogger.debug(null, "Hello World!");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.DEBUG, null, "Hello World!"));
-    }
-
-    /**
-     * Verifies that a debug log entry with a placeholder message and arguments can be issued.
-     */
-    @CaptureLogEntries(level = Level.DEBUG)
-    @Test
-    void debugMessageWithArguments() {
-        InternalLogger.debug(null, "Hello {}!", "Alice");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.DEBUG, null, "Hello Alice!"));
-    }
-
-    /**
-     * Verifies that a debug log entry with an exception and a custom text message can be issued.
-     */
-    @CaptureLogEntries(level = Level.DEBUG)
-    @Test
-    void debugExceptionAndMessage() {
         Exception exception = new Exception();
-        InternalLogger.debug(exception, "Oops!");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.DEBUG, exception, "Oops!"));
+        logger.log(Level.ERROR, exception, "Failed to handle <{}> and <{}>", "foo", "bar");
+
+        assertThat(backend.entries).singleElement().satisfies(entry -> {
+            assertThat(entry.getThread()).isEqualTo(Thread.currentThread());
+            assertThat(entry.getContext()).isEmpty();
+            assertThat(entry.getClassName()).isEqualTo(InternalLoggerTest.class.getName());
+            assertThat(entry.getMethodName()).isEqualTo("logExceptionAndMessageWithArguments");
+            assertThat(entry.getFileName()).isEqualTo("InternalLoggerTest.java");
+            assertThat(entry.getLineNumber()).isEqualTo(113);
+            assertThat(entry.getTag()).isEqualTo("tinylog");
+            assertThat(entry.getSeverityLevel()).isEqualTo(Level.ERROR);
+            assertThat(entry.getThrowable()).isSameAs(exception);
+            assertThat(entry.getFormattedMessage(configuration)).isEqualTo("Failed to handle <foo> and <bar>");
+        });
     }
 
     /**
-     * Verifies that no debug log entries wil be issued, if the debug debug level is disabled.
+     * Simple logging backend implementation that stores all log entries in an array list.
      */
-    @CaptureLogEntries(level = Level.INFO)
-    @Test
-    void debugDisabled() {
-        InternalLogger.debug(null, "Hello World!");
-        InternalLogger.debug(null, "Hello {}!", "Alice");
+    private static final class ListLoggingBackend implements LoggingBackend {
 
-        assertThat(log.consume()).isEmpty();
-    }
+        private final List<LogEntry> entries;
 
-    /**
-     * Verifies that an info log entry with a plain text message can be issued.
-     */
-    @CaptureLogEntries(level = Level.INFO)
-    @Test
-    void infoMessage() {
-        InternalLogger.info(null, "Hello World!");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.INFO, null, "Hello World!"));
-    }
+        /** */
+        private ListLoggingBackend() {
+            this.entries = new ArrayList<>();
+        }
 
-    /**
-     * Verifies that an info log entry with a placeholder message and arguments can be issued.
-     */
-    @CaptureLogEntries(level = Level.INFO)
-    @Test
-    void infoMessageWithArguments() {
-        InternalLogger.info(null, "Hello {}!", "Alice");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.INFO, null, "Hello Alice!"));
-    }
+        @Override
+        public ContextStorage getContextStorage() {
+            return new NopContextStorage();
+        }
 
-    /**
-     * Verifies that an info log entry with an exception and a custom text message can be issued.
-     */
-    @CaptureLogEntries(level = Level.INFO)
-    @Test
-    void infoExceptionAndMessage() {
-        Exception exception = new Exception();
-        InternalLogger.info(exception, "Oops!");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.INFO, exception, "Oops!"));
-    }
+        @Override
+        public LevelVisibility getLevelVisibilityByClass(String className) {
+            return new LevelVisibility(OutputDetails.ENABLED_WITH_FULL_LOCATION_INFO);
+        }
 
-    /**
-     * Verifies that no info log entries wil be issued, if the info severity level is disabled.
-     */
-    @CaptureLogEntries(level = Level.WARN)
-    @Test
-    void infoDisabled() {
-        InternalLogger.info(null, "Hello World!");
-        InternalLogger.info(null, "Hello {}!", "Alice");
+        @Override
+        public LevelVisibility getLevelVisibilityByTag(String tag) {
+            return new LevelVisibility(OutputDetails.ENABLED_WITH_FULL_LOCATION_INFO);
+        }
 
-        assertThat(log.consume()).isEmpty();
-    }
+        @Override
+        public boolean isEnabled(Object location, String tag, Level level) {
+            return true;
+        }
 
-    /**
-     * Verifies that a warning log entry with a plain text message can be issued.
-     */
-    @CaptureLogEntries(level = Level.WARN)
-    @Test
-    void warnMessage() {
-        InternalLogger.warn(null, "Hello World!");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.WARN, null, "Hello World!"));
-    }
+        @Override
+        public void output(LogEntry entry, boolean last) {
+            entries.add(entry);
+        }
 
-    /**
-     * Verifies that a warning log entry with a placeholder message and arguments can be issued.
-     */
-    @CaptureLogEntries(level = Level.WARN)
-    @Test
-    void warnMessageWithArguments() {
-        InternalLogger.warn(null, "Hello {}!", "Alice");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.WARN, null, "Hello Alice!"));
-    }
+        @Override
+        public void close() {
+            // Nothing to do
+        }
 
-    /**
-     * Verifies that a warning log entry with an exception and a custom text message can be issued.
-     */
-    @CaptureLogEntries(level = Level.WARN)
-    @Test
-    void warnExceptionAndMessage() {
-        Exception exception = new Exception();
-        InternalLogger.warn(exception, "Oops!");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.WARN, exception, "Oops!"));
-    }
-
-    /**
-     * Verifies that no warning log entries wil be issued, if the warn severity level is disabled.
-     */
-    @CaptureLogEntries(level = Level.ERROR)
-    @Test
-    void warnDisabled() {
-        InternalLogger.warn(null, "Hello World!");
-        InternalLogger.warn(null, "Hello {}!", "Alice");
-
-        assertThat(log.consume()).isEmpty();
-    }
-
-    /**
-     * Verifies that an error log entry with a plain text message can be issued.
-     */
-    @CaptureLogEntries(level = Level.ERROR)
-    @Test
-    void errorMessage() {
-        InternalLogger.error(null, "Hello World!");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.ERROR, null, "Hello World!"));
-    }
-
-    /**
-     * Verifies that an error log entry with a placeholder message and arguments can be issued.
-     */
-    @CaptureLogEntries(level = Level.ERROR)
-    @Test
-    void errorMessageWithArguments() {
-        InternalLogger.error(null, "Hello {}!", "Alice");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.ERROR, null, "Hello Alice!"));
-    }
-
-    /**
-     * Verifies that an error log entry with an exception and a custom text message can be issued.
-     */
-    @CaptureLogEntries(level = Level.ERROR)
-    @Test
-    void errorExceptionAndMessage() {
-        Exception exception = new Exception();
-        InternalLogger.error(exception, "Oops!");
-        assertThat(log.consume()).containsExactly(createLogEntry(Level.ERROR, exception, "Oops!"));
-    }
-
-    /**
-     * Verifies that no error log entries wil be issued, if the error severity level is disabled.
-     */
-    @CaptureLogEntries(level = Level.OFF)
-    @Test
-    void errorDisabled() {
-        InternalLogger.error(null, "Hello World!");
-        InternalLogger.error(null, "Hello {}!", "Alice");
-
-        assertThat(log.consume()).isEmpty();
-    }
-
-    /**
-     * Verifies that log entries can be issued belated when the internal logger will be initialized.
-     */
-    @CaptureLogEntries(level = Level.INFO, autostart = false)
-    @Test
-    void delayedIssuing() {
-        InternalLogger.info(null, "Hello World!");
-        assertThat(log.consume()).isEmpty();
-
-        framework.startUp();
-        assertThat(log.consume()).containsExactly(
-            new LogEntry(InternalLogger.class.getName(), "tinylog", Level.INFO, null, "Hello World!")
-        );
-    }
-
-    /**
-     * Verifies that log entries will be discarded, if the internal logger is initialized with a less severe level.
-     */
-    @CaptureLogEntries(level = Level.WARN, autostart = false)
-    @Test
-    void delayedDiscarding() {
-        InternalLogger.info(null, "Hello World!");
-        assertThat(log.consume()).isEmpty();
-
-        framework.startUp();
-        assertThat(log.consume()).isEmpty();
-    }
-
-    /**
-     * Creates a new log entry.
-     *
-     * @param level Severity level
-     * @param exception Exception or any other kind of throwable
-     * @param message Text message
-     * @return Created log entry
-     */
-    private static LogEntry createLogEntry(Level level, Throwable exception, String message) {
-        return new LogEntry(InternalLoggerTest.class.getName(), "tinylog", level, exception, message);
     }
 
 }

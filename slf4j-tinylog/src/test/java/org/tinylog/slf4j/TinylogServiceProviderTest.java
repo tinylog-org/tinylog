@@ -8,13 +8,10 @@ import org.slf4j.helpers.BasicMarkerFactory;
 import org.slf4j.spi.SLF4JServiceProvider;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Tinylog;
-import org.tinylog.core.backend.LoggingBackend;
-import org.tinylog.core.context.ContextStorage;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 class TinylogServiceProviderTest {
 
@@ -24,12 +21,7 @@ class TinylogServiceProviderTest {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test
     void factories() {
-        ContextStorage storage = mock(ContextStorage.class);
-        LoggingBackend backend = mock(LoggingBackend.class);
         Framework framework = mock(Framework.class);
-
-        when(backend.getContextStorage()).thenReturn(storage);
-        when(framework.getLoggingBackend()).thenReturn(backend);
 
         try (MockedStatic<Tinylog> tinylogMock = mockStatic(Tinylog.class)) {
             tinylogMock.when(Tinylog::getFramework).thenReturn(framework);

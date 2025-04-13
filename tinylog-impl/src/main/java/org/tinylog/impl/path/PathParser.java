@@ -1,18 +1,17 @@
 package org.tinylog.impl.path;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import org.tinylog.core.Level;
+import org.tinylog.core.backend.TinylogContext;
 import org.tinylog.core.internal.AbstractPatternParser;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.internal.LoggingContext;
-import org.tinylog.core.internal.SafeServiceLoader;
-import org.tinylog.impl.path.segments.PathSegment;
-import org.tinylog.impl.path.segments.PathSegmentBuilder;
-import org.tinylog.impl.path.segments.StaticPathSegment;
+import org.tinylog.impl.path.segment.PathSegment;
+import org.tinylog.impl.path.segment.PathSegmentBuilder;
+import org.tinylog.impl.path.segment.StaticPathSegment;
 
 /**
  * Parser for log file paths with placeholders and plain static text. Dynamic placeholders can be put in curly brackets.
@@ -30,19 +29,17 @@ import org.tinylog.impl.path.segments.StaticPathSegment;
  */
 public class PathParser extends AbstractPatternParser {
 
-    private final LoggingContext context;
+    private final TinylogContext context;
+    private final InternalLogger logger;
     private final Map<String, PathSegmentBuilder> builders;
 
     /**
-     * @param context The current logging context
+     * @param context The tinylog context to use for creating path segment builders
      */
-    public PathParser(LoggingContext context) {
+    public PathParser(TinylogContext context) {
         this.context = context;
-        this.builders = new HashMap<>();
-
-        SafeServiceLoader
-            .asList(context.getFramework().getClassLoader(), PathSegmentBuilder.class, "path segment builders")
-            .forEach(builder -> builders.put(builder.getName(), builder));
+        this.logger = context.getLogger();
+        this.builders = PathSegmentBuilder.load(context.getLoader());
     }
 
     /**
@@ -90,13 +87,13 @@ public class PathParser extends AbstractPatternParser {
 
         PathSegmentBuilder builder = builders.get(name);
         if (builder == null) {
-            InternalLogger.error(null, "Invalid path segment \"{}\"", placeholder);
+            logger.log(Level.ERROR, "Invalid path segment \"{}\"", placeholder);
             return null;
         } else {
             try {
                 return builder.create(context, value);
             } catch (Exception ex) {
-                InternalLogger.error(ex, "Failed to create path segment for \"{}\"", placeholder);
+                logger.log(Level.ERROR, ex, "Failed to create path segment for \"{}\"", placeholder);
                 return null;
             }
         }

@@ -1,18 +1,36 @@
 package org.tinylog.slf4j;
 
-import javax.inject.Inject;
-
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Framework;
-import org.tinylog.core.test.log.CaptureLogEntries;
+import org.tinylog.core.backend.LevelVisibility;
+import org.tinylog.core.backend.OutputDetails;
+import org.tinylog.core.internal.InternalLogger;
+import org.tinylog.core.runtime.JavaRuntime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-@CaptureLogEntries
 class TinylogLoggerFactoryTest {
 
-    @Inject
     private Framework framework;
+
+    /**
+     * Creates the framework.
+     */
+    @BeforeEach
+    void create() {
+        framework = mock(Framework.class);
+
+        JavaRuntime runtime = new JavaRuntime(mock(InternalLogger.class));
+        when(framework.getRuntime()).thenReturn(runtime);
+
+        LevelVisibility visibility = new LevelVisibility(OutputDetails.DISABLED);
+        when(framework.getLevelVisibilityByClass(any())).thenReturn(visibility);
+    }
+
 
     /**
      * Verifies that the factory provides the same logger instance for the same name.

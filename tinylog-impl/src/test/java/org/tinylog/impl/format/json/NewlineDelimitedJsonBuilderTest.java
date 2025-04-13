@@ -1,48 +1,57 @@
 package org.tinylog.impl.format.json;
 
-import java.util.Map;
 import java.util.ServiceLoader;
-
-import javax.inject.Inject;
 
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
-import org.tinylog.core.internal.LoggingContext;
-import org.tinylog.core.test.log.CaptureLogEntries;
-import org.tinylog.core.test.log.Log;
-import org.tinylog.impl.LogEntry;
+import org.tinylog.core.LogEntry;
+import org.tinylog.core.backend.TinylogContext;
 import org.tinylog.impl.format.OutputFormat;
 import org.tinylog.impl.format.OutputFormatBuilder;
-import org.tinylog.impl.test.FormatOutputRenderer;
-import org.tinylog.impl.test.LogEntryBuilder;
+import org.tinylog.test.junit.log.Log;
+import org.tinylog.test.junit.log.Tinylog;
+import org.tinylog.test.util.FormatOutputRenderer;
+import org.tinylog.test.util.LogEntryBuilder;
 
-import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
 
-import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.entry;
 
-@CaptureLogEntries
+@Tinylog
 class NewlineDelimitedJsonBuilderTest {
 
     @Inject
-    private LoggingContext context;
+    private TinylogContext context;
+
+    @Inject
+    private Configuration configuration;
 
     @Inject
     private Log log;
 
     /**
-     * Verifies that a warning will be logged and an empty JSON will be output, if no fields are defined.
+     * Verifies that the builder is registered as service.
      */
     @Test
+    void service() {
+        assertThat(ServiceLoader.load(OutputFormatBuilder.class)).anySatisfy(builder -> {
+            assertThat(builder).isInstanceOf(NewlineDelimitedJsonBuilder.class);
+            assertThat(builder.getName()).isEqualTo("ndjson");
+        });
+    }
+
+    /**
+     * Verifies that a warning will be logged and an empty JSON will be output, if no fields are defined.
+     */
+    @Tinylog(configuration = {})
+    @Test
     void noFields() {
-        Configuration configuration = new Configuration(emptyMap());
-        OutputFormat format = new NewlineDelimitedJsonBuilder().create(context, configuration);
+        OutputFormat format = new NewlineDelimitedJsonBuilder().create(context);
 
         assertThat(log.consume()).singleElement().satisfies(entry -> {
-            assertThat(entry.getLevel()).isEqualTo(Level.WARN);
-            assertThat(entry.getMessage()).contains("fields");
+            assertThat(entry.getSeverityLevel()).isEqualTo(Level.WARN);
+            assertThat(entry.getFormattedMessage(configuration)).contains("fields");
         });
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
@@ -55,11 +64,10 @@ class NewlineDelimitedJsonBuilderTest {
     /**
      * Verifies that a single field can be correctly output as JSON.
      */
+    @Tinylog(configuration = "fields.level=level")
     @Test
     void singleField() {
-        Map<String, String> properties = ImmutableMap.of("fields.level", "level");
-        Configuration configuration = new Configuration(properties);
-        OutputFormat format = new NewlineDelimitedJsonBuilder().create(context, configuration);
+        OutputFormat format = new NewlineDelimitedJsonBuilder().create(context);
 
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
         LogEntry logEntry = new LogEntryBuilder().severityLevel(Level.INFO).create();
@@ -71,16 +79,10 @@ class NewlineDelimitedJsonBuilderTest {
     /**
      * Verifies that multiple fields can be correctly output as JSON in the defined order.
      */
+    @Tinylog(configuration = {"fields.level={level}", "fields.foo=bar", "fields.msg={message}"})
     @Test
     void multipleFields() {
-        Map<String, String> properties = ImmutableMap.ofEntries(
-            entry("fields.level", "{level}"),
-            entry("fields.foo", "bar"),
-            entry("fields.msg", "{message}")
-        );
-
-        Configuration configuration = new Configuration(properties);
-        OutputFormat format = new NewlineDelimitedJsonBuilder().create(context, configuration);
+        OutputFormat format = new NewlineDelimitedJsonBuilder().create(context);
         FormatOutputRenderer renderer = new FormatOutputRenderer(format);
 
         LogEntry logEntry = new LogEntryBuilder()
@@ -90,17 +92,6 @@ class NewlineDelimitedJsonBuilderTest {
 
         assertThat(renderer.render(logEntry))
             .isEqualTo("{\"level\": \"INFO\", \"foo\": \"bar\", \"msg\": \"Hello World!\"}" + System.lineSeparator());
-    }
-
-    /**
-     * Verifies that the builder is registered as service.
-     */
-    @Test
-    void service() {
-        assertThat(ServiceLoader.load(OutputFormatBuilder.class)).anySatisfy(builder -> {
-            assertThat(builder).isInstanceOf(NewlineDelimitedJsonBuilder.class);
-            assertThat(builder.getName()).isEqualTo("ndjson");
-        });
     }
 
 }

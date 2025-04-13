@@ -1,7 +1,9 @@
 package org.tinylog.core.runtime;
 
+import org.tinylog.core.internal.InternalLogger;
+
 /**
- * Builder for {@link AndroidRuntime}.
+ * Builder for {@link LegacyAndroidRuntime}.
  */
 public class AndroidRuntimeBuilder implements RuntimeBuilder {
 
@@ -11,7 +13,7 @@ public class AndroidRuntimeBuilder implements RuntimeBuilder {
 
     @Override
     public boolean isSupported() {
-        return "Android Runtime".equals(System.getProperty("java.runtime.name"));
+        return System.getProperty("java.runtime.name").equals("Android Runtime");
     }
 
     @Override
@@ -20,8 +22,13 @@ public class AndroidRuntimeBuilder implements RuntimeBuilder {
     }
 
     @Override
-    public RuntimeFlavor create() {
-        return new AndroidRuntime();
+    public RuntimeFlavor create(InternalLogger logger) {
+        try {
+            Class.forName("java.lang.StackWalker");
+            return new ModernAndroidRuntime(logger);
+        } catch (ClassNotFoundException ex) {
+            return new LegacyAndroidRuntime(logger);
+        }
     }
 
 }

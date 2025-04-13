@@ -1,0 +1,29 @@
+package org.tinylog.impl.policy;
+
+import java.nio.file.Path;
+
+/**
+ * Startup policy that triggers a rollover event when trying to continue an already existing log file at startup.
+ */
+public class StartupPolicy implements Policy {
+
+    /** */
+    public StartupPolicy() {
+    }
+
+    @Override
+    public boolean canContinueFile(Path file) {
+        return false;
+    }
+
+    @Override
+    public void init(Path file) {
+        // Ignore
+    }
+
+    @Override
+    public boolean canAcceptDataRecord(int bytes) {
+        return true;
+    }
+
+}

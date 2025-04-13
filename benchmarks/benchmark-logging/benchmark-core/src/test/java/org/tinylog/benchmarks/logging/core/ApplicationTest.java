@@ -3,34 +3,31 @@ package org.tinylog.benchmarks.logging.core;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import javax.inject.Inject;
-
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.StdIo;
+import org.junitpioneer.jupiter.StdOut;
 import org.openjdk.jmh.Main;
-import org.tinylog.core.test.system.CaptureSystemOutput;
-import org.tinylog.core.test.system.Output;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@CaptureSystemOutput
 class ApplicationTest {
-
-    @Inject
-    private Output output;
 
     /**
      * Verifies that JMH will be executed correctly.
+     *
+     * @param out The captured output of the standard output stream
      */
     @Test
-    void executeJmh() throws URISyntaxException, IOException {
+    @StdIo
+    void executeJmh(StdOut out) throws URISyntaxException, IOException {
         Main.main(new String[] {"-h"});
-        Iterable<String> expectedOutput = output.consume();
+        String expectedOutput = out.capturedString();
 
         Application.main(new String[] {"-h"});
-        Iterable<String> actualOutput = output.consume();
+        String actualOutput = out.capturedString().substring(expectedOutput.length());
 
         assertThat(actualOutput)
-            .anySatisfy(line -> assertThat(line).contains("JMH"))
+            .contains("JMH")
             .isEqualTo(expectedOutput);
     }
 

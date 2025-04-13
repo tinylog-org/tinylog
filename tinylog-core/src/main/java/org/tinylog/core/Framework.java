@@ -1,62 +1,59 @@
 package org.tinylog.core;
 
-import java.time.Clock;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
+import java.util.stream.StreamSupport;
 
-import org.tinylog.core.backend.BundleLoggingBackend;
-import org.tinylog.core.backend.InternalLoggingBackend;
-import org.tinylog.core.backend.InternalLoggingBackendBuilder;
+import org.tinylog.core.backend.LevelVisibility;
 import org.tinylog.core.backend.LoggingBackend;
-import org.tinylog.core.backend.LoggingBackendBuilder;
-import org.tinylog.core.backend.NopLoggingBackendBuilder;
+import org.tinylog.core.backend.LoggingBackendFactory;
+import org.tinylog.core.backend.OutputDetails;
+import org.tinylog.core.context.ContextStorage;
+import org.tinylog.core.internal.AsynchronousTaskExecutor;
 import org.tinylog.core.internal.InternalLogger;
-import org.tinylog.core.internal.LoggingContext;
-import org.tinylog.core.internal.SafeServiceLoader;
 import org.tinylog.core.loader.ConfigurationLoader;
 import org.tinylog.core.runtime.RuntimeBuilder;
 import org.tinylog.core.runtime.RuntimeFlavor;
 
 /**
- * Storage for {@link Configuration}, registered {@link Hook} instances, and {@link LoggingBackend}.
+ * Core tinylog framework for handling the entire life cycle.
  */
 public class Framework {
 
-    private static final String FROZEN_MESSAGE =
-        "The configuration has already been applied and cannot be modified anymore";
+    private static final int TASK_CAPACITY = 1024;
 
-    private final Object mutex = new Object();
-
+    private final Object mutex;
+    private final AsynchronousTaskExecutor executor;
+    private final InternalLogger logger;
+    private final ClassLoader loader;
     private final RuntimeFlavor runtime;
-    private final Collection<Hook> hooks;
-
-    private volatile Configuration configuration;
-    private volatile LoggingBackend loggingBackend;
 
     private boolean frozen;
-    private boolean running;
+    private Configuration configuration;
+    private LoggingBackend backend;
+
+    /** */
+    public Framework() {
+        mutex = new Object();
+        executor = new AsynchronousTaskExecutor(TASK_CAPACITY);
+        logger = new InternalLogger(executor);
+        loader = getClassLoader();
+        runtime = RuntimeBuilder.load(loader).create(logger);
+
+        frozen = false;
+        configuration = loadConfiguration(loader, logger);
+    }
 
     /**
-     * Loads the configuration from default properties file and hooks from service files.
+     * Gets the internal logger for issuing log entries within tinylog.
      *
-     * @param loadConfiguration {@code true} to load the configuration from found properties file, {@code false} to
-     *                          keep the configuration empty
-     * @param loadHooks {@code true} to load all hooks that are registered as services, {@code false} to do not load
-     *                  any hooks
+     * @return The internal logger for tinylog
      */
-    public Framework(boolean loadConfiguration, boolean loadHooks) {
-        this.runtime = createRuntime();
-        this.configuration = loadConfiguration ? loadConfiguration() : new Configuration(Collections.emptyMap());
-        this.hooks = loadHooks ? loadHooks() : new ArrayList<>();
+    public InternalLogger getInternalLogger() {
+        return logger;
     }
 
     /**
@@ -65,26 +62,110 @@ public class Framework {
      * @return A valid and existing class loader instance
      */
     public ClassLoader getClassLoader() {
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        return classLoader == null ? Framework.class.getClassLoader() : classLoader;
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        return loader == null ? Framework.class.getClassLoader() : loader;
     }
 
     /**
-     * Gets the clock for getting the current date, time, and zone.
+     * Provides the correct {@link RuntimeFlavor} for the current virtual machine.
      *
-     * @return A working clock
-     */
-    public Clock getClock() {
-        return Clock.systemDefaultZone();
-    }
-
-    /**
-     * Provides the appropriate {@link RuntimeFlavor} for the actual virtual machine.
-     *
-     * @return The appropriate runtime instance
+     * @return The runtime flavor instance for the current virtual machine
      */
     public RuntimeFlavor getRuntime() {
         return runtime;
+    }
+
+    /**
+     * Retrieves the thread-based context value storage.
+     *
+     * @return The storage for thread-based context values
+     */
+    public ContextStorage getContextStorage() {
+        if (backend == null) {
+            start();
+        }
+
+        return backend.getContextStorage();
+    }
+
+    /**
+     * Retrieves the visibility of all severity levels for a fully-qualified class name. Log entries whose severity
+     * levels are set to {@link OutputDetails#DISABLED} do not need to be created since they are never output.
+     *
+     * @param className The fully-qualified class name for which the visibility of severity levels is requested
+     * @return The visibilities of all severity levels
+     */
+    public LevelVisibility getLevelVisibilityByClass(String className) {
+        if (backend == null) {
+            start();
+        }
+
+        return backend.getLevelVisibilityByClass(className);
+    }
+
+    /**
+     * Retrieves the visibility of all severity levels for a category tag. Log entries whose severity levels are set to
+     * {@link OutputDetails#DISABLED} do not need to be created since they are never output.
+     *
+     * @param tag The category tag for which the visibility of severity levels is requested
+     * @return The visibilities of all severity levels
+     */
+    public LevelVisibility getLevelVisibilityByTag(String tag) {
+        if (backend == null) {
+            start();
+        }
+
+        return backend.getLevelVisibilityByTag(tag);
+    }
+
+    /**
+     * Checks if a severity level is enabled for outputting log entries.
+     *
+     * @param location The location information of the caller
+     * @param tag The category tag
+     * @param level The severity level to check
+     * @return {@code true} if log entries of the passed severity level will be output, {@code false} if not
+     */
+    public boolean isEnabled(Object location, String tag, Level level) {
+        if (backend == null) {
+            start();
+        }
+
+        return backend.isEnabled(location, tag, level);
+    }
+
+    /**
+     * Submits a new log entry that should be processed by the active {@link LoggingBackend}.
+     *
+     * @param entry A newly issued log entry
+     */
+    public void submit(LogEntry entry) {
+        Task task = (backend, last) -> backend.output(entry, last);
+        executor.enqueue(task);
+    }
+
+    /**
+     * Initializes this framework.
+     */
+    public void start() {
+        synchronized (mutex) {
+            if (backend == null) {
+                frozen = true;
+                backend = new LoggingBackendFactory(loader, runtime, logger).create(configuration);
+                executor.start(backend);
+            }
+        }
+    }
+
+    /**
+     * Shuts this framework down.
+     *
+     * @throws InterruptedException If the current thread is interrupted while waiting for the successful shutdown
+     */
+    public void stop() throws InterruptedException {
+        synchronized (mutex) {
+            executor.stop();
+        }
     }
 
     /**
@@ -94,119 +175,26 @@ public class Framework {
      *                {@code false} for creating an empty {@link ConfigurationBuilder}
      * @return A new configuration builder instance
      */
-    public ConfigurationBuilder getConfigurationBuilder(boolean inherit) {
+    ConfigurationBuilder getConfigurationBuilder(boolean inherit) {
         if (inherit) {
-            return new ConfigurationBuilder(this, configuration.getAllValues());
+            return new ConfigurationBuilder(this, configuration.getAllValues(), logger);
         } else {
-            return new ConfigurationBuilder(this, Collections.emptyMap());
+            return new ConfigurationBuilder(this, Collections.emptyMap(), logger);
         }
     }
 
     /**
-     * Gets the logging backend from the stored configuration.
-     *
-     * @return The logging backend implementation
-     */
-    public LoggingBackend getLoggingBackend() {
-        if (loggingBackend == null) {
-            synchronized (mutex) {
-                if (loggingBackend == null) {
-                    loadLoggingBackend();
-                }
-            }
-        }
-
-        return loggingBackend;
-    }
-
-    /**
-     * Registers a new {@link Hook}.
-     *
-     * @param hook Hook to register
-     */
-    public void registerHook(Hook hook) {
-        synchronized (mutex) {
-            hooks.add(hook);
-
-            if (running) {
-                InternalLogger.debug(null, "Start hook {}", hook.getClass().getName());
-                SafeServiceLoader.execute(hook, "start", Hook::startUp);
-            }
-        }
-    }
-
-    /**
-     * Removes a registered {@link Hook}.
-     *
-     * @param hook Hook to unregister
-     */
-    public void removeHook(Hook hook) {
-        synchronized (mutex) {
-            hooks.remove(hook);
-        }
-    }
-
-    /**
-     * Starts the framework and calls the start-up method on all registered hooks, if the framework is not yet started.
-     */
-    public void startUp() {
-        synchronized (mutex) {
-            if (!running) {
-                running = true;
-
-                for (Hook hook : hooks) {
-                    InternalLogger.debug(null, "Start hook {}", hook.getClass().getName());
-                    SafeServiceLoader.execute(hook, "start", Hook::startUp);
-                }
-
-                loadLoggingBackend();
-
-                if (!"false".equalsIgnoreCase(configuration.getValue("auto-shutdown"))) {
-                    Runtime.getRuntime().addShutdownHook(new Thread(this::shutDown, "tinylog-shutdown-thread"));
-                }
-
-                InternalLogger.debug(null, "Logging framework is up");
-            }
-        }
-    }
-
-    /**
-     * Stops the framework and calls the shutdown method on all registered hooks, if the framework is not yet shut
-     * down.
-     */
-    public void shutDown() {
-        synchronized (mutex) {
-            if (running) {
-                running = false;
-
-                InternalLogger.debug(null, "Logging framework is shutting down");
-
-                for (Hook hook : hooks) {
-                    InternalLogger.debug(null, "Shut down hook {}", hook.getClass().getName());
-                    SafeServiceLoader.execute(hook, "shut down", Hook::shutDown);
-                }
-
-                loggingBackend = null;
-                InternalLogger.reset();
-            }
-        }
-    }
-
-    /**
-     * Replaces the current configuration with the new passed configuration.
-     *
-     * <p>
-     *     The configuration can be replaced as needed before issuing any log entries. As soon as the first log entry is
-     *     issued, the configuration becomes frozen and can no longer be replaced anymore.
-     * </p>
+     * Applies a new configuration.
      *
      * @param configuration The new configuration
-     * @throws UnsupportedOperationException The current configuration has already been applied and cannot be replaced
+     * @throws UnsupportedOperationException If another configuration has already been applied and cannot be overridden
+     *                                       anymore
      */
     void setConfiguration(Configuration configuration) {
         synchronized (mutex) {
             if (frozen) {
-                throw new UnsupportedOperationException(FROZEN_MESSAGE);
+                throw new UnsupportedOperationException("Another configuration has already been applied and cannot be"
+                    + " overridden anymore");
             } else {
                 this.configuration = configuration;
             }
@@ -214,140 +202,23 @@ public class Framework {
     }
 
     /**
-     * Creates a new {@link LoggingBackend}.
-     *
-     * @param context The current logging context
-     * @return The newly created logging backend instance
-     */
-    protected LoggingBackend createLoggingBackend(LoggingContext context) {
-        List<String> names = configuration.getList("backends");
-        Map<String, LoggingBackendBuilder> builders = new HashMap<>();
-        Map<String, LoggingBackend> backends = new LinkedHashMap<>();
-
-        SafeServiceLoader.load(
-            getClassLoader(),
-            LoggingBackendBuilder.class,
-            "logging backend builders",
-            builder -> builders.put(builder.getName().toLowerCase(Locale.ENGLISH), builder)
-        );
-
-        for (String name : names) {
-            String sanitizedName = name.toLowerCase(Locale.ENGLISH);
-            LoggingBackendBuilder builder = builders.get(sanitizedName);
-            if (builder == null) {
-                InternalLogger.error(
-                    null,
-                    "Could not find any logging backend with the name \"{}\" in the classpath",
-                    name
-                );
-            } else {
-                createNonExistentBackend(builder, context, backends);
-            }
-        }
-
-        if (backends.isEmpty()) {
-            for (Map.Entry<String, LoggingBackendBuilder> entry : builders.entrySet()) {
-                LoggingBackendBuilder builder = entry.getValue();
-                if (!(builder instanceof NopLoggingBackendBuilder)
-                        && !(builder instanceof InternalLoggingBackendBuilder)) {
-                    createNonExistentBackend(builder, context, backends);
-                }
-            }
-        }
-
-        if (backends.isEmpty()) {
-            InternalLogger.warn(null, "No logging backend could be found in the classpath. Therefore, no log "
-                + "entries will be output. Please add tinylog-impl.jar or any other logging backend for outputting log "
-                + "entries, or disable logging explicitly by setting \"backends = nop\" in the configuration.");
-            return new InternalLoggingBackend(context);
-        } else if (backends.size() == 1) {
-            return backends.values().stream().findAny().get();
-        } else {
-            return new BundleLoggingBackend(backends.values());
-        }
-    }
-
-    /**
-     * Finds and creates a supported runtime flavor.
-     *
-     * @return An instance of a supported runtime flavor
-     */
-    private RuntimeFlavor createRuntime() {
-        return SafeServiceLoader
-            .asList(getClassLoader(), RuntimeBuilder.class, "runtime builders")
-            .stream()
-            .filter(RuntimeBuilder::isSupported)
-            .sorted(Comparator.comparingInt(RuntimeBuilder::getPriority).reversed())
-            .findAny()
-            .orElseThrow(() -> new IllegalStateException("No supported runtime available"))
-            .create();
-    }
-
-    /**
-     * Loads all hooks that are registered as a {@link ServiceLoader service} in {@code META-INF/services}.
-     *
-     * @return All found hooks
-     */
-    private Collection<Hook> loadHooks() {
-        return SafeServiceLoader.asList(getClassLoader(), Hook.class, "hooks");
-    }
-
-    /**
      * Loads the configuration via a registered {@link ConfigurationLoader}.
      *
+     * @param classLoader The class loader to use for loading service implementations and resource files
+     * @param logger The internal logger instance for issuing internal tinylog log entries
      * @return The initial configuration
      */
-    private Configuration loadConfiguration() {
-        List<ConfigurationLoader> loaders = SafeServiceLoader.asList(
-            getClassLoader(),
-            ConfigurationLoader.class,
-            "configuration loaders"
-        );
+    private static Configuration loadConfiguration(ClassLoader classLoader, InternalLogger logger) {
+        Iterable<ConfigurationLoader> loaders = ServiceLoader.load(ConfigurationLoader.class, classLoader);
 
-        Map<String, String> properties = loaders.stream()
+        Map<String, String> properties = StreamSupport.stream(loaders.spliterator(), false)
             .sorted(Comparator.comparingInt(ConfigurationLoader::getPriority).reversed())
-            .map(loader -> loader.load(getClassLoader()))
+            .map(loader -> loader.load(classLoader, logger))
             .filter(Objects::nonNull)
             .findFirst()
             .orElse(Collections.emptyMap());
 
-        return new Configuration(properties);
-    }
-
-    /**
-     * Freezes the stored configuration and creates a new logging backend, if none is assigned yet.
-     */
-    private void loadLoggingBackend() {
-        frozen = true;
-        startUp();
-
-        if (loggingBackend == null) {
-            LoggingContext context = new LoggingContext(this, configuration);
-            loggingBackend = createLoggingBackend(context);
-            InternalLogger.init(context);
-            InternalLogger.debug(null, "Active logging backend: {}", loggingBackend.getClass().getName());
-        }
-    }
-
-    /**
-     * Creates and adds a new logging bachend if it doesn't exist in the target backend map.
-     *
-     * @param builder The builder to use for creating the logging backend
-     * @param context The current logging context
-     * @param backends The target map with logging backends
-     */
-    private static void createNonExistentBackend(
-        LoggingBackendBuilder builder,
-        LoggingContext context,
-        Map<String, LoggingBackend> backends
-    ) {
-        if (!backends.containsKey(builder.getName())) {
-            SafeServiceLoader.execute(
-                builder,
-                "execute",
-                instance -> backends.put(builder.getName(), instance.create(context))
-            );
-        }
+        return new Configuration(properties, logger);
     }
 
 }

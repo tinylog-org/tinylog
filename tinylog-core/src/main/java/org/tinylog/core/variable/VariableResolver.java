@@ -1,7 +1,11 @@
 package org.tinylog.core.variable;
 
+import java.util.ServiceLoader;
+
+import org.tinylog.core.internal.InternalLogger;
+
 /**
- * Service interface for variable resolvers in configuration files.
+ * Service interface for resolving prefixed variables in configuration files.
  */
 public interface VariableResolver {
 
@@ -24,8 +28,19 @@ public interface VariableResolver {
      * Resolves a variable by its name.
      *
      * @param name The name of the variable to resolve
+     * @param logger The internal logger instance for issuing internal tinylog log entries
      * @return The value of the variable if existing, or {@code null} if the variable could not be found
      */
-    String resolve(String name);
+    String resolve(String name, InternalLogger logger);
+
+    /**
+     * Loads and creates all available variable resolvers.
+     *
+     * @param loader The class loader to use for loading the service implementations
+     * @return An iterable with all variable resolvers
+     */
+    static Iterable<VariableResolver> load(ClassLoader loader) {
+        return ServiceLoader.load(VariableResolver.class, loader);
+    }
 
 }

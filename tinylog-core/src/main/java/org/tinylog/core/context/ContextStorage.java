@@ -28,7 +28,7 @@ public interface ContextStorage {
     String get(String key);
 
     /**
-     * Stores a new context value for a given key. If a value is already stored for the passed key, the existent value
+     * Stores a new context value for a given key. If a value is already stored for the given key, the existing value
      * is overwritten.
      *
      * @param key The key with which the context value is to be associated
@@ -40,10 +40,10 @@ public interface ContextStorage {
      * Replaces the current thread-based context values with the passed values.
      *
      * <p>
-     *     All currently stored values are removed, even if the associated key is not present in the passed mapping.
+     *     All currently stored values are removed, even if a associated key is not present in the passed mapping.
      * </p>
      *
-     * @param mapping New thread-based context values
+     * @param mapping New context values
      */
     void replace(Map<String, String> mapping);
 
@@ -54,12 +54,12 @@ public interface ContextStorage {
      *     If no value is associated with the passed key, this is a no-op. No exception will be thrown.
      * </p>
      *
-     * @param key The key whose associated context value is to be removed
+     * @param key The key whose associated context value to remove
      */
     void remove(String key);
 
     /**
-     * Removes all stored context values. Afterwards, this storage will be empty.
+     * Removes all stored context values. This storage will be empty afterwards.
      */
     void clear();
 

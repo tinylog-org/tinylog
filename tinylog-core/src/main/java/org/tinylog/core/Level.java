@@ -6,8 +6,8 @@ package org.tinylog.core;
 public enum Level {
 
     /**
-     * The off severity level is for configuration use only and disables any logging. Log entries must never be assigned
-     * an off severity level.
+     * The off severity level is for configuration usage only and disables any logging. Log entries must not use off as
+     * severity level.
      */
     OFF,
 
@@ -33,7 +33,7 @@ public enum Level {
     DEBUG,
 
     /**
-     * Trace log entries contain very fine-grained debug information for developers, typically the flow through.
+     * Trace log entries contain very fine-grained debug information for developers.
      */
     TRACE;
 
@@ -41,7 +41,7 @@ public enum Level {
      * Tests if this severity level is at least as severe as the passed severity level.
      *
      * @param other The severity level to compare with
-     * @return {@code true} if this severity level is same severe as the passed severity level or more severe than it,
+     * @return {@code true} if this severity level is the same as or more severe than the passed severity level,
      *         {@code false} if this severity level is less severe than the passed severity level
      */
     public boolean isAtLeastAsSevereAs(Level other) {
@@ -53,7 +53,7 @@ public enum Level {
      *
      * @param first The first severity level to compare
      * @param second The second severity level to compare
-     * @return The least serve level
+     * @return The least serve level of both passed severity levels
      */
     public static Level leastSevereLevel(Level first, Level second) {
         if (first.ordinal() > second.ordinal()) {
@@ -68,7 +68,7 @@ public enum Level {
      *
      * @param first The first severity level to compare
      * @param second The second severity level to compare
-     * @return The most serve level
+     * @return The most serve level of both passed severity levels
      */
     public static Level mostSevereLevel(Level first, Level second) {
         if (first.ordinal() < second.ordinal()) {

@@ -24,7 +24,7 @@ import org.tinylog.core.context.ContextStorage;
  */
 public final class ThreadContext {
 
-    private static final ContextStorage storage = Tinylog.getFramework().getLoggingBackend().getContextStorage();
+    private static final ContextStorage storage = Tinylog.getFramework().getContextStorage();
 
     /** */
     private ThreadContext() {
@@ -84,7 +84,7 @@ public final class ThreadContext {
     }
 
     /**
-     * Removes all stored context values. Afterwards, the thread context will be empty.
+     * Removes all stored context values. Afterward, the thread context will be empty.
      */
     public static void clear() {
         storage.clear();

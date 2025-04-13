@@ -6,9 +6,10 @@ import java.nio.file.Paths;
 import java.time.Clock;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.function.Supplier;
 
-import org.tinylog.core.internal.LoggingContext;
-import org.tinylog.impl.path.segments.PathSegment;
+import org.tinylog.core.backend.TinylogContext;
+import org.tinylog.impl.path.segment.PathSegment;
 
 /**
  * Dynamic file path with static and dynamic path segments.
@@ -20,11 +21,11 @@ public class DynamicPath {
     private final PathSegment[] pathSegments;
 
     /**
-     * @param context The current logging context
+     * @param context The current tinylog context
      * @param path The file path with placeholders
      */
-    public DynamicPath(LoggingContext context, String path) {
-        this.clock = context.getFramework().getClock();
+    public DynamicPath(TinylogContext context, String path) {
+        this.clock = context.getClock();
         this.zone = context.getConfiguration().getZone();
         this.pathSegments = new PathParser(context).parse(path).toArray(new PathSegment[0]);
     }
@@ -33,7 +34,7 @@ public class DynamicPath {
      * Gets the latest existing path by resolving all static and dynamic path segments.
      *
      * @return The latest existing path or {@code null} if none exist
-     * @throws Exception Failed to resolve the latest path
+     * @throws Exception If failed to resolve the path
      */
     public Path getLatestPath() throws Exception {
         Path parentDirectory = Paths.get("");
@@ -73,14 +74,14 @@ public class DynamicPath {
      * Generates a new file path by resolving all static and dynamic path segments.
      *
      * @return New static path
-     * @throws Exception Failed to generate the file path
+     * @throws Exception If failed to generate the file path
      */
     public Path generateNewPath() throws Exception {
-        ZonedDateTime date = ZonedDateTime.ofInstant(clock.instant(), zone);
+        Supplier<ZonedDateTime> currentDateSupplier = new LazyCurrentDateSupplier(clock, zone);
         StringBuilder builder = new StringBuilder();
 
         for (PathSegment segment : pathSegments) {
-            segment.resolve(builder, date);
+            segment.resolve(builder, currentDateSupplier);
         }
 
         Path path = Paths.get(builder.toString()).toAbsolutePath();

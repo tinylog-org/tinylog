@@ -10,8 +10,8 @@ import org.slf4j.spi.LocationAwareLogger;
 import org.slf4j.spi.LoggingEventAware;
 import org.tinylog.core.Framework;
 import org.tinylog.core.Level;
+import org.tinylog.core.LogEntry;
 import org.tinylog.core.backend.LevelVisibility;
-import org.tinylog.core.backend.LoggingBackend;
 import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.format.message.MessageFormatter;
 import org.tinylog.core.format.message.SimpleMessageFormatter;
@@ -25,8 +25,8 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     private static final String LOGGER_CLASS_NAME = TinylogLogger.class.getName();
 
     private final String category;
+    private final Framework framework;
     private final RuntimeFlavor runtime;
-    private final LoggingBackend backend;
     private final MessageFormatter formatter;
 
     private final LevelVisibility visibility;
@@ -42,11 +42,11 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
      */
     TinylogLogger(String category, Framework framework) {
         this.category = category;
+        this.framework = framework;
         this.runtime = framework.getRuntime();
-        this.backend = framework.getLoggingBackend();
         this.formatter = new SimpleMessageFormatter();
 
-        this.visibility = backend.getLevelVisibilityByClass(category);
+        this.visibility = framework.getLevelVisibilityByClass(category);
         this.visibilityTrace = visibility.getTrace();
         this.visibilityDebug = visibility.getDebug();
         this.visibilityInfo = visibility.getInfo();
@@ -73,7 +73,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void trace(String message) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityTrace).get();
-            issueLogEntry(location, null, Level.TRACE, null, message, (Object[]) null);
+            submit(location, null, Level.TRACE, null, message, (Object[]) null);
         }
     }
 
@@ -81,7 +81,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void trace(String message, Throwable throwable) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityTrace).get();
-            issueLogEntry(location, null, Level.TRACE, throwable, message, (Object[]) null);
+            submit(location, null, Level.TRACE, throwable, message, (Object[]) null);
         }
     }
 
@@ -89,7 +89,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void trace(String message, Object argument) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityTrace).get();
-            issueLogEntry(location, null, Level.TRACE, null, message, argument);
+            submit(location, null, Level.TRACE, null, message, argument);
         }
     }
 
@@ -97,7 +97,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void trace(String message, Object arg1, Object arg2) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityTrace).get();
-            issueLogEntry(location, null, Level.TRACE, null, message, arg1, arg2);
+            submit(location, null, Level.TRACE, null, message, arg1, arg2);
         }
     }
 
@@ -105,7 +105,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void trace(String message, Object... arguments) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityTrace).get();
-            issueLogEntry(location, null, Level.TRACE, null, message, arguments);
+            submit(location, null, Level.TRACE, null, message, arguments);
         }
     }
 
@@ -113,7 +113,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void trace(Marker marker, String message) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityTrace).get();
-            issueLogEntry(location, marker, Level.TRACE, null, message, (Object[]) null);
+            submit(location, marker, Level.TRACE, null, message, (Object[]) null);
         }
     }
 
@@ -121,7 +121,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void trace(Marker marker, String message, Throwable throwable) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityTrace).get();
-            issueLogEntry(location, marker, Level.TRACE, throwable, message, (Object[]) null);
+            submit(location, marker, Level.TRACE, throwable, message, (Object[]) null);
         }
     }
 
@@ -129,7 +129,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void trace(Marker marker, String message, Object argument) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityTrace).get();
-            issueLogEntry(location, marker, Level.TRACE, null, message, argument);
+            submit(location, marker, Level.TRACE, null, message, argument);
         }
     }
 
@@ -137,7 +137,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void trace(Marker marker, String message, Object arg1, Object arg2) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityTrace).get();
-            issueLogEntry(location, marker, Level.TRACE, null, message, arg1, arg2);
+            submit(location, marker, Level.TRACE, null, message, arg1, arg2);
         }
     }
 
@@ -145,7 +145,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void trace(Marker marker, String message, Object... arguments) {
         if (visibilityTrace != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityTrace).get();
-            issueLogEntry(location, marker, Level.TRACE, null, message, arguments);
+            submit(location, marker, Level.TRACE, null, message, arguments);
         }
     }
 
@@ -163,7 +163,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void debug(String message) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityDebug).get();
-            issueLogEntry(location, null, Level.DEBUG, null, message, (Object[]) null);
+            submit(location, null, Level.DEBUG, null, message, (Object[]) null);
         }
     }
 
@@ -171,7 +171,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void debug(String message, Throwable throwable) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityDebug).get();
-            issueLogEntry(location, null, Level.DEBUG, throwable, message, (Object[]) null);
+            submit(location, null, Level.DEBUG, throwable, message, (Object[]) null);
         }
     }
 
@@ -179,7 +179,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void debug(String message, Object argument) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityDebug).get();
-            issueLogEntry(location, null, Level.DEBUG, null, message, argument);
+            submit(location, null, Level.DEBUG, null, message, argument);
         }
     }
 
@@ -187,7 +187,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void debug(String message, Object arg1, Object arg2) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityDebug).get();
-            issueLogEntry(location, null, Level.DEBUG, null, message, arg1, arg2);
+            submit(location, null, Level.DEBUG, null, message, arg1, arg2);
         }
     }
 
@@ -195,7 +195,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void debug(String message, Object... arguments) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityDebug).get();
-            issueLogEntry(location, null, Level.DEBUG, null, message, arguments);
+            submit(location, null, Level.DEBUG, null, message, arguments);
         }
     }
 
@@ -203,7 +203,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void debug(Marker marker, String message) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityDebug).get();
-            issueLogEntry(location, marker, Level.DEBUG, null, message, (Object[]) null);
+            submit(location, marker, Level.DEBUG, null, message, (Object[]) null);
         }
     }
 
@@ -211,7 +211,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void debug(Marker marker, String message, Throwable throwable) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityDebug).get();
-            issueLogEntry(location, marker, Level.DEBUG, throwable, message, (Object[]) null);
+            submit(location, marker, Level.DEBUG, throwable, message, (Object[]) null);
         }
     }
 
@@ -219,7 +219,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void debug(Marker marker, String message, Object argument) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityDebug).get();
-            issueLogEntry(location, marker, Level.DEBUG, null, message, argument);
+            submit(location, marker, Level.DEBUG, null, message, argument);
         }
     }
 
@@ -227,7 +227,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void debug(Marker marker, String message, Object arg1, Object arg2) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityDebug).get();
-            issueLogEntry(location, marker, Level.DEBUG, null, message, arg1, arg2);
+            submit(location, marker, Level.DEBUG, null, message, arg1, arg2);
         }
     }
 
@@ -235,7 +235,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void debug(Marker marker, String message, Object... arguments) {
         if (visibilityDebug != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityDebug).get();
-            issueLogEntry(location, marker, Level.DEBUG, null, message, arguments);
+            submit(location, marker, Level.DEBUG, null, message, arguments);
         }
     }
 
@@ -253,7 +253,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void info(String message) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityInfo).get();
-            issueLogEntry(location, null, Level.INFO, null, message, (Object[]) null);
+            submit(location, null, Level.INFO, null, message, (Object[]) null);
         }
     }
 
@@ -261,7 +261,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void info(String message, Throwable throwable) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityInfo).get();
-            issueLogEntry(location, null, Level.INFO, throwable, message, (Object[]) null);
+            submit(location, null, Level.INFO, throwable, message, (Object[]) null);
         }
     }
 
@@ -269,7 +269,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void info(String message, Object argument) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityInfo).get();
-            issueLogEntry(location, null, Level.INFO, null, message, argument);
+            submit(location, null, Level.INFO, null, message, argument);
         }
     }
 
@@ -277,7 +277,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void info(String message, Object arg1, Object arg2) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityInfo).get();
-            issueLogEntry(location, null, Level.INFO, null, message, arg1, arg2);
+            submit(location, null, Level.INFO, null, message, arg1, arg2);
         }
     }
 
@@ -285,7 +285,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void info(String message, Object... arguments) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityInfo).get();
-            issueLogEntry(location, null, Level.INFO, null, message, arguments);
+            submit(location, null, Level.INFO, null, message, arguments);
         }
     }
 
@@ -293,7 +293,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void info(Marker marker, String message) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityInfo).get();
-            issueLogEntry(location, marker, Level.INFO, null, message, (Object[]) null);
+            submit(location, marker, Level.INFO, null, message, (Object[]) null);
         }
     }
 
@@ -301,7 +301,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void info(Marker marker, String message, Throwable throwable) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityInfo).get();
-            issueLogEntry(location, marker, Level.INFO, throwable, message, (Object[]) null);
+            submit(location, marker, Level.INFO, throwable, message, (Object[]) null);
         }
     }
 
@@ -309,7 +309,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void info(Marker marker, String message, Object argument) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityInfo).get();
-            issueLogEntry(location, marker, Level.INFO, null, message, argument);
+            submit(location, marker, Level.INFO, null, message, argument);
         }
     }
 
@@ -317,7 +317,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void info(Marker marker, String message, Object arg1, Object arg2) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityInfo).get();
-            issueLogEntry(location, marker, Level.INFO, null, message, arg1, arg2);
+            submit(location, marker, Level.INFO, null, message, arg1, arg2);
         }
     }
 
@@ -325,7 +325,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void info(Marker marker, String message, Object... arguments) {
         if (visibilityInfo != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityInfo).get();
-            issueLogEntry(location, marker, Level.INFO, null, message, arguments);
+            submit(location, marker, Level.INFO, null, message, arguments);
         }
     }
 
@@ -343,7 +343,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void warn(String message) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityWarn).get();
-            issueLogEntry(location, null, Level.WARN, null, message, (Object[]) null);
+            submit(location, null, Level.WARN, null, message, (Object[]) null);
         }
     }
 
@@ -351,7 +351,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void warn(String message, Throwable throwable) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityWarn).get();
-            issueLogEntry(location, null, Level.WARN, throwable, message, (Object[]) null);
+            submit(location, null, Level.WARN, throwable, message, (Object[]) null);
         }
     }
 
@@ -359,7 +359,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void warn(String message, Object argument) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityWarn).get();
-            issueLogEntry(location, null, Level.WARN, null, message, argument);
+            submit(location, null, Level.WARN, null, message, argument);
         }
     }
 
@@ -367,7 +367,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void warn(String message, Object arg1, Object arg2) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityWarn).get();
-            issueLogEntry(location, null, Level.WARN, null, message, arg1, arg2);
+            submit(location, null, Level.WARN, null, message, arg1, arg2);
         }
     }
 
@@ -375,7 +375,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void warn(String message, Object... arguments) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityWarn).get();
-            issueLogEntry(location, null, Level.WARN, null, message, arguments);
+            submit(location, null, Level.WARN, null, message, arguments);
         }
     }
 
@@ -383,7 +383,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void warn(Marker marker, String message) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityWarn).get();
-            issueLogEntry(location, marker, Level.WARN, null, message, (Object[]) null);
+            submit(location, marker, Level.WARN, null, message, (Object[]) null);
         }
     }
 
@@ -391,7 +391,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void warn(Marker marker, String message, Throwable throwable) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityWarn).get();
-            issueLogEntry(location, marker, Level.WARN, throwable, message, (Object[]) null);
+            submit(location, marker, Level.WARN, throwable, message, (Object[]) null);
         }
     }
 
@@ -399,7 +399,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void warn(Marker marker, String message, Object argument) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityWarn).get();
-            issueLogEntry(location, marker, Level.WARN, null, message, argument);
+            submit(location, marker, Level.WARN, null, message, argument);
         }
     }
 
@@ -407,7 +407,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void warn(Marker marker, String message, Object arg1, Object arg2) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityWarn).get();
-            issueLogEntry(location, marker, Level.WARN, null, message, arg1, arg2);
+            submit(location, marker, Level.WARN, null, message, arg1, arg2);
         }
     }
 
@@ -415,7 +415,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void warn(Marker marker, String message, Object... arguments) {
         if (visibilityWarn != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityWarn).get();
-            issueLogEntry(location, marker, Level.WARN, null, message, arguments);
+            submit(location, marker, Level.WARN, null, message, arguments);
         }
     }
 
@@ -433,7 +433,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void error(String message) {
         if (visibilityError != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityError).get();
-            issueLogEntry(location, null, Level.ERROR, null, message, (Object[]) null);
+            submit(location, null, Level.ERROR, null, message, (Object[]) null);
         }
     }
 
@@ -441,7 +441,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void error(String message, Throwable throwable) {
         if (visibilityError != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityError).get();
-            issueLogEntry(location, null, Level.ERROR, throwable, message, (Object[]) null);
+            submit(location, null, Level.ERROR, throwable, message, (Object[]) null);
         }
     }
 
@@ -449,7 +449,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void error(String message, Object argument) {
         if (visibilityError != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityError).get();
-            issueLogEntry(location, null, Level.ERROR, null, message, argument);
+            submit(location, null, Level.ERROR, null, message, argument);
         }
     }
 
@@ -457,7 +457,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void error(String message, Object arg1, Object arg2) {
         if (visibilityError != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityError).get();
-            issueLogEntry(location, null, Level.ERROR, null, message, arg1, arg2);
+            submit(location, null, Level.ERROR, null, message, arg1, arg2);
         }
     }
 
@@ -465,7 +465,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void error(String message, Object... arguments) {
         if (visibilityError != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityError).get();
-            issueLogEntry(location, null, Level.ERROR, null, message, arguments);
+            submit(location, null, Level.ERROR, null, message, arguments);
         }
     }
 
@@ -473,7 +473,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void error(Marker marker, String message) {
         if (visibilityError != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityError).get();
-            issueLogEntry(location, marker, Level.ERROR, null, message, (Object[]) null);
+            submit(location, marker, Level.ERROR, null, message, (Object[]) null);
         }
     }
 
@@ -481,7 +481,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void error(Marker marker, String message, Throwable throwable) {
         if (visibilityError != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityError).get();
-            issueLogEntry(location, marker, Level.ERROR, throwable, message, (Object[]) null);
+            submit(location, marker, Level.ERROR, throwable, message, (Object[]) null);
         }
     }
 
@@ -489,7 +489,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void error(Marker marker, String message, Object argument) {
         if (visibilityError != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityError).get();
-            issueLogEntry(location, marker, Level.ERROR, null, message, argument);
+            submit(location, marker, Level.ERROR, null, message, argument);
         }
     }
 
@@ -497,7 +497,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void error(Marker marker, String message, Object arg1, Object arg2) {
         if (visibilityError != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityError).get();
-            issueLogEntry(location, marker, Level.ERROR, null, message, arg1, arg2);
+            submit(location, marker, Level.ERROR, null, message, arg1, arg2);
         }
     }
 
@@ -505,7 +505,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
     public void error(Marker marker, String message, Object... arguments) {
         if (visibilityError != OutputDetails.DISABLED) {
             Object location = getDirectCaller(visibilityError).get();
-            issueLogEntry(location, marker, Level.ERROR, null, message, arguments);
+            submit(location, marker, Level.ERROR, null, message, arguments);
         }
     }
 
@@ -516,7 +516,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
         OutputDetails outputDetails = visibility.get(level);
         if (outputDetails != OutputDetails.DISABLED) {
             Object location = getRelativeCaller(outputDetails).apply(LOGGER_CLASS_NAME);
-            issueLogEntry(location, marker, level, throwable, message, arguments);
+            submit(location, marker, level, throwable, message, arguments);
         }
     }
 
@@ -528,7 +528,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
             Object location = getRelativeCaller(outputDetails).apply(event.getCallerBoundary());
             List<Marker> markers = event.getMarkers();
             Marker marker = markers == null || markers.isEmpty() ? null : markers.get(0);
-            issueLogEntry(location, marker, level, event.getThrowable(), event.getMessage(), event.getArgumentArray());
+            submit(location, marker, level, event.getThrowable(), event.getMessage(), event.getArgumentArray());
         }
     }
 
@@ -563,7 +563,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
      * @return A supplier for receiving the location information of the direct caller
      */
     private Supplier<?> getDirectCaller(OutputDetails outputDetails) {
-        if (outputDetails == OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION) {
+        if (outputDetails == OutputDetails.ENABLED_WITH_FULL_LOCATION_INFO) {
             return runtime.getDirectCaller(outputDetails);
         } else {
             return () -> category;
@@ -577,7 +577,7 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
      * @return A supplier for receiving the location information of the caller of a passed class
      */
     private Function<String, ?> getRelativeCaller(OutputDetails outputDetails) {
-        if (outputDetails == OutputDetails.ENABLED_WITH_FULL_LOCATION_INFORMATION) {
+        if (outputDetails == OutputDetails.ENABLED_WITH_FULL_LOCATION_INFO) {
             return runtime.getRelativeCaller(outputDetails);
         } else {
             return (String loggerClassName) -> category;
@@ -593,27 +593,39 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
      */
     private boolean isEnabled(Marker marker, Level level) {
         String tag = marker == null ? null : marker.getName();
-        return backend.isEnabled(category, tag, level);
+        return framework.isEnabled(category, tag, level);
     }
 
     /**
-     * Issues a log entry.
+     * Submits a new log entry to the framework.
      *
      * @param location The location information of the caller
      * @param marker The optional marker for getting the tag
      * @param level The severity level
      * @param throwable The optional throwable to log
      * @param message The message to log
-     * @param arguments The optional arguments for resolving potential placeholders in the passed message
+     * @param arguments The replacements for potential placeholders in the message
      */
-    private void issueLogEntry(Object location, Marker marker, Level level, Throwable throwable, String message,
+    private void submit(Object location, Marker marker, Level level, Throwable throwable, String message,
             Object... arguments) {
         String tag = marker == null ? null : marker.getName();
+
         if (throwable == null) {
             Object lastArgument = arguments == null || arguments.length == 0 ? null : arguments[arguments.length - 1];
             throwable = lastArgument instanceof Throwable ? (Throwable) lastArgument : null;
         }
-        backend.log(location, tag, level, throwable, message, arguments, arguments == null ? null : formatter);
+
+        framework.submit(new LogEntry(
+            Thread.currentThread(),
+            framework.getContextStorage().getMapping(),
+            location,
+            tag,
+            level,
+            throwable,
+            formatter,
+            message,
+            arguments
+        ));
     }
 
 }

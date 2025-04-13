@@ -3,7 +3,7 @@ package org.tinylog.core.backend;
 import org.tinylog.core.Level;
 
 /**
- *  Output requirement details of all severity levels.
+ * Output details for all severity levels.
  */
 public final class LevelVisibility {
 
@@ -14,11 +14,18 @@ public final class LevelVisibility {
     private final OutputDetails error;
 
     /**
-     * @param trace Output requirement details for trace log entries
-     * @param debug Output requirement details for debug log entries
-     * @param info Output requirement details for info log entries
-     * @param warn Output requirement details for warn log entries
-     * @param error Output requirement details for error log entries
+     * @param details The required output details for all log entries
+     */
+    public LevelVisibility(OutputDetails details) {
+        this(details, details, details, details, details);
+    }
+
+    /**
+     * @param trace The required output details for trace log entries
+     * @param debug The required output details for debug log entries
+     * @param info The required output details for info log entries
+     * @param warn The required output details for warn log entries
+     * @param error The required output details for error log entries
      */
     public LevelVisibility(OutputDetails trace, OutputDetails debug, OutputDetails info, OutputDetails warn,
             OutputDetails error) {
@@ -30,56 +37,56 @@ public final class LevelVisibility {
     }
 
     /**
-     * Gets the output requirement details for trace log entries.
+     * Gets the required output details for trace log entries.
      *
-     * @return Output requirement details for trace log entries
+     * @return The required output details for trace log entries
      */
     public OutputDetails getTrace() {
         return trace;
     }
 
     /**
-     * Gets the output requirement details for debug log entries.
+     * Gets the required output details for debug log entries.
      *
-     * @return Output requirement details for debug log entries
+     * @return The required output details for debug log entries
      */
     public OutputDetails getDebug() {
         return debug;
     }
 
     /**
-     * Gets the output requirement details for info log entries.
+     * Gets the required output details for info log entries.
      *
-     * @return Output requirement details for info log entries
+     * @return The required output details for info log entries
      */
     public OutputDetails getInfo() {
         return info;
     }
 
     /**
-     * Gets the output requirement details for warn log entries.
+     * Gets the required output details for warn log entries.
      *
-     * @return Output requirement details for warn log entries
+     * @return The required output details for warn log entries
      */
     public OutputDetails getWarn() {
         return warn;
     }
 
     /**
-     * Gets the output requirement details for error log entries.
+     * Gets the required output details for error log entries.
      *
-     * @return Output requirement details for error log entries
+     * @return The required output details for error log entries
      */
     public OutputDetails getError() {
         return error;
     }
 
     /**
-     * Gets the output requirement details for log entries with the passed severity level.
+     * Gets the required output details for log entries with the passed severity level.
      *
      * @param level The severity level
-     * @return Output requirement details for log entries with the passed severity level
-     * @throws IllegalArgumentException This exception will be thrown for the severity level {@link Level#OFF}
+     * @return The required output details for log entries with the passed severity level
+     * @throws IllegalArgumentException If the passed severity level is invalid (e.g. {@link Level#OFF})
      */
     public OutputDetails get(Level level) {
         switch (level) {
