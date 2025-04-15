@@ -54,10 +54,16 @@
 		<Bug pattern="MS_SHOULD_BE_FINAL, URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
 	</Match>
 	<Match>
-		<!-- Original Apache Log4j 1.2 Classes -->
+		<!-- Original Priority class from Apache Log4j 1.2 -->
 		<Class name="org.apache.log4j.Priority" />
-		<!-- Ignore unchecked casts as Apache Log4j 1.2 does -->
+		<!-- Ignore unchecked casts as Apache Log4j 1.2 does it, too -->
 		<Bug pattern="BC_UNCONFIRMED_CAST" />
+	</Match>
+	<Match>
+		<!-- Original Level class from Apache Log4j 1.2 -->
+		<Class name="org.apache.log4j.Level" />
+		<!-- Ignore overridable method is called from the readObject() method -->
+		<Bug pattern="MC_OVERRIDABLE_METHOD_CALL_IN_READ_OBJECT" />
 	</Match>
 	<Match>
 		<!-- JUnit Tests -->
