@@ -8,14 +8,14 @@ import org.tinylog.test.util.LogEntryBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ContextPlaceholderTest {
+class SingleContextPlaceholderTest {
 
     /**
      * Verifies that the context placeholder enables output but does not require any kind of location information.
      */
     @Test
     void provideOutputDetails() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
+        SingleContextPlaceholder placeholder = new SingleContextPlaceholder("foo");
         assertThat(placeholder.getOutputDetails()).isEqualTo(OutputDetails.ENABLED_WITHOUT_LOCATION_INFO);
     }
 
@@ -24,7 +24,7 @@ class ContextPlaceholderTest {
      */
     @Test
     void resolveWithContextValue() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
+        SingleContextPlaceholder placeholder = new SingleContextPlaceholder("foo");
         LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
         assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
         assertThat(placeholder.getValue(logEntry)).isEqualTo("bar");
@@ -35,7 +35,7 @@ class ContextPlaceholderTest {
      */
     @Test
     void resolveWithoutContextValue() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
+        SingleContextPlaceholder placeholder = new SingleContextPlaceholder("foo");
         LogEntry logEntry = new LogEntryBuilder().create();
         assertThat(placeholder.getType()).isEqualTo(ValueType.STRING);
         assertThat(placeholder.getValue(logEntry)).isNull();
@@ -46,7 +46,7 @@ class ContextPlaceholderTest {
      */
     @Test
     void renderWithContextValue() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
+        SingleContextPlaceholder placeholder = new SingleContextPlaceholder("foo");
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
         LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
         assertThat(renderer.render(logEntry)).isEqualTo("bar");
@@ -57,7 +57,7 @@ class ContextPlaceholderTest {
      */
     @Test
     void renderWithoutContextValue() {
-        ContextPlaceholder placeholder = new ContextPlaceholder("foo");
+        SingleContextPlaceholder placeholder = new SingleContextPlaceholder("foo");
         FormatOutputRenderer renderer = new FormatOutputRenderer(placeholder);
         LogEntry logEntry = new LogEntryBuilder().create();
         assertThat(renderer.render(logEntry)).isEmpty();

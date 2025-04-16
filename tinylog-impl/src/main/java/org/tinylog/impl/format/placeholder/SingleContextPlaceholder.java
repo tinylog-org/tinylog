@@ -6,14 +6,14 @@ import org.tinylog.core.backend.OutputDetails;
 /**
  * Placeholder implementation for resolving thread context values for a log entry.
  */
-public class ContextPlaceholder implements Placeholder {
+public class SingleContextPlaceholder implements Placeholder {
 
     private final String key;
 
     /**
      * @param key The key of the thread context value to output
      */
-    public ContextPlaceholder(String key) {
+    public SingleContextPlaceholder(String key) {
         this.key = key;
     }
 

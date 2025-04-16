@@ -11,7 +11,6 @@ import org.tinylog.test.util.LogEntryBuilder;
 import jakarta.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Tinylog
 class ContextPlaceholderBuilderTest {
@@ -31,26 +30,27 @@ class ContextPlaceholderBuilderTest {
     }
 
     /**
-     * Verifies that an {@link IllegalArgumentException} with a meaningful message description will be thrown, if the
-     * thread context key is missing.
+     * Verifies that a multi context placeholder can be created if there is no thread context key.
      */
     @Test
     void creationWithoutConfigurationValue() {
-        assertThatThrownBy(() -> new ContextPlaceholderBuilder().create(context, null))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessageContaining("key");
+        Placeholder placeholder = new ContextPlaceholderBuilder().create(context, null);
+        assertThat(placeholder).isInstanceOf(MultiContextPlaceholder.class);
+
+        LogEntry logEntry = new LogEntryBuilder().context("foo", "a").context("bar", "b").create();
+        assertThat(placeholder.getValue(logEntry)).isEqualTo("bar=b, foo=a");
     }
 
     /**
-     * Verifies that a context placeholder can be created for a given thread context key.
+     * Verifies that a single context placeholder can be created for a given thread context key.
      */
     @Test
     void creationWithConfigurationValue() {
         Placeholder placeholder = new ContextPlaceholderBuilder().create(context, "foo");
-        assertThat(placeholder).isInstanceOf(ContextPlaceholder.class);
+        assertThat(placeholder).isInstanceOf(SingleContextPlaceholder.class);
 
-        LogEntry logEntry = new LogEntryBuilder().context("foo", "bar").create();
-        assertThat(placeholder.getValue(logEntry)).isEqualTo("bar");
+        LogEntry logEntry = new LogEntryBuilder().context("foo", "a").context("bar", "b").create();
+        assertThat(placeholder.getValue(logEntry)).isEqualTo("a");
     }
 
 }

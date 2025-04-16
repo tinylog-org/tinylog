@@ -3,7 +3,7 @@ package org.tinylog.impl.format.placeholder;
 import org.tinylog.core.backend.TinylogContext;
 
 /**
- * Builder for creating an instance of {@link ContextPlaceholder}.
+ * Builder for creating an instance of {@link SingleContextPlaceholder} or {@link MultiContextPlaceholder}.
  */
 public class ContextPlaceholderBuilder implements PlaceholderBuilder {
 
@@ -19,9 +19,9 @@ public class ContextPlaceholderBuilder implements PlaceholderBuilder {
     @Override
     public Placeholder create(TinylogContext context, String value) {
         if (value == null) {
-            throw new IllegalArgumentException("Thread context key is not defined for context placeholder");
+            return new MultiContextPlaceholder();
         } else {
-            return new ContextPlaceholder(value);
+            return new SingleContextPlaceholder(value);
         }
     }
 
