@@ -1129,7 +1129,7 @@ class TinylogLoggerWithoutMarkersTest {
         }
 
         /**
-         * Tests for issuing warn log entries if {@link Level#WARN} is enabled.
+         * Tests for issuing warning log entries if {@link Level#WARN} is enabled.
          */
         @Nested
         class WarnEnabled {
@@ -1151,7 +1151,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a plain text message can be issued.
+             * Verifies that a warning log entry with a plain text message can be issued.
              */
             @Test
             void warnTextMessage() {
@@ -1162,7 +1162,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a plain text message and an exception can be issued.
+             * Verifies that a warning log entry with a plain text message and an exception can be issued.
              */
             @Test
             void warnTextMessageAndException() {
@@ -1174,7 +1174,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a message and a single placeholder can be issued.
+             * Verifies that a warning log entry with a message and a single placeholder can be issued.
              */
             @Test
             void warnFormattedMessageWithSingleArgument() {
@@ -1185,7 +1185,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a message and two arguments can be issued.
+             * Verifies that a warning log entry with a message and two arguments can be issued.
              */
             @Test
             void warnFormattedMessageWithTwoArguments() {
@@ -1196,7 +1196,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a message, a single placeholder, and an exception can be issued.
+             * Verifies that a warning log entry with a message, a single placeholder, and an exception can be issued.
              */
             @Test
             void warnFormattedMessageWithArgumentAndException() {
@@ -1208,7 +1208,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a message and three arguments can be issued.
+             * Verifies that a warning log entry with a message and three arguments can be issued.
              */
             @Test
             void warnFormattedMessageWithThreeArguments() {
@@ -1219,7 +1219,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a message, two placeholders, and an exception can be issued.
+             * Verifies that a warning log entry with a message, two placeholders, and an exception can be issued.
              */
             @Test
             void warnFormattedMessageWithArgumentsAndException() {
@@ -1231,7 +1231,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a full warn log entry can be issued via the generic log method.
+             * Verifies that a full warning log entry can be issued via the generic log method.
              */
             @Test
             void logGenericWarnEntry() {
@@ -1250,7 +1250,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a full warn log entry can be issued via the event log method.
+             * Verifies that a full warning log entry can be issued via the event log method.
              */
             @Test
             void logEventWarnEntry() {
@@ -1269,7 +1269,7 @@ class TinylogLoggerWithoutMarkersTest {
         }
 
         /**
-         * Tests for issuing warn log entries if {@link Level#WARN} is disabled.
+         * Tests for issuing warning log entries if {@link Level#WARN} is disabled.
          */
         @Nested
         class WarnDisabled {
@@ -1291,7 +1291,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a plain text message can be issued.
+             * Verifies that a warning log entry with a plain text message can be issued.
              */
             @Test
             void warnTextMessage() {
@@ -1302,7 +1302,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a plain text message and an exception can be issued.
+             * Verifies that a warning log entry with a plain text message and an exception can be issued.
              */
             @Test
             void warnTextMessageAndException() {
@@ -1314,7 +1314,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a message and a single placeholder can be issued.
+             * Verifies that a warning log entry with a message and a single placeholder can be issued.
              */
             @Test
             void warnFormattedMessageWithSingleArgument() {
@@ -1325,7 +1325,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a message and two arguments can be issued.
+             * Verifies that a warning log entry with a message and two arguments can be issued.
              */
             @Test
             void warnFormattedMessageWithTwoArguments() {
@@ -1336,7 +1336,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a message, a single placeholder, and an exception can be issued.
+             * Verifies that a warning log entry with a message, a single placeholder, and an exception can be issued.
              */
             @Test
             void warnFormattedMessageWithArgumentAndException() {
@@ -1348,7 +1348,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a message and three arguments can be issued.
+             * Verifies that a warning log entry with a message and three arguments can be issued.
              */
             @Test
             void warnFormattedMessageWithThreeArguments() {
@@ -1359,7 +1359,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a warn log entry with a message, two placeholders, and an exception can be issued.
+             * Verifies that a warning log entry with a message, two placeholders, and an exception can be issued.
              */
             @Test
             void warnFormattedMessageWithArgumentsAndException() {
@@ -1371,7 +1371,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a full warn log entry can be issued via the generic log method.
+             * Verifies that a full warning log entry can be issued via the generic log method.
              */
             @Test
             void logGenericWarnEntry() {
@@ -1390,7 +1390,7 @@ class TinylogLoggerWithoutMarkersTest {
             }
 
             /**
-             * Verifies that a full warn log entry can be issued via the event log method.
+             * Verifies that a full warning log entry can be issued via the event log method.
              */
             @Test
             void logEventWarnEntry() {
