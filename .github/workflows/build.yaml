@@ -1,10 +1,12 @@
 name: Build Repository
 
 on:
+
   push:
-    branches: [ "**" ]
+    branches: [ '**' ]
+
   pull_request:
-    branches-ignore: [ "renovate/**" ]
+    branches: [ '**' ]
 
 jobs:
 
