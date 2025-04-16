@@ -24,7 +24,7 @@ public final class LevelVisibility {
      * @param trace The required output details for trace log entries
      * @param debug The required output details for debug log entries
      * @param info The required output details for info log entries
-     * @param warn The required output details for warn log entries
+     * @param warn The required output details for warning log entries
      * @param error The required output details for error log entries
      */
     public LevelVisibility(OutputDetails trace, OutputDetails debug, OutputDetails info, OutputDetails warn,
@@ -64,9 +64,9 @@ public final class LevelVisibility {
     }
 
     /**
-     * Gets the required output details for warn log entries.
+     * Gets the required output details for warning log entries.
      *
-     * @return The required output details for warn log entries
+     * @return The required output details for warning log entries
      */
     public OutputDetails getWarn() {
         return warn;

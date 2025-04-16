@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.tinylog.core.Configuration;
@@ -76,15 +75,10 @@ public class EnhancedMessageFormatter extends AbstractPatternParser implements M
      * @return The formatted representation of the passed value
      */
     private String render(Configuration configuration, String pattern, Object value) {
-        if (value instanceof Supplier<?>) {
-            value = ((Supplier<?>) value).get();
-        }
-
         if (!pattern.isEmpty()) {
             if (isConditional(pattern)) {
                 try {
-                    Object singleton = value;
-                    Iterator<Object> iterator = Stream.generate(() -> singleton).iterator();
+                    Iterator<Object> iterator = Stream.generate(() -> value).iterator();
                     return new ChoiceFormat(format(configuration, pattern, iterator)).format(value);
                 } catch (RuntimeException ex) {
                     logger.log(

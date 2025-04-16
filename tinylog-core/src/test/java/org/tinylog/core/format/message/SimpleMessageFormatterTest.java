@@ -1,7 +1,5 @@
 package org.tinylog.core.format.message;
 
-import java.util.function.Supplier;
-
 import org.junit.jupiter.api.Test;
 import org.tinylog.core.Configuration;
 import org.tinylog.test.junit.log.Tinylog;
@@ -23,17 +21,6 @@ class SimpleMessageFormatterTest {
     void resolveStaticSingleArgument() {
         SimpleMessageFormatter formatter = new SimpleMessageFormatter();
         String output = formatter.format(configuration, "Hello {}!", "Alice");
-        assertThat(output).isEqualTo("Hello Alice!");
-    }
-
-    /**
-     * Verifies that a single lazy argument can be formatted.
-     */
-    @Test
-    void formatLazyArgument() {
-        SimpleMessageFormatter formatter = new SimpleMessageFormatter();
-        Supplier<?> supplier = () -> "Alice";
-        String output = formatter.format(configuration, "Hello {}!", supplier);
         assertThat(output).isEqualTo("Hello Alice!");
     }
 
