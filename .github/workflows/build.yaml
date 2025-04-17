@@ -18,11 +18,11 @@ jobs:
         with:
           distribution: zulu
           java-version: 9
-      - uses: skjolber/maven-cache-github-action@v3.1.1
+      - uses: skjolber/maven-cache-github-action@v3.1.2
         with:
           step: restore
       - run: mvn --batch-mode --update-snapshots verify
-      - uses: skjolber/maven-cache-github-action@v3.1.1
+      - uses: skjolber/maven-cache-github-action@v3.1.2
         with:
           step: save
       - uses: codecov/codecov-action@v5
@@ -39,11 +39,11 @@ jobs:
         with:
           distribution: zulu
           java-version: 9
-      - uses: skjolber/maven-cache-github-action@v3.1.1
+      - uses: skjolber/maven-cache-github-action@v3.1.2
         with:
           step: restore
       - run: mvn -P release --batch-mode --update-snapshots verify
-      - uses: skjolber/maven-cache-github-action@v3.1.1
+      - uses: skjolber/maven-cache-github-action@v3.1.2
         with:
           step: save
       - uses: codecov/codecov-action@v5
