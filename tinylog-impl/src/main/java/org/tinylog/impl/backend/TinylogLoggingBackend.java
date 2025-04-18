@@ -72,7 +72,7 @@ public class TinylogLoggingBackend implements LoggingBackend {
         } else if (location instanceof String) {
             return isEnabled((String) location, normalizeTag(tag), level);
         } else {
-            logger.log(Level.ERROR, "Location information must not be null");
+            logger.log(Level.ERROR, "Illegal location information \"{}\"", location);
             return isEnabled(null, normalizeTag(tag), level);
         }
     }
