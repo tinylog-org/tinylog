@@ -1,5 +1,6 @@
 package org.tinylog.slf4j.backend;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.slf4j.MDC;
@@ -16,7 +17,8 @@ public class Slf4jContextStorage implements ContextStorage {
 
     @Override
     public Map<String, String> getMapping() {
-        return MDC.getCopyOfContextMap();
+        Map<String, String> mapping = MDC.getCopyOfContextMap();
+        return mapping == null ? Collections.emptyMap() : mapping;
     }
 
     @Override
