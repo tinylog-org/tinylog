@@ -15,7 +15,7 @@ public class Slf4jLoggingBackendBuilder implements LoggingBackendBuilder {
 
     @Override
     public String getName() {
-        return "slf4f";
+        return "slf4j";
     }
 
     @Override
