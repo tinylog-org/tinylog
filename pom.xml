@@ -31,6 +31,7 @@
         <module>tinylog-api-kotlin</module>
         <module>tinylog-core</module>
         <module>tinylog-impl</module>
+        <module>tinylog-slf4j</module>
     </modules>
 
     <licenses>

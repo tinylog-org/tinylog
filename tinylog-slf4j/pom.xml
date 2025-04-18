@@ -6,9 +6,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <packaging>bundle</packaging>
-    <artifactId>slf4j-tinylog</artifactId>
+    <artifactId>tinylog-slf4j</artifactId>
 
-    <description>SLF4J binding for forwarding log entries from SLF4J to tinylog</description>
+    <description>SLF4J backend implementation for forwarding log entries from tinylog API to SLF4J</description>
     <url>${website.url}</url>
 
     <parent>
@@ -59,13 +59,6 @@
         <dependency>
             <groupId>org.tinylog</groupId>
             <artifactId>tinylog-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.tinylog</groupId>
-            <artifactId>tinylog-core</artifactId>
-            <classifier>tests</classifier>
-            <type>test-jar</type>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -137,7 +130,7 @@
                 <configuration>
                     <module>
                         <moduleInfo>
-                            <name>org.tinylog.slf4j</name>
+                            <name>org.tinylog.slf4j.impl</name>
                             <addServiceUses>true</addServiceUses>
                         </moduleInfo>
                     </module>
