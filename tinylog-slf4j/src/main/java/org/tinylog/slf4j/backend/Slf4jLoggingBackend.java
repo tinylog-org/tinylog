@@ -83,12 +83,22 @@ public class Slf4jLoggingBackend implements LoggingBackend {
     public void output(LogEntry entry, boolean last) {
         LoggingEventBuilder builder = getLoggingEventBuilder(entry.getClassName(), entry.getSeverityLevel());
 
+        if (builder instanceof NOPLoggingEventBuilder) {
+            return;
+        }
+
         Marker marker = getMarker(entry.getTag());
         if (marker != null) {
             builder = builder.addMarker(marker);
         }
 
-        builder.setCause(entry.getThrowable()).setMessage(() -> entry.getFormattedMessage(configuration)).log();
+        builder = builder.setCause(entry.getThrowable());
+
+        builder.log(() -> {
+            Throwable throwable = entry.getThrowable();
+            String message = entry.getFormattedMessage(configuration);
+            return message == null && throwable != null ? throwable.getMessage() : message;
+        });
     }
 
     @Override
