@@ -1,6 +1,7 @@
 package org.tinylog.slf4j.backend;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,7 +10,13 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junitpioneer.jupiter.StdIo;
 import org.junitpioneer.jupiter.StdOut;
+import org.mockito.Answers;
+import org.mockito.MockedStatic;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
+import org.slf4j.helpers.BasicMarkerFactory;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
 import org.tinylog.core.LogEntry;
@@ -27,6 +34,13 @@ import jakarta.inject.Inject;
 
 import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @Tinylog
 class Slf4jLoggingBackendTest {
@@ -370,10 +384,355 @@ class Slf4jLoggingBackendTest {
     }
 
     /**
-     * Tests for {@link Slf4jLoggingBackend#output(LogEntry, boolean)}.
+     * Tests for {@link Slf4jLoggingBackend#output(LogEntry, boolean)} with location unaware SLF4J loggers.
+     *
+     * <p>
+     *     Mocks are used to simulate a location unaware logger implementation.
+     * </p>
      */
     @Nested
-    class LogEntryOutput {
+    class LocationUnawareLogEntryOutput {
+
+        private MockedStatic<MarkerFactory> markerFactory;
+        private MockedStatic<LoggerFactory> loggerFactory;
+        private org.slf4j.Logger rootLogger;
+        private org.slf4j.Logger fooLogger;
+
+        /**
+         * Initializes all mocks for simulating a logging framework without location aware loggers.
+         */
+        @SuppressWarnings("ResultOfMethodCallIgnored")
+        @BeforeEach
+        void init() {
+            markerFactory = mockStatic(MarkerFactory.class);
+            markerFactory.when(MarkerFactory::getIMarkerFactory).thenReturn(new BasicMarkerFactory());
+
+            rootLogger = mock(org.slf4j.Logger.class, Answers.CALLS_REAL_METHODS);
+            fooLogger = mock(org.slf4j.Logger.class, Answers.CALLS_REAL_METHODS);
+
+            ILoggerFactory loggerFactoryInstance = mock(ILoggerFactory.class);
+            when(loggerFactoryInstance.getLogger(Logger.ROOT_LOGGER_NAME)).thenReturn(rootLogger);
+            when(loggerFactoryInstance.getLogger("example.Foo")).thenReturn(fooLogger);
+
+            loggerFactory = mockStatic(LoggerFactory.class);
+            loggerFactory.when(LoggerFactory::getILoggerFactory).thenReturn(loggerFactoryInstance);
+        }
+
+        /**
+         * Resets all static mocks.
+         */
+        @AfterEach
+        void dispose() {
+            markerFactory.close();
+            loggerFactory.close();
+        }
+
+        /**
+         * Verifies that trace log entries with a plain text message are output correctly.
+         */
+        @Test
+        void outputTraceMessage() {
+            when(fooLogger.isTraceEnabled(null)).thenReturn(true);
+
+            LogEntry entry = new LogEntry(
+                Thread.currentThread(),
+                emptyMap(),
+                "example.Foo",
+                null,
+                Level.TRACE,
+                null,
+                null,
+                "Hello World!",
+                null
+            );
+
+            new Slf4jLoggingBackend(context).output(entry, true);
+            verify(fooLogger).trace((Marker) null, "Hello World!", (Throwable) null);
+        }
+
+        /**
+         * Verifies that debug log entries with a plain text message are output correctly.
+         */
+        @Test
+        void outputDebugMessage() {
+            when(fooLogger.isDebugEnabled(null)).thenReturn(true);
+
+            LogEntry entry = new LogEntry(
+                Thread.currentThread(),
+                emptyMap(),
+                "example.Foo",
+                null,
+                Level.DEBUG,
+                null,
+                null,
+                "Hello World!",
+                null
+            );
+
+            new Slf4jLoggingBackend(context).output(entry, true);
+            verify(fooLogger).debug((Marker) null, "Hello World!", (Throwable) null);
+        }
+
+        /**
+         * Verifies that info log entries with a plain text message are output correctly.
+         */
+        @Test
+        void outputInfoMessage() {
+            when(fooLogger.isInfoEnabled(null)).thenReturn(true);
+
+            LogEntry entry = new LogEntry(
+                Thread.currentThread(),
+                emptyMap(),
+                "example.Foo",
+                null,
+                Level.INFO,
+                null,
+                null,
+                "Hello World!",
+                null
+            );
+
+            new Slf4jLoggingBackend(context).output(entry, true);
+            verify(fooLogger).info((Marker) null, "Hello World!", (Throwable) null);
+        }
+
+        /**
+         * Verifies that warning log entries with a plain text message are output correctly.
+         */
+        @Test
+        void outputWarnMessage() {
+            when(fooLogger.isWarnEnabled(null)).thenReturn(true);
+
+            LogEntry entry = new LogEntry(
+                Thread.currentThread(),
+                emptyMap(),
+                "example.Foo",
+                null,
+                Level.WARN,
+                null,
+                null,
+                "Hello World!",
+                null
+            );
+
+            new Slf4jLoggingBackend(context).output(entry, true);
+            verify(fooLogger).warn((Marker) null, "Hello World!", (Throwable) null);
+        }
+
+        /**
+         * Verifies that error log entries with a plain text message are output correctly.
+         */
+        @Test
+        void outputErrorMessage() {
+            when(fooLogger.isErrorEnabled(null)).thenReturn(true);
+
+            LogEntry entry = new LogEntry(
+                Thread.currentThread(),
+                emptyMap(),
+                "example.Foo",
+                null,
+                Level.ERROR,
+                null,
+                null,
+                "Hello World!",
+                null
+            );
+
+            new Slf4jLoggingBackend(context).output(entry, true);
+            verify(fooLogger).error((Marker) null, "Hello World!", (Throwable) null);
+        }
+
+
+        /**
+         * Verifies that log entries with a marker are output correctly.
+         */
+        @Test
+        void outputMarker() {
+            Marker marker = MarkerFactory.getIMarkerFactory().getMarker("bar");
+            when(fooLogger.isInfoEnabled(marker)).thenReturn(true);
+
+            LogEntry entry = new LogEntry(
+                Thread.currentThread(),
+                emptyMap(),
+                "example.Foo",
+                "bar",
+                Level.INFO,
+                null,
+                null,
+                "Hello World!",
+                null
+            );
+
+            new Slf4jLoggingBackend(context).output(entry, true);
+            verify(fooLogger).info(marker, "Hello World!", (Throwable) null);
+        }
+
+
+        /**
+         * Verifies that log entries with a formatted text message with placeholders are output correctly.
+         */
+        @Test
+        void outputFormattedTextMessage() {
+            when(fooLogger.isInfoEnabled(null)).thenReturn(true);
+
+            LogEntry entry = new LogEntry(
+                Thread.currentThread(),
+                emptyMap(),
+                "example.Foo",
+                null,
+                Level.INFO,
+                null,
+                new SimpleMessageFormatter(),
+                "Hello {}!",
+                new Object[] {"Alice"}
+            );
+
+            new Slf4jLoggingBackend(context).output(entry, true);
+            verify(fooLogger).info((Marker) null, "Hello Alice!", (Throwable) null);
+        }
+
+        /**
+         * Verifies that log entries with an exception but without any message are output correctly.
+         */
+        @Test
+        void outputExceptionOnly() {
+            when(fooLogger.isErrorEnabled(null)).thenReturn(true);
+
+            Exception exception = new Exception("Something went wrong");
+            exception.setStackTrace(new StackTraceElement[] {
+                new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
+                new StackTraceElement("example.OtherClass", "bar", "OtherClass.java", 42),
+            });
+
+            LogEntry entry = new LogEntry(
+                Thread.currentThread(),
+                emptyMap(),
+                "example.Foo",
+                null,
+                Level.ERROR,
+                exception,
+                null,
+                null,
+                null
+            );
+
+            new Slf4jLoggingBackend(context).output(entry, true);
+            verify(fooLogger).error((Marker) null, "Something went wrong", exception);
+        }
+
+        /**
+         * Verifies that log entries with an exception and a custom message are output correctly.
+         */
+        @Test
+        void outputExceptionWithCustomMessage() {
+            when(fooLogger.isErrorEnabled(null)).thenReturn(true);
+
+            Exception exception = new Exception("Something went wrong");
+            exception.setStackTrace(new StackTraceElement[] {
+                new StackTraceElement("example.MyClass", "foo", "MyClass.java", 42),
+            });
+
+            LogEntry entry = new LogEntry(
+                Thread.currentThread(),
+                emptyMap(),
+                "example.Foo",
+                null,
+                Level.ERROR,
+                exception,
+                null,
+                "Oops!",
+                null
+            );
+
+            new Slf4jLoggingBackend(context).output(entry, true);
+            verify(fooLogger).error((Marker) null, "Oops!", exception);
+        }
+
+
+        /**
+         * Verifies that log entries without any location information can be output correctly.
+         */
+        @Test
+        void outputWithoutLocationInformation() {
+            when(rootLogger.isInfoEnabled(null)).thenReturn(true);
+
+            LogEntry entry = new LogEntry(
+                Thread.currentThread(),
+                emptyMap(),
+                null,
+                null,
+                Level.INFO,
+                null,
+                null,
+                "Hello World!",
+                null
+            );
+
+            new Slf4jLoggingBackend(context).output(entry, true);
+            verify(rootLogger).info((Marker) null, "Hello World!", (Throwable) null);
+        }
+
+        /**
+         * Verifies that a log entry won't be output if its severity level is not enabled.
+         */
+        @Test
+        void discardNonSevereSeverityLevel() {
+            when(fooLogger.isInfoEnabled(null)).thenReturn(false);
+
+            LogEntry entry = new LogEntry(
+                Thread.currentThread(),
+                emptyMap(),
+                "example.Foo",
+                null,
+                Level.INFO,
+                null,
+                null,
+                "Hello World!",
+                null
+            );
+
+            new Slf4jLoggingBackend(context).output(entry, true);
+            verify(fooLogger, never()).info(any(Marker.class), any(String.class), any(Throwable.class));
+        }
+
+        /**
+         * Verifies that a log entry won't be output if its severity level is unsupported.
+         */
+        @Test
+        void discardIllegalSeverityLevel() {
+            LogEntry entry = new LogEntry(
+                Thread.currentThread(),
+                emptyMap(),
+                "example.Foo",
+                null,
+                Level.OFF,
+                null,
+                null,
+                "Hello World!",
+                null
+            );
+
+            new Slf4jLoggingBackend(context).output(entry, true);
+            verifyNoInteractions(fooLogger);
+
+            assertThat(log.consume()).singleElement().satisfies(element -> {
+                assertThat(element.getSeverityLevel()).isEqualTo(Level.ERROR);
+                assertThat(element.getFormattedMessage(configuration))
+                    .isEqualTo("Illegal severity level \"OFF\"");
+            });
+        }
+
+    }
+
+    /**
+     * Tests for {@link Slf4jLoggingBackend#output(LogEntry, boolean)} with location aware SLF4J loggers.
+     *
+     * <p>
+     *     The location aware logger implementation of Logback is used for these tests.
+     * </p>
+     */
+    @Nested
+    class LocationAwareLogEntryOutput {
 
         /**
          * Verifies that trace log entries with a plain text message are output correctly.
@@ -496,7 +855,7 @@ class Slf4jLoggingBackendTest {
         }
 
         /**
-         * Verifies that info log entries with a plain text message are output correctly.
+         * Verifies that log entries with a marker are output correctly.
          *
          * @param out The captured output of the standard output stream
          */

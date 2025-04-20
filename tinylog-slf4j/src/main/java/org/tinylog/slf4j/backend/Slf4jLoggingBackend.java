@@ -6,8 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
-import org.slf4j.spi.LoggingEventBuilder;
-import org.slf4j.spi.NOPLoggingEventBuilder;
+import org.slf4j.spi.LocationAwareLogger;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
 import org.tinylog.core.LogEntry;
@@ -22,6 +21,8 @@ import org.tinylog.core.internal.InternalLogger;
  * Logging backend adapter for forwarding log entries to SLF4J.
  */
 public class Slf4jLoggingBackend implements LoggingBackend {
+
+    private static final int SEVERITY_LEVEL_FACTOR = 10;
 
     private final Slf4jContextStorage contextStorage;
     private final LevelVisibility levelVisibility;
@@ -61,7 +62,73 @@ public class Slf4jLoggingBackend implements LoggingBackend {
     public boolean isEnabled(Object location, String tag, Level level) {
         Logger logger = getLogger(location);
         Marker marker = getMarker(tag);
+        return isEnabled(logger, marker, level);
+    }
 
+    @Override
+    public void output(LogEntry entry, boolean last) {
+        Logger logger = getLogger(entry.getClassName());
+        Marker marker = getMarker(entry.getTag());
+        Level level = entry.getSeverityLevel();
+
+        if (!isEnabled(logger, marker, level)) {
+            return;
+        }
+
+        Throwable throwable = entry.getThrowable();
+        String message = entry.getFormattedMessage(configuration);
+
+        if (message == null && throwable != null) {
+            message = throwable.getMessage();
+        }
+
+        if (logger instanceof LocationAwareLogger) {
+            LocationAwareLogger locationAwareLogger = (LocationAwareLogger) logger;
+            locationAwareLogger.log(
+                marker,
+                Slf4jLoggingBackend.class.getName(),
+                (Level.TRACE.ordinal() - level.ordinal()) * SEVERITY_LEVEL_FACTOR,
+                message,
+                null,
+                throwable
+            );
+        } else {
+            switch (level) {
+                case TRACE:
+                    logger.trace(marker, message, throwable);
+                    return;
+                case DEBUG:
+                    logger.debug(marker, message, throwable);
+                    return;
+                case INFO:
+                    logger.info(marker, message, throwable);
+                    return;
+                case WARN:
+                    logger.warn(marker, message, throwable);
+                    return;
+                case ERROR:
+                    logger.error(marker, message, throwable);
+                    return;
+                default:
+                    internalLogger.log(Level.ERROR, "Illegal severity level \"{}\"", level);
+            }
+        }
+    }
+
+    @Override
+    public void close() {
+        // Nothing to do
+    }
+
+    /**
+     * Checks if a given severity level is enabled for the given logger and marker.
+     *
+     * @param logger The SLF4J logger to check if the given severity level is enabled
+     * @param marker The SLF4J marker to check for being enabled
+     * @param level The severity level to check if it is enabled on the passed logger
+     * @return {@code true} if log entries of the passed marker and severity level will be output, {@code false} if not
+     */
+    private boolean isEnabled(Logger logger, Marker marker, Level level) {
         switch (level) {
             case TRACE:
                 return logger.isTraceEnabled(marker);
@@ -77,33 +144,6 @@ public class Slf4jLoggingBackend implements LoggingBackend {
                 internalLogger.log(Level.ERROR, "Illegal severity level \"{}\"", level);
                 return false;
         }
-    }
-
-    @Override
-    public void output(LogEntry entry, boolean last) {
-        LoggingEventBuilder builder = getLoggingEventBuilder(entry.getClassName(), entry.getSeverityLevel());
-
-        if (builder instanceof NOPLoggingEventBuilder) {
-            return;
-        }
-
-        Marker marker = getMarker(entry.getTag());
-        if (marker != null) {
-            builder = builder.addMarker(marker);
-        }
-
-        builder = builder.setCause(entry.getThrowable());
-
-        builder.log(() -> {
-            Throwable throwable = entry.getThrowable();
-            String message = entry.getFormattedMessage(configuration);
-            return message == null && throwable != null ? throwable.getMessage() : message;
-        });
-    }
-
-    @Override
-    public void close() {
-        // Nothing to do
     }
 
     /**
@@ -147,33 +187,6 @@ public class Slf4jLoggingBackend implements LoggingBackend {
         }
 
         return loggerFactory.getLogger(name);
-    }
-
-    /**
-     * Creates a logging event builder for a given logger name and severity level.
-     *
-     * @param name The name of the SLF4J logger
-     * @param level The severity level of the log entry
-     * @return A pre-initialized logging event builder
-     */
-    private LoggingEventBuilder getLoggingEventBuilder(String name, Level level) {
-        Logger logger = getLogger(name);
-
-        switch (level) {
-            case TRACE:
-                return logger.atTrace();
-            case DEBUG:
-                return logger.atDebug();
-            case INFO:
-                return logger.atInfo();
-            case WARN:
-                return logger.atWarn();
-            case ERROR:
-                return logger.atError();
-            default:
-                internalLogger.log(Level.ERROR, "Illegal severity level \"{}\"", level);
-                return NOPLoggingEventBuilder.singleton();
-        }
     }
 
 }
