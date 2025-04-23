@@ -62,7 +62,7 @@
 		<maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
 		<maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
 		<spotbugs-maven-plugin.version>4.8.5.0</spotbugs-maven-plugin.version>
-		<maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
+		<maven-bundle-plugin.version>6.0.0</maven-bundle-plugin.version>
 		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
 		<dokka-maven-plugin.version>2.0.0</dokka-maven-plugin.version>
