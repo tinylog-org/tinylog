@@ -31,7 +31,6 @@ public interface Policy {
      */
     void init(Path file) throws Exception;
 
-
     /**
      * Checks if a new data record should still be written to the current log file.
      *

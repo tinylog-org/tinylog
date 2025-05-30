@@ -111,7 +111,6 @@ class Slf4jLoggingBackendTest {
         assertThat(visibility.getError()).isEqualTo(OutputDetails.ENABLED_WITH_CALLER_CLASS_NAME);
     }
 
-
     /**
      * Verifies that the logging backend can be closed without throwing any exception.
      */
@@ -542,7 +541,6 @@ class Slf4jLoggingBackendTest {
             verify(fooLogger).error((Marker) null, "Hello World!", (Throwable) null);
         }
 
-
         /**
          * Verifies that log entries with a marker are output correctly.
          */
@@ -566,7 +564,6 @@ class Slf4jLoggingBackendTest {
             new Slf4jLoggingBackend(context).output(entry, true);
             verify(fooLogger).info(marker, "Hello World!", (Throwable) null);
         }
-
 
         /**
          * Verifies that log entries with a formatted text message with placeholders are output correctly.
@@ -647,7 +644,6 @@ class Slf4jLoggingBackendTest {
             new Slf4jLoggingBackend(context).output(entry, true);
             verify(fooLogger).error((Marker) null, "Oops!", exception);
         }
-
 
         /**
          * Verifies that log entries without any location information can be output correctly.

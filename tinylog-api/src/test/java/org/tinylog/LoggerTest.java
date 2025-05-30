@@ -67,7 +67,6 @@ class LoggerTest {
         tinylogMock.when(Tinylog::getFramework).thenReturn(framework);
     }
 
-
     /**
      * Restores the mocked tinylog class.
      */

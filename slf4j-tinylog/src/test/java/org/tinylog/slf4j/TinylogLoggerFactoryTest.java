@@ -31,7 +31,6 @@ class TinylogLoggerFactoryTest {
         when(framework.getLevelVisibilityByClass(any())).thenReturn(visibility);
     }
 
-
     /**
      * Verifies that the factory provides the same logger instance for the same name.
      */

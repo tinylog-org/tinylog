@@ -986,7 +986,6 @@ class TaggedLoggerTest {
 
         }
 
-
         /**
          * Tests discarding log entries if the assigned severity level is disabled.
          */
