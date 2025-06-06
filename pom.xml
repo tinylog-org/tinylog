@@ -211,6 +211,16 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.11.2</version>
+                <inherited>false</inherited>
+                <configuration>
+                    <doctitle>tinylog ${project.version}</doctitle>
+                    <windowtitle>tinylog ${project.version}</windowtitle>
+                </configuration>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -488,7 +498,6 @@
                         <doctitle>${project.name} ${project.version}</doctitle>
                         <windowtitle>${project.name} ${project.version}</windowtitle>
                         <source>${java.vm.specification.version}</source>
-                        <sourcepath>${project.basedir}/src/main/java</sourcepath>
                     </configuration>
                     <executions>
                         <execution>
