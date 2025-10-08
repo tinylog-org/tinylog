@@ -96,11 +96,11 @@ public class TinylogContext {
      */
     public TinylogContext withConfiguration(Configuration configuration) {
         return new TinylogContext(
-          loader,
-          clock,
-          runtime,
-          configuration,
-          logger
+            loader,
+            clock,
+            runtime,
+            configuration,
+            logger
         );
     }
 
