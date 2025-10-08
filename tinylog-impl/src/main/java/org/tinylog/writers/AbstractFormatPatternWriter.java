@@ -40,7 +40,7 @@ public abstract class AbstractFormatPatternWriter extends AbstractFileBasedWrite
 	public AbstractFormatPatternWriter(final Map<String, String> properties) {
 		super(properties);
 
-		String pattern = getStringValue("format");
+		String pattern = getStringValue("format", false);
 		if (pattern == null) {
 			pattern = DEFAULT_FORMAT_PATTERN;
 		}

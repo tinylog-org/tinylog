@@ -38,11 +38,28 @@ public abstract class AbstractWriter implements Writer {
 	 * @return Found value or {@code null}
 	 */
 	public String getStringValue(final String key) {
+		return getStringValue(key, true);
+	}
+
+	/**
+	 * Gets the string value for the passed key from the configuration properties.
+	 *
+	 * <p>
+	 *     Leading and trailing spaces of the found value will be removed.
+	 * </p>
+	 *
+	 * @param key Case-sensitive property key
+	 * @param trimmed {@code true} for trimming the found value, otherwise {@code false}
+	 * @return Found value or {@code null}
+	 */
+	public String getStringValue(final String key, final boolean trimmed) {
 		String value = properties.get(key);
 		if (value == null) {
 			return null;
-		} else {
+		} else if (trimmed) {
 			return value.trim();
+		} else {
+			return value;
 		}
 	}
 
