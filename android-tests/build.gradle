@@ -71,7 +71,7 @@ android {
 }
 
 checkstyle {
-    toolVersion = "12.1.0"
+    toolVersion = "12.1.1"
 }
 
 spotbugs {
