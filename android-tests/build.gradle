@@ -38,7 +38,7 @@ dependencies {
     androidTestImplementation "org.junit.jupiter:junit-jupiter-params:5.14.2"
     androidTestImplementation "org.mockito:mockito-android:5.21.0"
     androidTestImplementation "org.tinylog:tinylog-core:${version}:tests"
-    androidTestRuntimeOnly "de.mannodermaus.junit5:android-test-runner:1.9.0"
+    androidTestRuntimeOnly "de.mannodermaus.junit5:android-test-runner:2.0.0"
 }
 
 android {
