@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        jdk: [ 17, 21 ]
+        jdk: [ 21, 25 ]
 
     steps:
 
@@ -49,18 +49,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [ 26, 35 ]
+        api-level: [ 26, 36 ]
 
     steps:
 
       - name: Checkout Git repository
         uses: actions/checkout@v6
 
-      - name: Download and install JDK 17
+      - name: Download and install JDK 21
         uses: actions/setup-java@v5
         with:
           distribution: zulu
-          java-version: 17
+          java-version: 21
 
       - name: Install tinylog artifacts via Maven
         run: mvn --batch-mode --update-snapshots --also-make --projects :tinylog-core,:tinylog-impl install -DskipTests
