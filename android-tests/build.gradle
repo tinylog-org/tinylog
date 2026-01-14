@@ -31,7 +31,7 @@ dependencies {
     implementation "org.tinylog:tinylog-core:${version}"
     implementation "org.tinylog:tinylog-impl:${version}"
     androidTestImplementation "androidx.test:runner:1.7.0"
-    androidTestImplementation "de.mannodermaus.junit5:android-test-core:2.0.0"
+    androidTestImplementation "de.mannodermaus.junit5:android-test-core:2.0.1"
     androidTestImplementation "jakarta.inject:jakarta.inject-api:2.0.1"
     androidTestImplementation "org.assertj:assertj-core:3.27.6"
     androidTestImplementation "org.junit.jupiter:junit-jupiter-api:5.14.2"
