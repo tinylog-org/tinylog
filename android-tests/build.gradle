@@ -32,7 +32,7 @@ dependencies {
     implementation "org.tinylog:tinylog-impl:${version}"
     androidTestImplementation "androidx.test:runner:1.7.0"
     androidTestImplementation "jakarta.inject:jakarta.inject-api:2.0.1"
-    androidTestImplementation "org.assertj:assertj-core:3.27.6"
+    androidTestImplementation "org.assertj:assertj-core:3.27.7"
     androidTestImplementation "org.junit.jupiter:junit-jupiter-api:5.14.2"
     androidTestImplementation "org.junit.jupiter:junit-jupiter-params:5.14.2"
     androidTestImplementation "org.mockito:mockito-android:5.21.0"
