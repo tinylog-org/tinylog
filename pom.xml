@@ -55,7 +55,7 @@
 		<build-helper-maven-plugin.version>3.6.1</build-helper-maven-plugin.version>
 		<maven-resources-plugin.version>3.4.0</maven-resources-plugin.version>
 		<maven-compiler-plugin.version>3.15.0</maven-compiler-plugin.version>
-		<kotlin-maven-plugin.version>1.6.21</kotlin-maven-plugin.version>
+		<kotlin-maven-plugin.version>1.7.22</kotlin-maven-plugin.version>
 		<scala-maven-plugin.version>4.9.9</scala-maven-plugin.version>
 		<animal-sniffer-maven-plugin.version>1.27</animal-sniffer-maven-plugin.version>
 		<jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
@@ -88,7 +88,7 @@
 		<jboss-logging.version>3.4.3.Final</jboss-logging.version>
 		<jmh.version>1.37</jmh.version>
 		<junit.version>4.13.2</junit.version>
-		<kotlin.version>1.4.32</kotlin.version>
+		<kotlin.version>1.6.21</kotlin.version>
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<mockk.version>1.12.4</mockk.version>
 		<powermock.version>2.0.9</powermock.version>
@@ -139,7 +139,7 @@
 			<properties>
 				<!-- Real Java versions for clean release build -->
 				<maven.compiler.source>1.6</maven.compiler.source>
-				<maven.compiler.target>1.6</maven.compiler.target>
+				<maven.compiler.target>1.8</maven.compiler.target>
 				<maven.compiler.testSource>9</maven.compiler.testSource>
 				<maven.compiler.testTarget>9</maven.compiler.testTarget>
 				<!-- Enable Animal Sniffer for release builds -->
