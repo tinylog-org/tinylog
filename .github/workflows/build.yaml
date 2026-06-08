@@ -25,7 +25,7 @@ jobs:
       - uses: skjolber/maven-cache-github-action@v3.1.2
         with:
           step: save
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -46,7 +46,7 @@ jobs:
       - uses: skjolber/maven-cache-github-action@v3.1.2
         with:
           step: save
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
