@@ -69,7 +69,7 @@ android {
 }
 
 checkstyle {
-    toolVersion = "13.7.0"
+    toolVersion = "13.8.0"
 }
 
 spotbugs {
