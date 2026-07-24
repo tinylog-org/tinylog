@@ -10,7 +10,7 @@ import org.tinylog.core.internal.InternalLogger;
 /**
  * Runtime implementation for Android 13 and older.
  */
-public class LegacyAndroidRuntime extends AbstractAndroidRuntime {
+public final class LegacyAndroidRuntime extends AbstractAndroidRuntime {
 
     private static final int DIRECT_STACK_TRACE_DEPTH = 3;
     private static final int RELATIVE_STACK_TRACE_SIZE = 8;

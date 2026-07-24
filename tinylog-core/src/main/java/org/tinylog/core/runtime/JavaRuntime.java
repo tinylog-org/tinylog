@@ -14,7 +14,7 @@ import org.tinylog.core.internal.InternalLogger;
  * Runtime implementation for standard Java.
  */
 @IgnoreJRERequirement
-public class JavaRuntime extends AbstractRuntime {
+public final class JavaRuntime extends AbstractRuntime {
 
     private static final int STACK_TRACE_DEPTH = 2;
 

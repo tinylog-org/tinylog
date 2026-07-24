@@ -13,7 +13,7 @@ import org.tinylog.core.internal.InternalLogger;
  * Runtime implementation for Android 14 and later.
  */
 @IgnoreJRERequirement
-public class ModernAndroidRuntime extends AbstractAndroidRuntime {
+public final class ModernAndroidRuntime extends AbstractAndroidRuntime {
 
     private static final int STACK_TRACE_DEPTH = 2;
 
