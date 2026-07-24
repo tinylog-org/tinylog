@@ -22,6 +22,7 @@ import java.time.temporal.TemporalQuery;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -67,7 +68,9 @@ public class DateTimeSegment implements PathSegment {
     public String findLatest(Path parentDirectory, String prefix) throws IOException {
         try (Stream<Path> stream = Files.list(parentDirectory)) {
             Optional<DateTimeTuple> latest = stream
-                .map(path -> path.getFileName().toString())
+                .map(Path::getFileName)
+                .filter(Objects::nonNull)
+                .map(Path::toString)
                 .filter(name -> name.startsWith(prefix))
                 .map(name -> new DateTimeTuple(formatter, name.substring(prefix.length())))
                 .filter(tuple -> tuple.value != null)
