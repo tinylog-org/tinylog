@@ -178,7 +178,8 @@ public final class MessageAndExceptionTokenTest {
 	public void renderExceptionUsingFilters() {
 		Exception exception = new RuntimeException("Test");
 		List<ThrowableFilter> filters = Collections.singletonList(
-			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "42", origin.getStackTrace(), origin.getCause())
+			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "42", origin.getStackTrace(),
+				origin.getCause(), origin.getSuppressed())
 		);
 
 		MessageAndExceptionToken token = new MessageAndExceptionToken(filters);
@@ -197,7 +198,8 @@ public final class MessageAndExceptionTokenTest {
 	public void applyExceptionUsingFilters() throws SQLException {
 		Exception exception = new RuntimeException("Test");
 		List<ThrowableFilter> filters = Collections.singletonList(
-			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "42", origin.getStackTrace(), origin.getCause())
+			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "42", origin.getStackTrace(),
+				origin.getCause(), origin.getSuppressed())
 		);
 
 		PreparedStatement statement = mock(PreparedStatement.class);

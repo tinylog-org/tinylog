@@ -13,6 +13,7 @@
 
 package org.tinylog.throwable;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -24,6 +25,7 @@ public final class ThrowableStore implements ThrowableData {
 	private String message;
 	private List<StackTraceElement> stackTrace;
 	private ThrowableData cause;
+	private List<ThrowableData> suppressed;
 
 	/**
 	 * @param className
@@ -37,10 +39,28 @@ public final class ThrowableStore implements ThrowableData {
 	 */
 	public ThrowableStore(final String className, final String message, final List<StackTraceElement> stackTrace,
 		final ThrowableData cause) {
+		this(className, message, stackTrace, cause, Collections.<ThrowableData>emptyList());
+	}
+
+	/**
+	 * @param className
+	 *            Class name of the throwable
+	 * @param message
+	 *            Message of the throwable
+	 * @param stackTrace
+	 *            Stack trace for the throwable
+	 * @param cause
+	 *            Cause of the throwable (can be {@code null})
+	 * @param suppressed
+	 *            Suppressed throwables of the throwable (can be {@code null})
+	 */
+	public ThrowableStore(final String className, final String message, final List<StackTraceElement> stackTrace,
+		final ThrowableData cause, final List<ThrowableData> suppressed) {
 		this.className = className;
 		this.message = message;
 		this.stackTrace = stackTrace;
 		this.cause = cause;
+		this.suppressed = suppressed == null ? Collections.<ThrowableData>emptyList() : suppressed;
 	}
 
 	@Override
@@ -61,6 +81,11 @@ public final class ThrowableStore implements ThrowableData {
 	@Override
 	public ThrowableData getCause() {
 		return cause;
+	}
+
+	@Override
+	public List<ThrowableData> getSuppressed() {
+		return suppressed;
 	}
 
 }

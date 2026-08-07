@@ -45,7 +45,18 @@ public abstract class AbstractStackTraceElementsFilter extends AbstractThrowable
 			cause = filter(cause);
 		}
 
-		return new ThrowableStore(origin.getClassName(), origin.getMessage(), newTrace, cause);
+		List<ThrowableData> originSuppressed = origin.getSuppressed();
+		List<ThrowableData> newSuppressed;
+		if (originSuppressed.isEmpty()) {
+			newSuppressed = originSuppressed;
+		} else {
+			newSuppressed = new ArrayList<ThrowableData>(originSuppressed.size());
+			for (int i = 0; i < originSuppressed.size(); ++i) {
+				newSuppressed.add(filter(originSuppressed.get(i)));
+			}
+		}
+
+		return new ThrowableStore(origin.getClassName(), origin.getMessage(), newTrace, cause, newSuppressed);
 	}
 
 	/**

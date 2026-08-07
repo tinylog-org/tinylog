@@ -83,7 +83,7 @@ final class ExceptionToken implements Token {
 	}
 
 	/**
-	 * Renders a throwable including stack trace and cause throwable.
+	 * Renders a throwable including stack trace, suppressed throwables, and cause throwable.
 	 *
 	 * @param throwable
 	 *            Throwable to render
@@ -93,6 +93,23 @@ final class ExceptionToken implements Token {
 	 *            Output will be appended to this string builder
 	 */
 	private void render(final ThrowableData throwable, final List<StackTraceElement> parentTrace, final StringBuilder builder) {
+		render(throwable, parentTrace, builder, "");
+	}
+
+	/**
+	 * Renders a throwable including stack trace, suppressed throwables, and cause throwable.
+	 *
+	 * @param throwable
+	 *            Throwable to render
+	 * @param parentTrace
+	 *            Stack trace from parent throwable
+	 * @param builder
+	 *            Output will be appended to this string builder
+	 * @param prefix
+	 *            Line prefix for indentation of nested throwables
+	 */
+	private void render(final ThrowableData throwable, final List<StackTraceElement> parentTrace, final StringBuilder builder,
+		final String prefix) {
 		List<StackTraceElement> stackTrace = throwable.getStackTrace();
 
 		int parentIndex = parentTrace.size() - 1;
@@ -103,7 +120,7 @@ final class ExceptionToken implements Token {
 			childIndex -= 1;
 			commonElements += 1;
 		}
-		
+
 		builder.append(throwable.getClassName());
 		String message = throwable.getMessage();
 		if (message != null) {
@@ -113,22 +130,33 @@ final class ExceptionToken implements Token {
 
 		for (int i = 0; i < stackTrace.size() - commonElements; ++i) {
 			builder.append(NEW_LINE);
+			builder.append(prefix);
 			builder.append("\tat ");
 			builder.append(stackTrace.get(i));
 		}
-		
+
 		if (commonElements > 0) {
 			builder.append(NEW_LINE);
+			builder.append(prefix);
 			builder.append("\t... ");
 			builder.append(commonElements);
 			builder.append(" more");
 		}
 
+		List<ThrowableData> suppressed = throwable.getSuppressed();
+		for (int i = 0; i < suppressed.size(); ++i) {
+			builder.append(NEW_LINE);
+			builder.append(prefix);
+			builder.append("\tSuppressed: ");
+			render(suppressed.get(i), stackTrace, builder, prefix + "\t");
+		}
+
 		ThrowableData cause = throwable.getCause();
 		if (cause != null) {
 			builder.append(NEW_LINE);
+			builder.append(prefix);
 			builder.append("Caused by: ");
-			render(cause, stackTrace, builder);
+			render(cause, stackTrace, builder, prefix);
 		}
 	}
 
