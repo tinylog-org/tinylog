@@ -2,7 +2,7 @@ tinylog 3
 =========
 [![Build](https://github.com/tinylog-org/tinylog/actions/workflows/build.yaml/badge.svg?branch=v3.0&event=push)](https://github.com/tinylog-org/tinylog/actions/workflows/build.yaml)
 [![Code Coverage](https://codecov.io/gh/tinylog-org/tinylog/branch/v3.0/graph/badge.svg)](https://app.codecov.io/gh/tinylog-org/tinylog/tree/v3.0)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.tinylog/tinylog-api/badge.svg)](https://search.maven.org/search?q=g:org.tinylog)
+[![Maven Central](https://img.shields.io/maven-central/v/org.tinylog/tinylog-api)](https://central.sonatype.com/search?q=g:org.tinylog)
 [![Percentage of issues still open](https://isitmaintained.com/badge/open/tinylog-org/tinylog.svg)](https://github.com/tinylog-org/tinylog/issues "Percentage of issues still open")
 
 Example
