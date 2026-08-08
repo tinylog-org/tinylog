@@ -189,6 +189,71 @@ public final class ExceptionTokenTest {
 	}
 
 	/**
+	 * Verifies that an exception including its suppressed exceptions will be rendered correctly for a
+	 * {@link StringBuilder}.
+	 */
+	@Test
+	public void renderExceptionWithSuppressed() {
+		Exception exception = new Exception("e");
+		exception.addSuppressed(new RuntimeException("e1"));
+		exception.addSuppressed(new RuntimeException("e2"));
+
+		ExceptionToken token = new ExceptionToken(Collections.emptyList());
+
+		assertThat(render(token, exception))
+			.startsWith(Exception.class.getName() + ": e")
+			.contains("Suppressed: " + RuntimeException.class.getName() + ": e1")
+			.contains("Suppressed: " + RuntimeException.class.getName() + ": e2")
+			.contains(ExceptionTokenTest.class.getName(), "renderExceptionWithSuppressed");
+	}
+
+	/**
+	 * Verifies that an exception including its suppressed exceptions will be added correctly rendered to a
+	 * {@link PreparedStatement}.
+	 *
+	 * @throws SQLException
+	 *             Failed to add value to prepared SQL statement
+	 */
+	@Test
+	public void applyExceptionWithSuppressed() throws SQLException {
+		Exception exception = new Exception("e");
+		exception.addSuppressed(new RuntimeException("e1"));
+		exception.addSuppressed(new RuntimeException("e2"));
+
+		PreparedStatement statement = mock(PreparedStatement.class);
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+
+		new ExceptionToken(Collections.emptyList()).apply(createLogEntry(exception), statement, 1);
+
+		verify(statement).setString(eq(1), captor.capture());
+		assertThat(captor.getValue())
+			.startsWith(Exception.class.getName() + ": e")
+			.contains("Suppressed: " + RuntimeException.class.getName() + ": e1")
+			.contains("Suppressed: " + RuntimeException.class.getName() + ": e2")
+			.contains(ExceptionTokenTest.class.getName(), "applyExceptionWithSuppressed");
+	}
+
+	/**
+	 * Verifies that suppressed exceptions are rendered before the cause exception.
+	 */
+	@Test
+	public void renderExceptionWithSuppressedAndCause() {
+		Exception exception = new Exception("e");
+		exception.addSuppressed(new RuntimeException("suppressed"));
+		exception.initCause(new IOException("cause"));
+
+		ExceptionToken token = new ExceptionToken(Collections.emptyList());
+		String rendered = render(token, exception);
+
+		assertThat(rendered)
+			.startsWith(Exception.class.getName() + ": e")
+			.contains("Suppressed: " + RuntimeException.class.getName() + ": suppressed")
+			.contains("Caused by: " + IOException.class.getName() + ": cause");
+		assertThat(rendered.indexOf("Suppressed:"))
+			.isLessThan(rendered.indexOf("Caused by:"));
+	}
+
+	/**
 	 * Verifies that {@link ThrowableFilter throwable filters} can be applied to a passed exception when rendering a
 	 * string.
 	 */
@@ -196,8 +261,10 @@ public final class ExceptionTokenTest {
 	public void renderyExceptionUsingFilters() {
 		Exception exception = new RuntimeException("Test");
 		List<ThrowableFilter> filters = Arrays.asList(
-			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "1", origin.getStackTrace(), origin.getCause()),
-			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "2", origin.getStackTrace(), origin.getCause())
+			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "1", origin.getStackTrace(),
+				origin.getCause(), origin.getSuppressed()),
+			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "2", origin.getStackTrace(),
+				origin.getCause(), origin.getSuppressed())
 		);
 
 		ExceptionToken token = new ExceptionToken(filters);
@@ -216,8 +283,10 @@ public final class ExceptionTokenTest {
 	public void applyyExceptionUsingFilters() throws SQLException {
 		Exception exception = new RuntimeException("Test");
 		List<ThrowableFilter> filters = Arrays.asList(
-			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "1", origin.getStackTrace(), origin.getCause()),
-			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "2", origin.getStackTrace(), origin.getCause())
+			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "1", origin.getStackTrace(),
+				origin.getCause(), origin.getSuppressed()),
+			origin -> new ThrowableStore(origin.getClassName(), origin.getMessage() + "2", origin.getStackTrace(),
+				origin.getCause(), origin.getSuppressed())
 		);
 
 		PreparedStatement statement = mock(PreparedStatement.class);

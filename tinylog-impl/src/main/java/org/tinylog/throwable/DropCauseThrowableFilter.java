@@ -34,16 +34,18 @@ public final class DropCauseThrowableFilter extends AbstractThrowableFilter {
 	@Override
 	public ThrowableData filter(final ThrowableData origin) {
 		if (getArguments().isEmpty()) {
-			return new ThrowableStore(origin.getClassName(), origin.getMessage(), origin.getStackTrace(), null);
+			return new ThrowableStore(origin.getClassName(), origin.getMessage(), origin.getStackTrace(), null,
+				origin.getSuppressed());
 		} else {
 			String className = origin.getClassName();
 
 			for (String filter : getArguments()) {
 				if (className.equals(filter)) {
-					return new ThrowableStore(origin.getClassName(), origin.getMessage(), origin.getStackTrace(), null);
+					return new ThrowableStore(origin.getClassName(), origin.getMessage(), origin.getStackTrace(), null,
+						origin.getSuppressed());
 				}
 			}
-			
+
 			return origin;
 		}
 	}

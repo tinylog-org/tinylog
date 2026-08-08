@@ -48,4 +48,11 @@ public interface ThrowableData {
 	 */
 	ThrowableData getCause();
 
+	/**
+	 * Gets the suppressed throwables of the throwable to output.
+	 *
+	 * @return Suppressed throwables (never {@code null}, may be empty)
+	 */
+	List<ThrowableData> getSuppressed();
+
 }

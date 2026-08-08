@@ -149,6 +149,25 @@ public final class StripThrowableFilterTest {
 	}
 
 	/**
+	 * Verifies that suppressed throwables are filtered recursively (stack trace strip).
+	 */
+	@Test
+	public void filterSuppressedRecursively() {
+		RuntimeException suppressed = new RuntimeException("suppressed");
+		RuntimeException exception = new RuntimeException("main");
+		exception.addSuppressed(suppressed);
+
+		StripThrowableFilter filter = new StripThrowableFilter("org.tinylog");
+		ThrowableData data = filter.filter(new ThrowableWrapper(exception));
+
+		assertThat(data.getSuppressed()).hasSize(1);
+		assertThat(data.getSuppressed().get(0).getClassName()).isEqualTo(RuntimeException.class.getName());
+		assertThat(data.getSuppressed().get(0).getMessage()).isEqualTo("suppressed");
+		assertThat(data.getSuppressed().get(0).getStackTrace())
+			.noneMatch(element -> element.getClassName().startsWith("org.tinylog"));
+	}
+
+	/**
 	 * Verifies that the throwable filter is registered as service under the name "strip".
 	 */
 	@Test
