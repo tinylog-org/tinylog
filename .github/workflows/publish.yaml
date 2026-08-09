@@ -55,7 +55,7 @@ jobs:
 
       - name: Create P2 repository
         run: |
-          mvn -P release --no-transfer-progress --batch-mode --non-recursive p2:site
+          mvn p2:site -P release --no-transfer-progress --batch-mode --non-recursive
 
       - name: Upload P2 repository
         uses: kevinpainchaud/simple-ftp-deploy-action@v1.2.1
