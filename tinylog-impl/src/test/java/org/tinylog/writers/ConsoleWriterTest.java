@@ -13,7 +13,13 @@
 
 package org.tinylog.writers;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Rule;
@@ -225,6 +231,57 @@ public final class ConsoleWriterTest {
 		assertThat(systemStream.consumeErrorOutput()).contains("Hello World!" + NEW_LINE);
 	}
 	
+	/**
+	 * Verifies that log entries are written in chronological order, even if standard output stream is buffered.
+	 */
+	@Test
+	public void chronologicalOrderWithBufferedStandardOutputStream() throws UnsupportedEncodingException {
+		List<String> writeOrder = new ArrayList<String>();
+		PrintStream originalStandardStream = System.out;
+		PrintStream originalErrorStream = System.err;
+
+		try {
+			System.setOut(createRecordingPrintStream(writeOrder, "out"));
+			System.setErr(createRecordingPrintStream(writeOrder, "err"));
+
+			ConsoleWriter writer = new ConsoleWriter(singletonMap("format", "{message}"));
+			writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("1 Test Trace").create());
+			writer.write(LogEntryBuilder.empty().level(Level.DEBUG).message("2 Test Debug").create());
+			writer.write(LogEntryBuilder.empty().level(Level.INFO).message("3 Test Info").create());
+			writer.write(LogEntryBuilder.empty().level(Level.WARN).message("4 Test Warn").create());
+			writer.write(LogEntryBuilder.empty().level(Level.ERROR).message("5 Test Error").create());
+			writer.write(LogEntryBuilder.empty().level(Level.WARN).message("6 Test Warn").create());
+			writer.write(LogEntryBuilder.empty().level(Level.INFO).message("7 Test Info").create());
+			writer.write(LogEntryBuilder.empty().level(Level.DEBUG).message("8 Test Debug").create());
+			writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("9 Test Trace").create());
+
+			assertThat(writeOrder).containsExactly(
+				"out:1 Test Trace" + NEW_LINE,
+				"out:2 Test Debug" + NEW_LINE,
+				"out:3 Test Info" + NEW_LINE,
+				"err:4 Test Warn" + NEW_LINE,
+				"err:5 Test Error" + NEW_LINE,
+				"err:6 Test Warn" + NEW_LINE,
+				"out:7 Test Info" + NEW_LINE,
+				"out:8 Test Debug" + NEW_LINE,
+				"out:9 Test Trace" + NEW_LINE
+			);
+		} finally {
+			System.setOut(originalStandardStream);
+			System.setErr(originalErrorStream);
+		}
+	}
+
+	private static PrintStream createRecordingPrintStream(final List<String> writeOrder, final String label)
+			throws UnsupportedEncodingException {
+		return new PrintStream(new ByteArrayOutputStream(), false, StandardCharsets.UTF_8.name()) {
+			@Override
+			public void write(final byte[] buffer, final int offset, final int length) {
+				writeOrder.add(label + ":" + new String(buffer, offset, length, StandardCharsets.UTF_8));
+			}
+		};
+	}
+
 	/**
 	 * Verifies that an empty logger works correctly.
 	 */
