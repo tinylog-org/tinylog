@@ -13,7 +13,8 @@
 
 package org.tinylog.writers;
 
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedOutputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -241,8 +242,30 @@ public final class ConsoleWriterTest {
 		PrintStream originalErrorStream = System.err;
 
 		try {
-			System.setOut(createRecordingPrintStream(writeOrder, "out"));
-			System.setErr(createRecordingPrintStream(writeOrder, "err"));
+			OutputStream outSink = new OutputStream() {
+				@Override
+				public void write(final int b) {
+					write(new byte[] { (byte) b }, 0, 1);
+				}
+
+				@Override
+				public void write(final byte[] buffer, final int offset, final int length) {
+					writeOrder.add("out:" + new String(buffer, offset, length, StandardCharsets.UTF_8));
+				}
+			};
+			OutputStream errSink = new OutputStream() {
+				@Override
+				public void write(final int b) {
+					write(new byte[] { (byte) b }, 0, 1);
+				}
+
+				@Override
+				public void write(final byte[] buffer, final int offset, final int length) {
+					writeOrder.add("err:" + new String(buffer, offset, length, StandardCharsets.UTF_8));
+				}
+			};
+			System.setOut(new PrintStream(new BufferedOutputStream(outSink), false, "UTF-8"));
+			System.setErr(new PrintStream(errSink, true, "UTF-8"));
 
 			ConsoleWriter writer = new ConsoleWriter(singletonMap("format", "{message}"));
 			writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("1 Test Trace").create());
@@ -272,23 +295,13 @@ public final class ConsoleWriterTest {
 		}
 	}
 
-	private static PrintStream createRecordingPrintStream(final List<String> writeOrder, final String label)
-			throws UnsupportedEncodingException {
-		return new PrintStream(new ByteArrayOutputStream(), false, StandardCharsets.UTF_8.name()) {
-			@Override
-			public void write(final byte[] buffer, final int offset, final int length) {
-				writeOrder.add(label + ":" + new String(buffer, offset, length, StandardCharsets.UTF_8));
-			}
-		};
-	}
-
 	/**
 	 * Verifies that an empty logger works correctly.
 	 */
 	@Test
 	public void errorOutputStreamForEmptyLogger() {
 		ConsoleWriter writer = new ConsoleWriter();
-		writer.flush(); // Does nothing but gets coverage for flush
+		writer.flush(); // Flushes buffered console streams
 
 		writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("Hello World!").date(LocalDate.now()).create());
 		assertThat(systemStream.consumeStandardOutput()).contains("Hello World!" + NEW_LINE);
