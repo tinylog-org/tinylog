@@ -33,8 +33,8 @@ dependencies {
     androidTestImplementation "androidx.test:runner:1.7.0"
     androidTestImplementation "jakarta.inject:jakarta.inject-api:2.0.1"
     androidTestImplementation "org.assertj:assertj-core:3.27.7"
-    androidTestImplementation "org.junit.jupiter:junit-jupiter-api:5.14.4"
-    androidTestImplementation "org.junit.jupiter:junit-jupiter-params:5.14.4"
+    androidTestImplementation "org.junit.jupiter:junit-jupiter-api:6.1.3"
+    androidTestImplementation "org.junit.jupiter:junit-jupiter-params:6.1.3"
     androidTestImplementation "org.mockito:mockito-android:5.23.0"
     androidTestImplementation "org.tinylog:tinylog-core:${version}:tests"
 }
