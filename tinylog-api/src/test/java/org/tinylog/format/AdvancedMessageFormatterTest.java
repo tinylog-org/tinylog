@@ -270,7 +270,6 @@ public final class AdvancedMessageFormatterTest {
 		return new AdvancedMessageFormatter(locale, escape).format(message, arguments);
 	}
 
-
 	/**
 	 * Verifies that an escaped placeholder can end at the final character.
 	 */
@@ -289,4 +288,5 @@ public final class AdvancedMessageFormatterTest {
 		assertThat(format("hello'")).isEqualTo("hello'");
 		assertThat(format("'")).isEqualTo("'");
 	}
+
 }
