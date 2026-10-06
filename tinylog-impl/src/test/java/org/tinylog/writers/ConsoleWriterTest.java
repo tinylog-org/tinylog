@@ -13,7 +13,14 @@
 
 package org.tinylog.writers;
 
+import java.io.BufferedOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Rule;
@@ -226,12 +233,75 @@ public final class ConsoleWriterTest {
 	}
 	
 	/**
+	 * Verifies that log entries are written in chronological order, even if standard output stream is buffered.
+	 */
+	@Test
+	public void chronologicalOrderWithBufferedStandardOutputStream() throws UnsupportedEncodingException {
+		List<String> writeOrder = new ArrayList<String>();
+		PrintStream originalStandardStream = System.out;
+		PrintStream originalErrorStream = System.err;
+
+		try {
+			OutputStream outSink = new OutputStream() {
+				@Override
+				public void write(final int b) {
+					write(new byte[] { (byte) b }, 0, 1);
+				}
+
+				@Override
+				public void write(final byte[] buffer, final int offset, final int length) {
+					writeOrder.add("out:" + new String(buffer, offset, length, StandardCharsets.UTF_8));
+				}
+			};
+			OutputStream errSink = new OutputStream() {
+				@Override
+				public void write(final int b) {
+					write(new byte[] { (byte) b }, 0, 1);
+				}
+
+				@Override
+				public void write(final byte[] buffer, final int offset, final int length) {
+					writeOrder.add("err:" + new String(buffer, offset, length, StandardCharsets.UTF_8));
+				}
+			};
+			System.setOut(new PrintStream(new BufferedOutputStream(outSink), false, "UTF-8"));
+			System.setErr(new PrintStream(errSink, true, "UTF-8"));
+
+			ConsoleWriter writer = new ConsoleWriter(singletonMap("format", "{message}"));
+			writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("1 Test Trace").create());
+			writer.write(LogEntryBuilder.empty().level(Level.DEBUG).message("2 Test Debug").create());
+			writer.write(LogEntryBuilder.empty().level(Level.INFO).message("3 Test Info").create());
+			writer.write(LogEntryBuilder.empty().level(Level.WARN).message("4 Test Warn").create());
+			writer.write(LogEntryBuilder.empty().level(Level.ERROR).message("5 Test Error").create());
+			writer.write(LogEntryBuilder.empty().level(Level.WARN).message("6 Test Warn").create());
+			writer.write(LogEntryBuilder.empty().level(Level.INFO).message("7 Test Info").create());
+			writer.write(LogEntryBuilder.empty().level(Level.DEBUG).message("8 Test Debug").create());
+			writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("9 Test Trace").create());
+
+			assertThat(writeOrder).containsExactly(
+				"out:1 Test Trace" + NEW_LINE,
+				"out:2 Test Debug" + NEW_LINE,
+				"out:3 Test Info" + NEW_LINE,
+				"err:4 Test Warn" + NEW_LINE,
+				"err:5 Test Error" + NEW_LINE,
+				"err:6 Test Warn" + NEW_LINE,
+				"out:7 Test Info" + NEW_LINE,
+				"out:8 Test Debug" + NEW_LINE,
+				"out:9 Test Trace" + NEW_LINE
+			);
+		} finally {
+			System.setOut(originalStandardStream);
+			System.setErr(originalErrorStream);
+		}
+	}
+
+	/**
 	 * Verifies that an empty logger works correctly.
 	 */
 	@Test
 	public void errorOutputStreamForEmptyLogger() {
 		ConsoleWriter writer = new ConsoleWriter();
-		writer.flush(); // Does nothing but gets coverage for flush
+		writer.flush(); // Flushes buffered console streams
 
 		writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("Hello World!").date(LocalDate.now()).create());
 		assertThat(systemStream.consumeStandardOutput()).contains("Hello World!" + NEW_LINE);
