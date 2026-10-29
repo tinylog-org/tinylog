@@ -27,7 +27,7 @@ import org.tinylog.provider.InternalLogger;
  */
 public final class LegacyJavaRuntime extends AbstractJavaRuntime {
 
-	private static final Timestamp startTime = new LegacyTimestamp(ManagementFactory.getRuntimeMXBean().getStartTime());
+	private static final Timestamp startTime = new LegacyTimestamp(System.currentTimeMillis());
 
 	private final boolean hasSunReflection;
 	private final Method stackTraceElementGetter;
