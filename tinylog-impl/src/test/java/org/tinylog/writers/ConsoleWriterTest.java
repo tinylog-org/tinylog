@@ -234,6 +234,9 @@ public final class ConsoleWriterTest {
 	
 	/**
 	 * Verifies that log entries are written in chronological order, even if standard output stream is buffered.
+	 *
+	 * @throws UnsupportedEncodingException
+	 *             UTF-8 is not supported
 	 */
 	@Test
 	public void chronologicalOrderWithBufferedStandardOutputStream() throws UnsupportedEncodingException {
