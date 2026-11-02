@@ -11,7 +11,8 @@
         </encoder>
     </appender>
 
-    <root level="TRACE">
+    <root>
+        <level value="TRACE"/>
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
