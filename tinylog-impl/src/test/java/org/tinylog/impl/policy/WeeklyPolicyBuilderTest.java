@@ -87,7 +87,6 @@ class WeeklyPolicyBuilderTest {
         assertThat(policy.canAcceptDataRecord(0)).isFalse();
     }
 
-
     /**
      * Verifies that an exception with a meaningful message will be thrown, if the configuration value contains an
      * invalid time or zone.
