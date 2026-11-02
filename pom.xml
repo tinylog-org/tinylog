@@ -17,8 +17,8 @@
         <builder.name>tinylog.org</builder.name>
         <kotlin.compiler.languageVersion>2.0</kotlin.compiler.languageVersion>
         <kotlin.compiler.apiVersion>2.0</kotlin.compiler.apiVersion>
-        <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
-        <maven.compiler.release>11</maven.compiler.release>
+        <kotlin.compiler.jvmTarget>21</kotlin.compiler.jvmTarget>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <root.basedir>${project.basedir}</root.basedir>
         <website.url>https://tinylog.org/</website.url>
@@ -394,8 +394,8 @@
                         <instructions>
                             <Import-Package>!android.*,!dalvik.*,*</Import-Package>
                             <!-- Workaround until https://github.com/bndtools/bnd/issues/2227 will be fixed -->
-                            <_exportcontents>!META-INF.versions.11,*</_exportcontents>
-                            <_fixupmessages>"*META-INF/versions/11*"</_fixupmessages>
+                            <_exportcontents>!META-INF.versions.21,*</_exportcontents>
+                            <_fixupmessages>"*META-INF/versions/21*"</_fixupmessages>
                         </instructions>
                     </configuration>
                 </plugin>
@@ -529,7 +529,7 @@
                     <artifactId>moditect-maven-plugin</artifactId>
                     <version>1.3.0.Final</version>
                     <configuration>
-                        <jvmVersion>11</jvmVersion>
+                        <jvmVersion>21</jvmVersion>
                         <overwriteExistingFiles>true</overwriteExistingFiles>
                         <exclusions>
                             <exclusion>

@@ -42,11 +42,11 @@ dependencies {
 android {
     namespace = "tinylog"
 
-    compileSdkVersion 36
+    compileSdkVersion 37
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 
     buildTypes {
@@ -57,7 +57,7 @@ android {
 
     defaultConfig {
         minSdkVersion 26
-        targetSdkVersion 36
+        targetSdkVersion 37
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArgument("runnerBuilder", "de.mannodermaus.junit5.AndroidJUnit5Builder")
     }

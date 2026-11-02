@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        jdk: [ 21, 26 ]
+        jdk: [ 21, 27 ]
 
     steps:
 
@@ -49,7 +49,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [ 26, 36 ]
+        include:
+          - api-level: 26
+            target: default
+          - api-level: 37.1
+            target: google_apis_ps16k
 
     steps:
 
@@ -75,6 +79,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
           arch: x86_64
           working-directory: ./android-tests
           script: ./gradlew createDebugCoverageReport spotbugsDebug checkstyle --no-daemon --no-build-cache

@@ -4,7 +4,7 @@
 
 ## Building tinylog
 
-A JDK 9 or higher is required to compile tinylog 3. It is recommended to use the Long-Term-Support (LTS) JDK versions 11 or 17.
+A JDK 21 or higher is required to compile tinylog 3. It is recommended to use the Long-Term-Support (LTS) JDK versions 21 or 25.
 
 As build tool, Maven 3.5 or later is required. tinylog 3 can be built and installed in the local repository via the typical Maven command:
 
