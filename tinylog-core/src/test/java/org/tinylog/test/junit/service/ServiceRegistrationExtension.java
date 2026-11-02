@@ -1,7 +1,6 @@
 package org.tinylog.test.junit.service;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -42,8 +41,7 @@ public class ServiceRegistrationExtension extends AbstractParameterizedExtension
                 .map(Class::getName)
                 .collect(Collectors.joining("\n"));
             Path file = serviceFolder.resolve(annotation.service().getName());
-            byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
-            Files.write(file, bytes, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            Files.writeString(file, content, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         }
 
         ClassLoader defaultLoader = Thread.currentThread().getContextClassLoader();

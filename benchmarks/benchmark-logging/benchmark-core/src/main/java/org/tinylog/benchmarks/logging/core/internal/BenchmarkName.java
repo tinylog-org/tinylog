@@ -2,7 +2,6 @@ package org.tinylog.benchmarks.logging.core.internal;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -54,7 +53,7 @@ class BenchmarkName {
             String fullName = version == null ? name : name + " " + version;
 
             Path path = new ProjectLocation(benchmark.getClass()).resolve(ProjectLocation.BENCHMARK_NAME_FILE);
-            Files.write(path, fullName.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(path, fullName);
         }
     }
 

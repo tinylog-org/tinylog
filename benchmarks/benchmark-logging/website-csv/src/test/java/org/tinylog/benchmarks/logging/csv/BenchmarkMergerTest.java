@@ -2,7 +2,6 @@ package org.tinylog.benchmarks.logging.csv;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -55,8 +54,7 @@ class BenchmarkMergerTest {
      */
     private void writeFile(Path path, String content) throws IOException {
         Files.createDirectories(path.getParent());
-        byte[] data = content.getBytes(StandardCharsets.UTF_8);
-        Files.write(path, data);
+        Files.writeString(path, content);
     }
 
 }

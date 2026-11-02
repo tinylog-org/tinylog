@@ -118,8 +118,7 @@ public class BenchmarkMerger {
      * @throws IOException Failed to write to the passed file
      */
     private static void writeFile(Path path, String content) throws IOException {
-        byte[] data = content.getBytes(StandardCharsets.UTF_8);
-        Files.write(path, data);
+        Files.writeString(path, content);
     }
 
 }

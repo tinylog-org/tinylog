@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -332,7 +331,7 @@ class PropertiesLoaderTest {
     private Path createTextFile(String fileName, String... lines) throws IOException {
         Path file = folder.resolve(fileName);
         String content = String.join("\n", lines);
-        Files.write(file, content.getBytes(StandardCharsets.UTF_8));
+        Files.writeString(file, content);
         return file;
     }
 
