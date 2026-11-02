@@ -16,8 +16,8 @@
     <properties>
         <argLine />
         <builder.name>tinylog.org</builder.name>
-        <kotlin.compiler.languageVersion>2.0</kotlin.compiler.languageVersion>
-        <kotlin.compiler.apiVersion>2.0</kotlin.compiler.apiVersion>
+        <kotlin.compiler.languageVersion>2.4</kotlin.compiler.languageVersion>
+        <kotlin.compiler.apiVersion>2.4</kotlin.compiler.apiVersion>
         <kotlin.compiler.jvmTarget>21</kotlin.compiler.jvmTarget>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
