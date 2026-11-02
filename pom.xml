@@ -14,6 +14,7 @@
     <url>${website.url}</url>
 
     <properties>
+        <argLine />
         <builder.name>tinylog.org</builder.name>
         <kotlin.compiler.languageVersion>2.0</kotlin.compiler.languageVersion>
         <kotlin.compiler.apiVersion>2.0</kotlin.compiler.apiVersion>
@@ -210,6 +211,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -463,6 +476,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.11.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
                     <version>3.2.0</version>
                 </plugin>
@@ -498,6 +516,7 @@
                         <doctitle>${project.name} ${project.version}</doctitle>
                         <windowtitle>${project.name} ${project.version}</windowtitle>
                         <source>${java.vm.specification.version}</source>
+                        <doclint>all,-missing</doclint>
                     </configuration>
                     <executions>
                         <execution>
