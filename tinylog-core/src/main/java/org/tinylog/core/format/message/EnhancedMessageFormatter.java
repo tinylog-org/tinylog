@@ -18,7 +18,7 @@ import org.tinylog.core.internal.InternalLogger;
  * patterns in placeholders.
  *
  * <p>
- *     All registered {@link ValueFormat} instances can be used to format arguments via patterns. Additionally the
+ *     All registered {@link ValueFormat} instances can be used to format arguments via patterns. Additionally, the
  *     {@link ChoiceFormat} syntax is supported for conditional formatting.
  * </p>
  *

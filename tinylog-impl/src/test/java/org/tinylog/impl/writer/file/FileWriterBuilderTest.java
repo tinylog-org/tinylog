@@ -260,7 +260,7 @@ class FileWriterBuilderTest {
     void noPolicy() throws Exception {
         applyConfiguration(Map.of(
             "file", file.toString(),
-            "chatset", StandardCharsets.US_ASCII.name(),
+            "charset", StandardCharsets.US_ASCII.name(),
             "pattern", "{message}"
         ));
 
@@ -280,7 +280,7 @@ class FileWriterBuilderTest {
     void singlePolicy() throws Exception {
         applyConfiguration(Map.of(
             "file", file.toString(),
-            "chatset", StandardCharsets.US_ASCII.name(),
+            "charset", StandardCharsets.US_ASCII.name(),
             "pattern", "{message}",
             "policies", "startup"
         ));
@@ -302,7 +302,7 @@ class FileWriterBuilderTest {
         int size = (1 + System.lineSeparator().length()) * 2; // two lines (letter + line separator)
         applyConfiguration(Map.of(
             "file", file.toString(),
-            "chatset", StandardCharsets.US_ASCII.name(),
+            "charset", StandardCharsets.US_ASCII.name(),
             "pattern", "{message}",
             "policies", "startup, size: " + size
         ));
@@ -325,7 +325,7 @@ class FileWriterBuilderTest {
     void reportUnknownPolicy() throws Exception {
         applyConfiguration(Map.of(
             "file", file.toString(),
-            "chatset", StandardCharsets.US_ASCII.name(),
+            "charset", StandardCharsets.US_ASCII.name(),
             "pattern", "{message}",
             "policies", "foo, startup"
         ));
@@ -350,7 +350,7 @@ class FileWriterBuilderTest {
     void reportInvalidPolicy() throws Exception {
         applyConfiguration(Map.of(
             "file", file.toString(),
-            "chatset", StandardCharsets.US_ASCII.name(),
+            "charset", StandardCharsets.US_ASCII.name(),
             "pattern", "{message}",
             "policies", "size: AB, startup"
         ));

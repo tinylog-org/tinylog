@@ -29,7 +29,7 @@ public class BenchmarkExecutor {
      *
      * @param arguments The arguments for JMH
      * @throws URISyntaxException Failed to convert the location URL of the logger class into a valid URI
-     * @throws IOException Failed to execute command line or to write the benchmark nane into the target file
+     * @throws IOException Failed to execute command line or to write the benchmark name into the target file
      */
     public void execute(String... arguments) throws URISyntaxException, IOException {
         ServiceLoader<BenchmarkInfo> serviceLoader = ServiceLoader.load(BenchmarkInfo.class);

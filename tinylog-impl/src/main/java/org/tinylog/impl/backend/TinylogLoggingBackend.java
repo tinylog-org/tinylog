@@ -135,7 +135,7 @@ public class TinylogLoggingBackend implements LoggingBackend {
      * Gets the level configuration for a class.
      *
      * <p>
-     *     If there is level configuration for the passed class, it will be returned. Otherwise the level configuration
+     *     If there is level configuration for the passed class, it will be returned. Otherwise, the level configuration
      *     for the most concrete package or the global root will be returned.
      * </p>
      *

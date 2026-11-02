@@ -36,11 +36,11 @@ class VmStackTraceElementFunction implements Function<String, Object> {
     }
 
     /**
-     * Finds the first stace trace element of the caller of the class with passed fully-qualified class name.
+     * Finds the first stack trace element of the caller of the class with passed fully-qualified class name.
      *
      * @param trace The stack trace in which to search for the caller
      * @param className The fully-qualified class name
-     * @return The stace trace element of the caller if found, otherwise {@code null}
+     * @return The stack trace element of the caller if found, otherwise {@code null}
      */
     private StackTraceElement findStackTraceElement(StackTraceElement[] trace, String className) {
         int index = stackTraceSkipCount;

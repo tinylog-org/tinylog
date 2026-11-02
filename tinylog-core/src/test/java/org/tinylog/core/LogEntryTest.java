@@ -169,7 +169,7 @@ class LogEntryTest {
     /**
      * Verifies that the stored severity level can be received.
      *
-     * @param level The severiyt level to test
+     * @param level The severity level to test
      */
     @ParameterizedTest
     @EnumSource(mode = EnumSource.Mode.EXCLUDE, names = "OFF")

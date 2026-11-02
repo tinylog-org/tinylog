@@ -18,7 +18,7 @@ public interface Writer extends AutoCloseable {
      *
      * <p>
      *     tinylog calls this method only once during the initialization phase and assumes that the output details will
-     *     never change afterwards.
+     *     never change afterward.
      * </p>
      *
      * @return The output detail for this writer

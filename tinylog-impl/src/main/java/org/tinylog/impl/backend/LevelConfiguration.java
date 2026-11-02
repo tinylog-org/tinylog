@@ -67,7 +67,7 @@ class LevelConfiguration {
     /**
      * Gets the least severe configured severity level.
      *
-     * @return The least severe configured severity leve
+     * @return The least severe configured severity level
      */
     Level getLeastSevereLevel() {
         return levels.values().stream().reduce(Level.OFF, Level::leastSevereLevel);

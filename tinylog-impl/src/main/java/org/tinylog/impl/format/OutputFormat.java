@@ -13,7 +13,7 @@ public interface OutputFormat {
      *
      * <p>
      *     tinylog calls this method only once during the initialization phase and assumes that the output details will
-     *     never change afterwards.
+     *     never change afterward.
      * </p>
      *
      * @return The output detail for this output format

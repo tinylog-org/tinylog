@@ -46,7 +46,7 @@ class BenchmarkMergerTest {
      * Writes a text path.
      *
      * <p>
-     *     Non existing sub folders are created automatically.
+     *     Non-existing sub folders are created automatically.
      * </p>
      *
      * @param path The path to the text file

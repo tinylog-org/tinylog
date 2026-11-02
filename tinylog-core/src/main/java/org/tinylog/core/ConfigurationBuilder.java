@@ -60,7 +60,7 @@ public class ConfigurationBuilder {
      * Sets a value for a given key. If another value is already stored under the passed key, the old value will be
      * overwritten with the new value.
      *
-     * @param key The key under which the value should to be stored
+     * @param key The key under which the value should be stored
      * @param value The value to store
      * @return The same configuration builder instance
      */

@@ -40,7 +40,7 @@ public interface ContextStorage {
      * Replaces the current thread-based context values with the passed values.
      *
      * <p>
-     *     All currently stored values are removed, even if a associated key is not present in the passed mapping.
+     *     All currently stored values are removed, even if an associated key is not present in the passed mapping.
      * </p>
      *
      * @param mapping New context values
@@ -59,7 +59,7 @@ public interface ContextStorage {
     void remove(String key);
 
     /**
-     * Removes all stored context values. This storage will be empty afterwards.
+     * Removes all stored context values. This storage will be empty afterward.
      */
     void clear();
 

@@ -20,7 +20,7 @@ public final class Application {
      *
      * @param args The arguments for JMH
      * @throws URISyntaxException Failed to convert the location URL of the logger class into a valid URI
-     * @throws IOException Failed to execute command line or to write the benchmark nane into the target file
+     * @throws IOException Failed to execute command line or to write the benchmark name into the target file
      */
     public static void main(String[] args) throws URISyntaxException, IOException {
         new BenchmarkExecutor(Main::main).execute(args);
