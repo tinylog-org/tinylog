@@ -60,7 +60,15 @@ public class Configuration {
             return parent == null ? Locale.getDefault() : parent.getLocale();
         } else {
             String[] tokens = value.split("_", MAX_LOCALE_ARGUMENTS);
-            return new Locale(tokens[0], tokens.length > 1 ? tokens[1] : "", tokens.length > 2 ? tokens[2] : "");
+            Locale.Builder builder = new Locale.Builder();
+            builder.setLanguage(tokens[0]);
+            if (tokens.length > 1) {
+                builder.setRegion(tokens[1]);
+            }
+            if (tokens.length > 2) {
+                builder.setVariant(tokens[2]);
+            }
+            return builder.build();
         }
     }
 
