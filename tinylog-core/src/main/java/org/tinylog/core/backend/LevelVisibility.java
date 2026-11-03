@@ -89,20 +89,14 @@ public final class LevelVisibility {
      * @throws IllegalArgumentException If the passed severity level is invalid (e.g. {@link Level#OFF})
      */
     public OutputDetails get(Level level) {
-        switch (level) {
-            case ERROR:
-                return getError();
-            case WARN:
-                return getWarn();
-            case INFO:
-                return getInfo();
-            case DEBUG:
-                return getDebug();
-            case TRACE:
-                return getTrace();
-            default:
-                throw new IllegalArgumentException("Illegal severity level: " + level);
-        }
+        return switch (level) {
+            case ERROR -> getError();
+            case WARN -> getWarn();
+            case INFO -> getInfo();
+            case DEBUG -> getDebug();
+            case TRACE -> getTrace();
+            default -> throw new IllegalArgumentException("Illegal severity level: " + level);
+        };
     }
 
 }

@@ -163,21 +163,17 @@ public class UptimePlaceholder implements Placeholder {
      * @return The created resolve function if the passed time unit is supported, otherwise {@code null}
      */
     private static ToLongFunction<Duration> createTimeUnitResolver(char timeUnit, int length, boolean firstTimeUnit) {
-        switch (timeUnit) {
-            case 'S':
+        return switch (timeUnit) {
+            case 'S' -> {
                 double multiplier = Math.pow(DECIMAL_BASE, length - NANOS_SCALE);
-                return duration -> (long) (duration.getNano() * multiplier);
-            case 's':
-                return firstTimeUnit ? Duration::getSeconds : duration -> duration.getSeconds() % SECONDS_PER_MINUTE;
-            case 'm':
-                return firstTimeUnit ? Duration::toMinutes : duration -> duration.toMinutes() % MINUTES_PER_HOUR;
-            case 'H':
-                return firstTimeUnit ? Duration::toHours : duration -> duration.toHours() % HOURS_PER_DAY;
-            case 'd':
-                return Duration::toDays;
-            default:
-                return null;
-        }
+                yield duration -> (long) (duration.getNano() * multiplier);
+            }
+            case 's' -> firstTimeUnit ? Duration::getSeconds : duration -> duration.getSeconds() % SECONDS_PER_MINUTE;
+            case 'm' -> firstTimeUnit ? Duration::toMinutes : duration -> duration.toMinutes() % MINUTES_PER_HOUR;
+            case 'H' -> firstTimeUnit ? Duration::toHours : duration -> duration.toHours() % HOURS_PER_DAY;
+            case 'd' -> Duration::toDays;
+            default -> null;
+        };
     }
 
     /**

@@ -68,30 +68,20 @@ public final class JavaRuntime extends AbstractRuntime {
 
     @Override
     public Supplier<Object> getDirectCaller(OutputDetails outputDetails) {
-        switch (outputDetails) {
-            case ENABLED_WITH_FULL_LOCATION_INFO:
-                return stackTraceElementSupplier;
-
-            case ENABLED_WITH_CALLER_CLASS_NAME:
-                return callerClassSupplier;
-
-            default:
-                return nullSupplier;
-        }
+        return switch (outputDetails) {
+            case ENABLED_WITH_FULL_LOCATION_INFO -> stackTraceElementSupplier;
+            case ENABLED_WITH_CALLER_CLASS_NAME -> callerClassSupplier;
+            default -> nullSupplier;
+        };
     }
 
     @Override
     public Function<String, Object> getRelativeCaller(OutputDetails outputDetails) {
-        switch (outputDetails) {
-            case ENABLED_WITH_FULL_LOCATION_INFO:
-                return stackTraceElementFunction;
-
-            case ENABLED_WITH_CALLER_CLASS_NAME:
-                return callerClassFunction;
-
-            default:
-                return nullFunction;
-        }
+        return switch (outputDetails) {
+            case ENABLED_WITH_FULL_LOCATION_INFO -> stackTraceElementFunction;
+            case ENABLED_WITH_CALLER_CLASS_NAME -> callerClassFunction;
+            default -> nullFunction;
+        };
     }
 
 }

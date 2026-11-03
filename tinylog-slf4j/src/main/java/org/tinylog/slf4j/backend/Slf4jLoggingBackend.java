@@ -128,21 +128,17 @@ public class Slf4jLoggingBackend implements LoggingBackend {
      * @return {@code true} if log entries of the passed marker and severity level will be output, {@code false} if not
      */
     private boolean isEnabled(Logger logger, Marker marker, Level level) {
-        switch (level) {
-            case TRACE:
-                return logger.isTraceEnabled(marker);
-            case DEBUG:
-                return logger.isDebugEnabled(marker);
-            case INFO:
-                return logger.isInfoEnabled(marker);
-            case WARN:
-                return logger.isWarnEnabled(marker);
-            case ERROR:
-                return logger.isErrorEnabled(marker);
-            default:
+        return switch (level) {
+            case TRACE -> logger.isTraceEnabled(marker);
+            case DEBUG -> logger.isDebugEnabled(marker);
+            case INFO -> logger.isInfoEnabled(marker);
+            case WARN -> logger.isWarnEnabled(marker);
+            case ERROR -> logger.isErrorEnabled(marker);
+            default -> {
                 internalLogger.log(Level.ERROR, "Illegal severity level \"{}\"", level);
-                return false;
-        }
+                yield false;
+            }
+        };
     }
 
     /**

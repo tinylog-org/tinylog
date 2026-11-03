@@ -540,20 +540,14 @@ public class TinylogLogger implements LocationAwareLogger, LoggingEventAware {
      * @throws IllegalArgumentException Passed an invalid SLF4J level code
      */
     private Level getLevel(int levelCode) {
-        switch (levelCode) {
-            case TRACE_INT:
-                return Level.TRACE;
-            case DEBUG_INT:
-                return Level.DEBUG;
-            case INFO_INT:
-                return Level.INFO;
-            case WARN_INT:
-                return Level.WARN;
-            case ERROR_INT:
-                return Level.ERROR;
-            default:
-                throw new IllegalArgumentException("Invalid level code " + levelCode);
-        }
+        return switch (levelCode) {
+            case TRACE_INT -> Level.TRACE;
+            case DEBUG_INT -> Level.DEBUG;
+            case INFO_INT -> Level.INFO;
+            case WARN_INT -> Level.WARN;
+            case ERROR_INT -> Level.ERROR;
+            default -> throw new IllegalArgumentException("Invalid level code " + levelCode);
+        };
     }
 
     /**
