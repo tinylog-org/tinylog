@@ -48,18 +48,15 @@ public final class LocationInfoAssert extends AbstractAssert<LocationInfoAssert,
     public LocationInfoAssert hasClass(Class<?> expectedClass) {
         isInstanceOfAny(StackTraceElement.class, Class.class, String.class);
 
-        if (actual instanceof StackTraceElement) {
-            StackTraceElement actualElement = (StackTraceElement) actual;
+        if (actual instanceof StackTraceElement actualElement) {
             if (Objects.equals(actualElement.getClassName(), expectedClass.getName())) {
                 return this;
             }
-        } else if (actual instanceof Class<?>) {
-            Class<?> actualClass = (Class<?>) actual;
+        } else if (actual instanceof Class<?> actualClass) {
             if (Objects.equals(actualClass, expectedClass)) {
                 return this;
             }
-        } else if (actual instanceof String) {
-            String actualClassName = (String) actual;
+        } else if (actual instanceof String actualClassName) {
             if (Objects.equals(actualClassName, expectedClass.getName())) {
                 return this;
             }

@@ -45,8 +45,7 @@ public final class LocationResolver {
      * @return The method name or {@code null}
      */
     public static String getMethodName(Object location) {
-        if (location instanceof StackTraceElement) {
-            StackTraceElement stackTraceElement = (StackTraceElement) location;
+        if (location instanceof StackTraceElement stackTraceElement) {
             return normalizeMethodName(stackTraceElement.getMethodName());
         } else {
             return null;
@@ -60,8 +59,7 @@ public final class LocationResolver {
      * @return The source file name or {@code null}
      */
     public static String getFileName(Object location) {
-        if (location instanceof StackTraceElement) {
-            StackTraceElement stackTraceElement = (StackTraceElement) location;
+        if (location instanceof StackTraceElement stackTraceElement) {
             return stackTraceElement.getFileName();
         } else {
             return null;
@@ -75,8 +73,7 @@ public final class LocationResolver {
      * @return The line number of the source file or {@code -1}
      */
     public static int getLineNumber(Object location) {
-        if (location instanceof StackTraceElement) {
-            StackTraceElement stackTraceElement = (StackTraceElement) location;
+        if (location instanceof StackTraceElement stackTraceElement) {
             return stackTraceElement.getLineNumber();
         } else {
             return -1;

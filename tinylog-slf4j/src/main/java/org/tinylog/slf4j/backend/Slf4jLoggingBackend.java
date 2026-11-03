@@ -82,8 +82,7 @@ public class Slf4jLoggingBackend implements LoggingBackend {
             message = throwable.getMessage();
         }
 
-        if (logger instanceof LocationAwareLogger) {
-            LocationAwareLogger locationAwareLogger = (LocationAwareLogger) logger;
+        if (logger instanceof LocationAwareLogger locationAwareLogger) {
             locationAwareLogger.log(
                 marker,
                 Slf4jLoggingBackend.class.getName(),
