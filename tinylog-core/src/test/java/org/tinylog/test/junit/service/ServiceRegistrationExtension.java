@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -66,8 +67,10 @@ public class ServiceRegistrationExtension extends AbstractParameterizedExtension
 
         Path folder = get(context, Path.class);
         if (folder != null) {
-            for (Path path : Files.walk(folder).sorted(Comparator.reverseOrder()).toArray(Path[]::new)) {
-                Files.deleteIfExists(path);
+            try (Stream<Path> stream = Files.walk(folder)) {
+                for (Path path : stream.sorted(Comparator.reverseOrder()).toArray(Path[]::new)) {
+                    Files.deleteIfExists(path);
+                }
             }
         }
     }
