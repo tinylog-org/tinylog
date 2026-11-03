@@ -35,9 +35,8 @@ public interface PolicyBuilder {
      * @param context The tinylog context to use for creating a new policy
      * @param value An optional configuration value for the policy
      * @return New instance of the policy
-     * @throws Exception If failed to create a new policy for the passed configuration value
      */
-    Policy create(TinylogContext context, String value) throws Exception;
+    Policy create(TinylogContext context, String value);
 
     /**
      * Loads and creates all available policy builders.

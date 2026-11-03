@@ -35,7 +35,7 @@ public class ConsoleWriter implements Writer {
     }
 
     @Override
-    public void log(LogEntry entry) throws Exception {
+    public void log(LogEntry entry) {
         StringBuilder builder = new StringBuilder(BUILDER_CAPACITY);
         format.render(builder, entry);
 

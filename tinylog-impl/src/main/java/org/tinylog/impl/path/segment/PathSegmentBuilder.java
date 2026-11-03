@@ -36,9 +36,8 @@ public interface PathSegmentBuilder {
      * @param context The tinylog context to use for creating a new path segment
      * @param value An optional configuration value for the path segment
      * @return New path segment instance
-     * @throws Exception If failed to create a new path segment for the passed configuration value
      */
-    PathSegment create(TinylogContext context, String value) throws Exception;
+    PathSegment create(TinylogContext context, String value);
 
     /**
      * Loads and creates all available path segment builders.
