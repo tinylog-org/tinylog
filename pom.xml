@@ -18,8 +18,8 @@
         <builder.name>tinylog.org</builder.name>
         <kotlin.compiler.languageVersion>2.4</kotlin.compiler.languageVersion>
         <kotlin.compiler.apiVersion>2.4</kotlin.compiler.apiVersion>
-        <kotlin.compiler.jvmTarget>21</kotlin.compiler.jvmTarget>
-        <maven.compiler.release>21</maven.compiler.release>
+        <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
+        <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <root.basedir>${project.basedir}</root.basedir>
         <website.url>https://tinylog.org/</website.url>

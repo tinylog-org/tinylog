@@ -56,7 +56,7 @@ class ConfigurationTest {
         @Tinylog(configuration = "locale=de")
         @Test
         void getExistingLocaleWithLanguageOnly() {
-            assertThat(configuration.getLocale()).isEqualTo(Locale.of("de"));
+            assertThat(configuration.getLocale()).isEqualTo(new Locale("de"));
         }
 
         /**
@@ -65,7 +65,7 @@ class ConfigurationTest {
         @Tinylog(configuration = "locale=it_CH")
         @Test
         void getExistingLocaleWithLanguageAndCountry() {
-            assertThat(configuration.getLocale()).isEqualTo(Locale.of("it", "CH"));
+            assertThat(configuration.getLocale()).isEqualTo(new Locale("it", "CH"));
         }
 
         /**
@@ -74,7 +74,7 @@ class ConfigurationTest {
         @Tinylog(configuration = "locale=en_US_POSIX")
         @Test
         void getExistingFullLocale() {
-            assertThat(configuration.getLocale()).isEqualTo(Locale.of("en", "US", "POSIX"));
+            assertThat(configuration.getLocale()).isEqualTo(new Locale("en", "US", "POSIX"));
         }
 
         /**
