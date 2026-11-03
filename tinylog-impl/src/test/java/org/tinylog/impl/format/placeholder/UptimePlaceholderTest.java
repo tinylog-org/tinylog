@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 import org.tinylog.core.LogEntry;
 import org.tinylog.core.backend.OutputDetails;
 import org.tinylog.core.runtime.RuntimeFlavor;
@@ -98,7 +99,7 @@ class UptimePlaceholderTest {
     private static final class FormatPatternsProvider implements ArgumentsProvider {
 
         @Override
-        public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+        public Stream<Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
             return Stream.of(
                 /* Minimum second fraction digits */
                 Arguments.of(Duration.ofMillis(100).minusNanos(1), "S", "0"),
@@ -195,7 +196,7 @@ class UptimePlaceholderTest {
     private static final class BigDecimalsProvider implements ArgumentsProvider {
 
         @Override
-        public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+        public Stream<Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
             return Stream.of(
                 Arguments.of(Duration.ofSeconds(0), new BigDecimal("0.000000000")),
                 Arguments.of(Duration.ofSeconds(1).minusNanos(1), new BigDecimal("0.999999999")),

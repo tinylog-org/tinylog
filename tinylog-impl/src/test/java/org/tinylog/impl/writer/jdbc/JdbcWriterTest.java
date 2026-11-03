@@ -28,6 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 import org.mockito.MockedStatic;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
@@ -639,7 +640,7 @@ class JdbcWriterTest {
     private static final class IllegalCharacterProvider implements ArgumentsProvider {
 
         @Override
-        public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+        public Stream<Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
             return Stream.of(
                 /* Without quote character (space according to JDBC specification) */
                 Arguments.of("\u0000", " "),

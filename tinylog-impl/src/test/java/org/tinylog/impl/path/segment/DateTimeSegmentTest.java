@@ -16,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 import org.tinylog.core.Configuration;
 import org.tinylog.core.Level;
 import org.tinylog.core.internal.InternalLogger;
@@ -155,7 +156,7 @@ class DateTimeSegmentTest {
     private static final class DateTimePatternProvider implements ArgumentsProvider {
 
         @Override
-        public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+        public Stream<Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context) {
             return Stream.of(
                 Arguments.of("yyyy-MM-dd_HH-mmVV", "2000-01-01_00-00Z", "2000-02-01_00-00Z", "2000-03-01_00-00Z"),
                 Arguments.of("yyyy-MM-dd_HH-mmX", "2000-01-01_00-00+01", "2000-02-01_00-00+01", "2000-03-01_00-00+01"),
