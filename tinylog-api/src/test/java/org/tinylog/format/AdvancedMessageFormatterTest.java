@@ -270,4 +270,23 @@ public final class AdvancedMessageFormatterTest {
 		return new AdvancedMessageFormatter(locale, escape).format(message, arguments);
 	}
 
+	/**
+	 * Verifies that an escaped placeholder can end at the final character.
+	 */
+	@Test
+	public void ignoreEscapedPlaceholdersAtEnd() {
+		assumeThat(escape).isTrue();
+		assertThat(format("'{}'", "foo")).isEqualTo("{}");
+		assertThat(format("{} '{bar}'", "foo")).isEqualTo("foo {bar}");
+	}
+
+	/**
+	 * Verifies that unmatched trailing ticks remain literal.
+	 */
+	@Test
+	public void keepTrailingSingleTick() {
+		assertThat(format("hello'")).isEqualTo("hello'");
+		assertThat(format("'")).isEqualTo("'");
+	}
+
 }

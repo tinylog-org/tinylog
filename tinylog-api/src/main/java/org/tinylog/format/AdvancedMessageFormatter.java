@@ -73,8 +73,8 @@ public class AdvancedMessageFormatter extends AbstractMessageFormatter {
 
 		for (int index = 0; index < length; ++index) {
 			char character = message.charAt(index);
-			if (escape && character == '\'' && index + 1 < length && openingCurlyBracketsCount == 0) {
-				if (message.charAt(index + 1) == '\'') {
+			if (escape && character == '\'' && openingCurlyBracketsCount == 0) {
+				if (index + 1 < length && message.charAt(index + 1) == '\'') {
 					builder.append('\'');
 					index += 1;
 				} else {
