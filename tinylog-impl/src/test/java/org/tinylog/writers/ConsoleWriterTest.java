@@ -233,13 +233,13 @@ public final class ConsoleWriterTest {
 	}
 	
 	/**
-	 * Verifies that log entries are written in chronological order, even if standard output stream is buffered.
+	 * Verifies that info and error entries stay interleaved when stdout and stderr are buffered separately.
 	 *
 	 * @throws UnsupportedEncodingException
 	 *             UTF-8 is not supported
 	 */
 	@Test
-	public void chronologicalOrderWithBufferedStandardOutputStream() throws UnsupportedEncodingException {
+	public void chronologicalOrderWithSeparatelyBufferedStreams() throws UnsupportedEncodingException {
 		List<String> writeOrder = new ArrayList<String>();
 		PrintStream originalStandardStream = System.out;
 		PrintStream originalErrorStream = System.err;
@@ -268,7 +268,7 @@ public final class ConsoleWriterTest {
 				}
 			};
 			System.setOut(new PrintStream(new BufferedOutputStream(outSink), false, "UTF-8"));
-			System.setErr(new PrintStream(errSink, true, "UTF-8"));
+			System.setErr(new PrintStream(new BufferedOutputStream(errSink), false, "UTF-8"));
 
 			ConsoleWriter writer = new ConsoleWriter(singletonMap("format", "{message}"));
 			writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("1 Test Trace").create());
@@ -304,7 +304,7 @@ public final class ConsoleWriterTest {
 	@Test
 	public void errorOutputStreamForEmptyLogger() {
 		ConsoleWriter writer = new ConsoleWriter();
-		writer.flush(); // Flushes buffered console streams
+		writer.flush(); // Does nothing but gets coverage for flush
 
 		writer.write(LogEntryBuilder.empty().level(Level.TRACE).message("Hello World!").date(LocalDate.now()).create());
 		assertThat(systemStream.consumeStandardOutput()).contains("Hello World!" + NEW_LINE);

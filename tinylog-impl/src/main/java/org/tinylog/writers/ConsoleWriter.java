@@ -97,8 +97,6 @@ public final class ConsoleWriter extends AbstractFormatPatternWriter {
 
 	@Override
 	public void flush() {
-		System.out.flush();
-		System.err.flush();
 	}
 
 	@Override
