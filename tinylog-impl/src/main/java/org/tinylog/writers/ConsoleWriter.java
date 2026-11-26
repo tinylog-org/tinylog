@@ -85,10 +85,13 @@ public final class ConsoleWriter extends AbstractFormatPatternWriter {
 
 	@Override
 	public void write(final LogEntry logEntry) {
+		String rendered = render(logEntry);
 		if (logEntry.getLevel().ordinal() < errorLevel.ordinal()) {
-			System.out.print(render(logEntry));
+			System.out.print(rendered);
+			System.out.flush();
 		} else {
-			System.err.print(render(logEntry));
+			System.err.print(rendered);
+			System.err.flush();
 		}
 	}
 
